@@ -7,36 +7,36 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #f5f5f5; }
-    .header { background: #ff6b35; color: white; padding: 15px; text-align: center; }
-    .container { padding: 15px; max-width: 500px; margin: 0 auto; }
-    .card { background: white; border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .btn { padding: 12px; border: none; border-radius: 5px; font-weight: bold; font-size: 16px; width: 100%; margin: 5px 0; cursor: pointer; }
-    .btn-checkout { background: #28a745; color: white; }
-    .btn-expense { background: #dc3545; color: white; }
-    .btn-view { background: #6c757d; color: white; }
-    .btn-stock { background: #17a2b8; color: white; }
-    .btn-price { background: #ffc107; color: black; }
-    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 9999; }
-    .modal-content { background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; }
-    .hidden { display: none!important; }
+   .header { background: #ff6b35; color: white; padding: 15px; text-align: center; }
+   .container { padding: 15px; max-width: 500px; margin: 0 auto; }
+   .card { background: white; border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+   .btn { padding: 12px; border: none; border-radius: 5px; font-weight: bold; font-size: 16px; width: 100%; margin: 5px 0; cursor: pointer; }
+   .btn-checkout { background: #28a745; color: white; }
+   .btn-expense { background: #dc3545; color: white; }
+   .btn-view { background: #6c757d; color: white; }
+   .btn-stock { background: #17a2b8; color: white; }
+   .btn-price { background: #ffc107; color: black; }
+   .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+   .modal-content { background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; }
+   .hidden { display: none!important; }
         input, select { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 5px; }
-    .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
-    .qty-btn { background: #ff6b35; color: white; border: none; width: 35px; height: 35px; border-radius: 5px; font-weight: bold; font-size: 18px; cursor: pointer; position: relative; }
-    .qty-btn:disabled { background: #ccc; cursor: not-allowed; }
-    .qty-input { width: 40px; height: 35px; text-align: center; border: 2px solid #ff6b35; border-radius: 5px; font-weight: bold; margin-right: 5px; }
-    .stock-badge { background: #28a745; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; margin-left: 5px; }
-    .stock-badge.low { background: #ffc107; color: black; }
-    .stock-badge.out { background: #dc3545; }
-    .cart-badge { background: #007bff; color: white; padding: 2px 6px; border-radius: 10px; font-size: 10px; position: absolute; top: -5px; right: -5px; font-weight: bold; }
-    .envelope-btn { background: #ff6b35; color: white; padding: 15px; margin: 8px 0; border: none; border-radius: 8px; font-weight: bold; font-size: 18px; width: 100%; text-align: left; position: relative; cursor: pointer; }
-    .envelope-btn:after { content: '▼'; position: absolute; right: 15px; }
-    .envelope-btn.active:after { content: '▲'; }
-    .envelope-content { background: #fff5f2; border-radius: 0 0 8px 8px; padding: 10px; margin-top: -8px; margin-bottom: 8px; border: 2px solid #ff6b35; border-top: none; }
-    .grid-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 5px 0; }
-    .grid-item { background: white; border: 2px solid #ff6b35; border-radius: 8px; padding: 8px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; min-height: 140px; }
-    .grid-item-name { font-weight: bold; font-size: 12px; margin-bottom: 3px; }
-    .grid-item-price { color: #ff6b35; font-weight: bold; font-size: 15px; margin-bottom: 5px; }
-    .grid-item-controls { display: flex; justify-content: center; align-items: center; }
+   .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+   .qty-btn { background: #ff6b35; color: white; border: none; width: 35px; height: 35px; border-radius: 5px; font-weight: bold; font-size: 18px; cursor: pointer; position: relative; }
+   .qty-btn:disabled { background: #ccc; cursor: not-allowed; }
+   .qty-input { width: 40px; height: 35px; text-align: center; border: 2px solid #ff6b35; border-radius: 5px; font-weight: bold; margin-right: 5px; }
+   .stock-badge { background: #28a745; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; margin-left: 5px; }
+   .stock-badge.low { background: #ffc107; color: black; }
+   .stock-badge.out { background: #dc3545; }
+   .cart-badge { background: #007bff; color: white; padding: 2px 6px; border-radius: 10px; font-size: 10px; position: absolute; top: -5px; right: -5px; font-weight: bold; }
+   .envelope-btn { background: #ff6b35; color: white; padding: 15px; margin: 8px 0; border: none; border-radius: 8px; font-weight: bold; font-size: 18px; width: 100%; text-align: left; position: relative; cursor: pointer; }
+   .envelope-btn:after { content: '▼'; position: absolute; right: 15px; }
+   .envelope-btn.active:after { content: '▲'; }
+   .envelope-content { background: #fff5f2; border-radius: 0 0 8px 8px; padding: 10px; margin-top: -8px; margin-bottom: 8px; border: 2px solid #ff6b35; border-top: none; }
+   .grid-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 5px 0; }
+   .grid-item { background: white; border: 2px solid #ff6b35; border-radius: 8px; padding: 8px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; min-height: 140px; }
+   .grid-item-name { font-weight: bold; font-size: 12px; margin-bottom: 3px; }
+   .grid-item-price { color: #ff6b35; font-weight: bold; font-size: 15px; margin-bottom: 5px; }
+   .grid-item-controls { display: flex; justify-content: center; align-items: center; }
     </style>
 </head>
 <body>
@@ -65,6 +65,11 @@
             <button class="envelope-btn" onclick="toggleEnvelope('envSiopao', this)">📁 SIOPAO</button>
             <div id="envSiopao" class="envelope-content hidden">
                 <div class="grid-menu" id="gridSiopao"></div>
+            </div>
+
+            <button class="envelope-btn" onclick="toggleEnvelope('envDumplings', this)">📁 DUMPLINGS</button>
+            <div id="envDumplings" class="envelope-content hidden">
+                <div class="grid-menu" id="gridDumplings"></div>
             </div>
 
             <button class="envelope-btn" onclick="toggleEnvelope('envSauce', this)">📁 SAUCE</button>
@@ -152,11 +157,18 @@
         const items30 = ['Pork Siomai 30', 'Chicken Siomai 30', 'Beef Siomai 30', 'Shrimp Siomai 30', 'Japanese Siomai 30'];
         const itemsBig = ['BIG Pork Siomai', 'BIG Chicken Siomai', 'BIG Beef Siomai', 'BIG Japanese Siomai'];
         const itemsSiopao = ['JUMBO Asado', 'MINI Asado', 'JUMBO Bola-Bola', 'MINI Bola-Bola'];
+        const itemsDumplings = ['Gyoza', 'Sharkspin', 'HAKAW'];
         const itemsSauce = ['Chili Garlic', 'Siopao Sauce'];
-        const allItems = [...items65,...items30,...itemsBig,...itemsSiopao,...itemsSauce];
+        const allItems = [...items65,...items30,...itemsBig,...itemsSiopao,...itemsDumplings,...itemsSauce];
 
-        // Default prices
-        const defaultPrices = { 'Pork Siomai 65': 65, 'Chicken Siomai 65': 65, 'Beef Siomai 65': 65, 'Shrimp Siomai 65': 65, 'Pork Siomai 30': 30, 'Chicken Siomai 30': 30, 'Beef Siomai 30': 30, 'Shrimp Siomai 30': 30, 'Japanese Siomai 30': 30, 'BIG Pork Siomai': 85, 'BIG Chicken Siomai': 85, 'BIG Beef Siomai': 85, 'BIG Japanese Siomai': 85, 'JUMBO Asado': 35, 'MINI Asado': 20, 'JUMBO Bola-Bola': 35, 'MINI Bola-Bola': 20, 'Chili Garlic': 10, 'Siopao Sauce': 5 };
+        const defaultPrices = {
+            'Pork Siomai 65': 65, 'Chicken Siomai 65': 65, 'Beef Siomai 65': 65, 'Shrimp Siomai 65': 65,
+            'Pork Siomai 30': 30, 'Chicken Siomai 30': 30, 'Beef Siomai 30': 30, 'Shrimp Siomai 30': 30, 'Japanese Siomai 30': 30,
+            'BIG Pork Siomai': 85, 'BIG Chicken Siomai': 85, 'BIG Beef Siomai': 85, 'BIG Japanese Siomai': 85,
+            'JUMBO Asado': 35, 'MINI Asado': 20, 'JUMBO Bola-Bola': 35, 'MINI Bola-Bola': 20,
+            'Gyoza': 70, 'Sharkspin': 75, 'HAKAW': 80,
+            'Chili Garlic': 10, 'Siopao Sauce': 5
+        };
 
         allItems.forEach(item => {
             if (stockData[item] === undefined) stockData[item] = 0;
@@ -164,7 +176,7 @@
         });
 
         function renderGrid() {
-            const grids = { 'grid65': items65, 'grid30': items30, 'gridBig': itemsBig, 'gridSiopao': itemsSiopao, 'gridSauce': itemsSauce };
+            const grids = { 'grid65': items65, 'grid30': items30, 'gridBig': itemsBig, 'gridSiopao': itemsSiopao, 'gridDumplings': itemsDumplings, 'gridSauce': itemsSauce };
             Object.keys(grids).forEach(gridId => {
                 const grid = document.getElementById(gridId);
                 grid.innerHTML = '';
