@@ -7,36 +7,38 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #f5f5f5; }
-   .header { background: #ff6b35; color: white; padding: 15px; text-align: center; }
-   .container { padding: 15px; max-width: 500px; margin: 0 auto; }
-   .card { background: white; border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-   .btn { padding: 12px; border: none; border-radius: 5px; font-weight: bold; font-size: 16px; width: 100%; margin: 5px 0; cursor: pointer; }
-   .btn-checkout { background: #28a745; color: white; }
-   .btn-expense { background: #dc3545; color: white; }
-   .btn-view { background: #6c757d; color: white; }
-   .btn-stock { background: #17a2b8; color: white; }
-   .btn-price { background: #ffc107; color: black; }
-   .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 9999; }
-   .modal-content { background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; }
-   .hidden { display: none!important; }
-        input, select { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 5px; }
-   .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
-   .qty-btn { background: #ff6b35; color: white; border: none; width: 35px; height: 35px; border-radius: 5px; font-weight: bold; font-size: 18px; cursor: pointer; position: relative; }
-   .qty-btn:disabled { background: #ccc; cursor: not-allowed; }
-   .qty-input { width: 40px; height: 35px; text-align: center; border: 2px solid #ff6b35; border-radius: 5px; font-weight: bold; margin-right: 5px; }
-   .stock-badge { background: #28a745; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; margin-left: 5px; }
-   .stock-badge.low { background: #ffc107; color: black; }
-   .stock-badge.out { background: #dc3545; }
-   .cart-badge { background: #007bff; color: white; padding: 2px 6px; border-radius: 10px; font-size: 10px; position: absolute; top: -5px; right: -5px; font-weight: bold; }
-   .envelope-btn { background: #ff6b35; color: white; padding: 15px; margin: 8px 0; border: none; border-radius: 8px; font-weight: bold; font-size: 18px; width: 100%; text-align: left; position: relative; cursor: pointer; }
-   .envelope-btn:after { content: '▼'; position: absolute; right: 15px; }
-   .envelope-btn.active:after { content: '▲'; }
-   .envelope-content { background: #fff5f2; border-radius: 0 0 8px 8px; padding: 10px; margin-top: -8px; margin-bottom: 8px; border: 2px solid #ff6b35; border-top: none; }
-   .grid-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 5px 0; }
-   .grid-item { background: white; border: 2px solid #ff6b35; border-radius: 8px; padding: 8px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; min-height: 140px; }
-   .grid-item-name { font-weight: bold; font-size: 12px; margin-bottom: 3px; }
-   .grid-item-price { color: #ff6b35; font-weight: bold; font-size: 15px; margin-bottom: 5px; }
-   .grid-item-controls { display: flex; justify-content: center; align-items: center; }
+  .header { background: #ff6b35; color: white; padding: 15px; text-align: center; }
+  .container { padding: 15px; max-width: 500px; margin: 0 auto; }
+  .card { background: white; border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+  .btn { padding: 12px; border: none; border-radius: 5px; font-weight: bold; font-size: 16px; width: 100%; margin: 5px 0; cursor: pointer; }
+  .btn-checkout { background: #28a745; color: white; }
+  .btn-expense { background: #dc3545; color: white; }
+  .btn-view { background: #6c757d; color: white; }
+  .btn-stock { background: #17a2b8; color: white; }
+  .btn-price { background: #ffc107; color: black; }
+  .btn-backup { background: #6f42c1; color: white; }
+  .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+  .modal-content { background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; }
+  .hidden { display: none!important; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 5px; }
+  .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+  .qty-btn { background: #ff6b35; color: white; border: none; width: 35px; height: 35px; border-radius: 5px; font-weight: bold; font-size: 18px; cursor: pointer; position: relative; }
+  .qty-btn:disabled { background: #ccc; cursor: not-allowed; }
+  .qty-input { width: 40px; height: 35px; text-align: center; border: 2px solid #ff6b35; border-radius: 5px; font-weight: bold; margin-right: 5px; }
+  .stock-badge { background: #28a745; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; margin-left: 5px; }
+  .stock-badge.low { background: #ffc107; color: black; }
+  .stock-badge.out { background: #dc3545; }
+  .cart-badge { background: #007bff; color: white; padding: 2px 6px; border-radius: 10px; font-size: 10px; position: absolute; top: -5px; right: -5px; font-weight: bold; }
+  .envelope-btn { background: #ff6b35; color: white; padding: 15px; margin: 8px 0; border: none; border-radius: 8px; font-weight: bold; font-size: 18px; width: 100%; text-align: left; position: relative; cursor: pointer; }
+  .envelope-btn:after { content: '▼'; position: absolute; right: 15px; }
+  .envelope-btn.active:after { content: '▲'; }
+  .envelope-content { background: #fff5f2; border-radius: 0 0 8px 8px; padding: 10px; margin-top: -8px; margin-bottom: 8px; border: 2px solid #ff6b35; border-top: none; }
+  .grid-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 5px 0; }
+  .grid-item { background: white; border: 2px solid #ff6b35; border-radius: 8px; padding: 8px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; min-height: 140px; }
+  .grid-item-name { font-weight: bold; font-size: 12px; margin-bottom: 3px; }
+  .grid-item-price { color: #ff6b35; font-weight: bold; font-size: 15px; margin-bottom: 5px; }
+  .grid-item-controls { display: flex; justify-content: center; align-items: center; }
+  .data-info { background: #e7f3ff; padding: 10px; border-radius: 5px; font-size: 12px; margin-top: 10px; text-align: center; }
     </style>
 </head>
 <body>
@@ -46,36 +48,25 @@
             <h3>🍱 Categories - Stock: <span id="totalStockCount">0</span> pcs</h3>
             <button class="btn btn-stock" onclick="document.getElementById('stockModal').classList.remove('hidden')">📦 MANAGE STOCK</button>
             <button class="btn btn-price" onclick="document.getElementById('priceModal').classList.remove('hidden')">💲 EDIT PRICES</button>
+            <button class="btn btn-backup" onclick="document.getElementById('backupModal').classList.remove('hidden')">💾 BACKUP/RESTORE</button>
 
             <button class="envelope-btn" onclick="toggleEnvelope('env65', this)">📁 65's</button>
-            <div id="env65" class="envelope-content hidden">
-                <div class="grid-menu" id="grid65"></div>
-            </div>
+            <div id="env65" class="envelope-content hidden"><div class="grid-menu" id="grid65"></div></div>
 
             <button class="envelope-btn" onclick="toggleEnvelope('env30', this)">📁 30's</button>
-            <div id="env30" class="envelope-content hidden">
-                <div class="grid-menu" id="grid30"></div>
-            </div>
+            <div id="env30" class="envelope-content hidden"><div class="grid-menu" id="grid30"></div></div>
 
             <button class="envelope-btn" onclick="toggleEnvelope('envBig', this)">📁 BIG SIOMAI</button>
-            <div id="envBig" class="envelope-content hidden">
-                <div class="grid-menu" id="gridBig"></div>
-            </div>
+            <div id="envBig" class="envelope-content hidden"><div class="grid-menu" id="gridBig"></div></div>
 
             <button class="envelope-btn" onclick="toggleEnvelope('envSiopao', this)">📁 SIOPAO</button>
-            <div id="envSiopao" class="envelope-content hidden">
-                <div class="grid-menu" id="gridSiopao"></div>
-            </div>
+            <div id="envSiopao" class="envelope-content hidden"><div class="grid-menu" id="gridSiopao"></div></div>
 
             <button class="envelope-btn" onclick="toggleEnvelope('envDumplings', this)">📁 DUMPLINGS</button>
-            <div id="envDumplings" class="envelope-content hidden">
-                <div class="grid-menu" id="gridDumplings"></div>
-            </div>
+            <div id="envDumplings" class="envelope-content hidden"><div class="grid-menu" id="gridDumplings"></div></div>
 
             <button class="envelope-btn" onclick="toggleEnvelope('envSauce', this)">📁 SAUCE</button>
-            <div id="envSauce" class="envelope-content hidden">
-                <div class="grid-menu" id="gridSauce"></div>
-            </div>
+            <div id="envSauce" class="envelope-content hidden"><div class="grid-menu" id="gridSauce"></div></div>
         </div>
 
         <div class="card">
@@ -97,6 +88,7 @@
             <p>Items Sold: <span id="itemsSold">0</span></p>
             <button class="btn btn-expense" onclick="document.getElementById('expenseModal').classList.remove('hidden')">💸 ADD EXPENSE</button>
             <button class="btn btn-view" onclick="viewExpenses()">📋 VIEW EXPENSES</button>
+            <div class="data-info">Data expires: <span id="dataExpiryDate"></span></div>
         </div>
     </div>
 
@@ -126,6 +118,18 @@
         </div>
     </div>
 
+    <div id="backupModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>💾 Backup & Restore</h3>
+            <p style="font-size:12px;color:#666;">I-export mo data mo every month para safe. Pag nawala, import mo lang ulit.</p>
+            <button class="btn btn-backup" onclick="exportData()">📤 EXPORT ALL DATA</button>
+            <textarea id="importData" rows="4" placeholder="Paste backup data here"></textarea>
+            <button class="btn btn-stock" onclick="importData()">📥 IMPORT DATA</button>
+            <button class="btn btn-expense" onclick="resetAllData()">🗑️ RESET ALL DATA</button>
+            <button class="btn btn-view" onclick="document.getElementById('backupModal').classList.add('hidden')">CLOSE</button>
+        </div>
+    </div>
+
     <div id="expenseModal" class="modal hidden">
         <div class="modal-content">
             <h3>💸 Add Expense</h3>
@@ -146,6 +150,32 @@
     </div>
 
     <script>
+        // DATA EXPIRY SYSTEM - 1 YEAR
+        const DATA_EXPIRY_DAYS = 365;
+
+        function checkDataExpiry() {
+            const expiryDate = localStorage.getItem('dataExpiryDate');
+            const today = new Date().toISOString().split('T')[0];
+
+            if (!expiryDate) {
+                // First time - set expiry 1 year from now
+                const newExpiry = new Date();
+                newExpiry.setDate(newExpiry.getDate() + DATA_EXPIRY_DAYS);
+                localStorage.setItem('dataExpiryDate', newExpiry.toISOString().split('T')[0]);
+                document.getElementById('dataExpiryDate').textContent = newExpiry.toLocaleDateString();
+                return;
+            }
+
+            document.getElementById('dataExpiryDate').textContent = new Date(expiryDate).toLocaleDateString();
+
+            if (today >= expiryDate) {
+                if (confirm('⚠️ 1 YEAR NA ANG DATA MO BOSS!\n\nGusto mo i-archive muna bago mag-reset?\n\nOK = Export muna\nCancel = Reset agad')) {
+                    exportData();
+                }
+                resetAllData(true);
+            }
+        }
+
         let cart = [];
         let salesData = JSON.parse(localStorage.getItem('salesData')) || [];
         let expensesData = JSON.parse(localStorage.getItem('expensesData')) || [];
@@ -430,6 +460,58 @@
             document.getElementById('expenseListModal').classList.remove('hidden');
         }
 
+        function exportData() {
+            const backup = {
+                salesData: salesData,
+                expensesData: expensesData,
+                stockData: stockData,
+                priceData: priceData,
+                exportDate: new Date().toISOString()
+            };
+            const dataStr = JSON.stringify(backup);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `DhanSiomai_Backup_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            alert('✅ Backup downloaded! Save mo sa Google Drive mo boss para safe.');
+        }
+
+        function importData() {
+            const dataStr = document.getElementById('importData').value;
+            if (!dataStr) { alert('Paste mo muna yung backup data boss'); return; }
+            try {
+                const backup = JSON.parse(dataStr);
+                if (confirm('⚠️ Ooverwrite lahat ng current data mo. Sure ka boss?')) {
+                    salesData = backup.salesData || [];
+                    expensesData = backup.expensesData || [];
+                    stockData = backup.stockData || {};
+                    priceData = backup.priceData || {};
+                    localStorage.setItem('salesData', JSON.stringify(salesData));
+                    localStorage.setItem('expensesData', JSON.stringify(expensesData));
+                    localStorage.setItem('stockData', JSON.stringify(stockData));
+                    localStorage.setItem('priceData', JSON.stringify(priceData));
+                    alert('✅ Data restored! Refresh mo page boss.');
+                    location.reload();
+                }
+            } catch(e) {
+                alert('❌ Invalid backup data boss. Check mo ulit.');
+            }
+        }
+
+        function resetAllData(auto = false) {
+            if (!auto &&!confirm('⚠️ BURADO LAHAT BOSS!\n\nSales, expenses, stock, prices - lahat reset.\n\nSure ka?')) return;
+            localStorage.removeItem('salesData');
+            localStorage.removeItem('expensesData');
+            localStorage.removeItem('stockData');
+            localStorage.removeItem('priceData');
+            localStorage.removeItem('dataExpiryDate');
+            alert('✅ Reset complete! Refresh mo page.');
+            location.reload();
+        }
+
+        checkDataExpiry();
         renderGrid();
         updateSummary();
         updateCart();
