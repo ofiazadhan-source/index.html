@@ -1,1 +1,65 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dhan Siomai - Order Online</title>
+    <meta name="theme-color" content="#FF6600">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+        body{background:#f5f5f5}
+     .header{background:#FF6600;color:white;padding:15px;text-align:center;font-size:24px;font-weight:bold;position:sticky;top:0}
+     .container{max-width:500px;margin:0 auto;padding:15px}
+     .product{background:white;border:2px solid #FF6600;border-radius:8px;padding:15px;margin-bottom:15px}
+     .product h3{color:#FF6600;margin-bottom:5px}
+     .price{font-size:20px;font-weight:bold;color:#333}
+     .stock{background:#28a745;color:white;padding:2px 8px;border-radius:12px;font-size:12px;display:inline-block;margin:5px 0}
+     .stock.out{background:#dc3545}
+     .qty-controls{display:flex;gap:10px;align-items:center;margin-top:10px}
+     .qty-btn{background:#FF6600;color:white;border:none;width:35px;height:35px;border-radius:5px;font-size:20px;cursor:pointer}
+     .qty-input{width:60px;text-align:center;padding:8px;border:1px solid #ddd;border-radius:5px}
+     .cart{background:white;border:2px solid #FF6600;border-radius:8px;padding:15px;margin-top:20px;position:sticky;bottom:0}
+     .checkout-btn{background:#28a745;color:white;border:none;width:100%;padding:15px;border-radius:8px;font-size:18px;font-weight:bold;cursor:pointer;margin-top:10px}
+     .checkout-btn:disabled{background:#ccc}
+        input,textarea,select{width:100%;padding:10px;margin:5px 0;border:1px solid #ddd;border-radius:5px}
+        label{font-weight:bold;margin-top:10px;display:block}
+    </style>
+</head>
+<body>
+    <div class="header">🥟 DHAN SIOMAI - ORDER NOW</div>
+    <div class="container">
+        <div id="products"></div>
+        <div class="cart">
+            <h3>🛒 Your Order</h3>
+            <div id="cart-items">Cart is empty</div>
+            <div style="font-size:20px;font-weight:bold;margin:10px 0">Total: ₱<span id="total">0</span></div>
+            <label>Full Name:</label>
+            <input type="text" id="customer-name" placeholder="Juan Dela Cruz">
+            <label>Mobile Number:</label>
+            <input type="tel" id="customer-phone" placeholder="09123456789">
+            <label>Delivery Address:</label>
+            <textarea id="customer-address" rows="2" placeholder="House #, Street, Brgy, City"></textarea>
+            <label>Order Type:</label>
+            <select id="order-type">
+                <option value="Delivery">Delivery - ₱50 fee</option>
+                <option value="Pickup">Pickup - Free</option>
+            </select>
+            <label>Payment:</label>
+            <select id="payment">
+                <option value="COD">Cash on Delivery</option>
+                <option value="GCash">GCash - Send proof after</option>
+            </select>
+            <button class="checkout-btn" onclick="checkout()" id="checkout-btn" disabled>PLACE ORDER VIA WHATSAPP</button>
+        </div>
+    </div>
+    <script>
+        const products=[{id:1,name:"Pork 65",price:150,stock:347},{id:2,name:"Chicken 65",price:150,stock:247},{id:3,name:"Beef 65",price:150,stock:47},{id:4,name:"Shrimp 65",price:150,stock:0}];
+        let cart={};
+        function renderProducts(){const container=document.getElementById('products');container.innerHTML=products.map(p=>`<div class="product"><h3>${p.name}</h3><div class="price">₱${p.price}</div><span class="stock ${p.stock===0?'out':''}">${p.stock>0?p.stock+' pcs left':'Out of Stock'}</span><div class="qty-controls"><button class="qty-btn" onclick="updateQty(${p.id},-1)" ${p.stock===0?'disabled':''}>-</button><input type="number" class="qty-input" id="qty-${p.id}" value="0" min="0" max="${p.stock}" readonly><button class="qty-btn" onclick="updateQty(${p.id},1)" ${p.stock===0?'disabled':''}>+</button></div></div>`).join('')}
+        function updateQty(id,change){const product=products.find(p=>p.id===id);const current=cart[id]||0;const newQty=current+change;if(newQty>=0&&newQty<=product.stock){cart[id]=newQty;if(newQty===0)delete cart[id];document.getElementById(`qty-${id}`).value=newQty;updateCart()}}
+        function updateCart(){const cartDiv=document.getElementById('cart-items');const totalDiv=document.getElementById('total');const btn=document.getElementById('checkout-btn');let html='';let total=0;for(let id in cart){const product=products.find(p=>p.id==id);const qty=cart[id];const subtotal=product.price*qty;total+=subtotal;html+=`<div>${product.name} x${qty} = ₱${subtotal}</div>`}const orderType=document.getElementById('order-type').value;if(orderType==='Delivery'&&total>0){total+=50;html+=`<div>Delivery Fee = ₱50</div>`}cartDiv.innerHTML=html||'Cart is empty';totalDiv.textContent=total;btn.disabled=total===0}
+        function checkout(){const name=document.getElementById('customer-name').value;const phone=document.getElementById('customer-phone').value;const address=document.getElementById('customer-address').value;const orderType=document.getElementById('order-type').value;const payment=document.getElementById('payment').value;if(!name||!phone||!address){alert('Please fill up all fields boss!');return}let message=`*NEW ORDER - DHAN SIOMAI*%0A%0A`;message+=`*Customer:* ${name}%0A`;message+=`*Phone:* ${phone}%0A`;message+=`*Type:* ${orderType}%0A`;message+=`*Address:* ${address}%0A`;message+=`*Payment:* ${payment}%0A%0A`;message+=`*ORDERS:*%0A`;let total=0;for(let id in cart){const product=products.find(p=>p.id==id);const qty=cart[id];const subtotal=product.price*qty;total+=subtotal;message+=`- ${product.name} x${qty} = ₱${subtotal}%0A`}if(orderType==='Delivery'){total+=50;message+=`- Delivery Fee = ₱50%0A`}message+=`%0A*TOTAL: ₱${total}*`;const yourNumber='639052733253';window.open(`https://wa.me/${yourNumber}?text=${message}`,'_blank')}
+        document.getElementById('order-type').addEventListener('change',updateCart);renderProducts();
+    </script>
+</body>
+</html>
