@@ -54,6 +54,13 @@
    .no-print { display: none!important; }
   }
     </style>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#FF6600">
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js');
+  }
+</script>
 </head>
 <body>
     <div class="header"><h2>DHAN SIOMAI POS</h2></div>
