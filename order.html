@@ -1,16 +1,16 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dhan Siomai - Order Online</title>
-    <meta name="theme-color" content="#FF6600">
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
-        body{background:#f5f5f5}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dhan Siomai - Order Online</title>
+<meta name="theme-color" content="#FF6600">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#f5f5f5}
 .header{background:#FF6600;color:white;padding:15px;text-align:center;font-size:22px;font-weight:bold;position:sticky;top:0;z-index:10}
 .container{max-width:500px;margin:0 auto;padding:15px;padding-bottom:80px}
+.loading{text-align:center;padding:50px;color:#FF6600;font-size:18px}
 .category{background:#FF6600;color:white;padding:12px;border-radius:8px;margin:15px 0 5px 0;font-size:18px;font-weight:bold;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
 .category-items{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:10px 0;display:none}
 .category-items.show{display:grid}
@@ -29,102 +29,172 @@
 .cart.show{transform:translateY(0)}
 .checkout-btn{background:#28a745;color:white;border:none;width:100%;padding:15px;border-radius:8px;font-size:18px;font-weight:bold;cursor:pointer;margin-top:10px}
 .checkout-btn:disabled{background:#ccc}
-        input,textarea,select{width:100%;padding:12px;margin:5px 0;border:2px solid #ddd;border-radius:5px;font-size:16px}
-        label{font-weight:bold;margin-top:10px;display:block;color:#333}
+input,textarea,select{width:100%;padding:12px;margin:5px 0;border:2px solid #ddd;border-radius:5px;font-size:16px}
+label{font-weight:bold;margin-top:10px;display:block;color:#333}
 .close-cart{position:absolute;top:10px;right:15px;background:none;border:none;font-size:24px;cursor:pointer;color:#FF6600}
-    </style>
+</style>
 </head>
 <body>
-    <div class="header">🥟 DHAN SIOMAI - ORDER NOW</div>
-    <div class="container">
-        <div id="categories"></div>
-    </div>
-    <button class="cart-bar" onclick="toggleCart()">🛒 VIEW CART - Total: ₱<span id="total-mini">0</span></button>
-    <div class="cart" id="cart">
-        <button class="close-cart" onclick="toggleCart()">×</button>
-        <h3>🛒 Your Order</h3>
-        <div id="cart-items">Cart is empty</div>
-        <div style="font-size:22px;font-weight:bold;margin:10px 0;color:#FF6600">Total: ₱<span id="total">0</span></div>
-        <label>Full Name:</label>
-        <input type="text" id="customer-name" placeholder="Juan Dela Cruz">
-        <label>Mobile Number:</label>
-        <input type="tel" id="customer-phone" placeholder="09123456789">
-        <label>Delivery Address:</label>
-        <textarea id="customer-address" rows="2" placeholder="House #, Street, Brgy, City"></textarea>
-        <label>Order Type:</label>
-        <select id="order-type">
-            <option value="Delivery">Delivery - ₱50 fee</option>
-            <option value="Pickup">Pickup - Free</option>
-        </select>
-        <label>Payment:</label>
-        <select id="payment">
-            <option value="COD">Cash on Delivery</option>
-            <option value="GCash">GCash - Send proof after</option>
-        </select>
-        <button class="checkout-btn" onclick="checkout()" id="checkout-btn" disabled>PLACE ORDER VIA WHATSAPP</button>
-    </div>
-    <script>
-        const products=[
-            {id:1,cat:"65's",name:"Pork 65",price:150,stock:347},
-            {id:2,cat:"65's",name:"Chicken 65",price:150,stock:244},
-            {id:3,cat:"65's",name:"Beef 65",price:150,stock:47},
-            {id:4,cat:"65's",name:"Shrimp 65",price:150,stock:0},
-            {id:5,cat:"30's",name:"Pork 30",price:80,stock:44},
-            {id:6,cat:"30's",name:"Chicken 30",price:80,stock:0},
-            {id:7,cat:"30's",name:"Beef 30",price:80,stock:0},
-            {id:8,cat:"30's",name:"Shrimp 30",price:80,stock:0},
-            {id:9,cat:"30's",name:"Japanese 30",price:120,stock:50},
-            {id:10,cat:"BIG SIOMAI",name:"BIG Pork",price:120,stock:50},
-            {id:11,cat:"BIG SIOMAI",name:"BIG Chicken",price:120,stock:10},
-            {id:12,cat:"BIG SIOMAI",name:"BIG Beef",price:120,stock:0},
-            {id:13,cat:"BIG SIOMAI",name:"BIG Japanese",price:150,stock:50},
-            {id:14,cat:"SIOPAO",name:"JUMBO Asado",price:200,stock:0},
-            {id:15,cat:"SIOPAO",name:"MINI Asado",price:200,stock:0},
-            {id:16,cat:"SIOPAO",name:"JUMBO Bola-Bola",price:200,stock:0},
-            {id:17,cat:"SIOPAO",name:"MINI Bola-Bola",price:200,stock:0},
-            {id:18,cat:"DUMPLINGS",name:"Gyoza",price:110,stock:47},
-            {id:19,cat:"DUMPLINGS",name:"Sharkspin",price:120,stock:0},
-            {id:20,cat:"DUMPLINGS",name:"HAKAW",price:280,stock:0},
-            {id:21,cat:"SAUCE",name:"Chili Garlic",price:75,stock:0},
-            {id:22,cat:"SAUCE",name:"Siopao Sauce",price:5,stock:0}
-        ];
-        let cart={};
-        const yourNumber = '639052733253'; // ← PALITAN MO TO NG WHATSAPP NUMBER MO BOSS
-        
-        function toggleCart(){document.getElementById('cart').classList.toggle('show')}
-        function renderProducts(){
-            const container=document.getElementById('categories');
-            const cats=[...new Set(products.map(p=>p.cat))];
-            container.innerHTML=cats.map((cat,index)=>{
-                const catProducts=products.filter(p=>p.cat===cat);
-                return `<div class="category" data-cat="${index}">📁 ${cat} <span>▼</span></div>
-                <div class="category-items" id="cat-${index}">
-                ${catProducts.map(p=>`<div class="product">
-                    <h3>${p.name}</h3>
-                    <div class="price">₱${p.price}</div>
-                    <span class="stock ${p.stock>0?'in':'out'}">${p.stock}</span>
-                    <div class="qty-controls">
-                        <button class="qty-btn" onclick="updateQty(${p.id},-1)" ${p.stock===0?'disabled':''}>-</button>
-                        <input type="number" class="qty-input" id="qty-${p.id}" value="0" min="0" max="${p.stock}" readonly>
-                        <button class="qty-btn" onclick="updateQty(${p.id},1)" ${p.stock===0?'disabled':''}>+</button>
-                    </div>
-                </div>`).join('')}
-                </div>`
-            }).join('');
-            
-            // Event listener para sa lahat ng category
-            document.querySelectorAll('.category').forEach(el=>{
-                el.addEventListener('click',function(){
-                    const catIndex = this.getAttribute('data-cat');
-                    document.getElementById(`cat-${catIndex}`).classList.toggle('show');
-                });
-            });
-        }
-        function updateQty(id,change){const product=products.find(p=>p.id===id);const current=cart[id]||0;const newQty=current+change;if(newQty>=0&&newQty<=product.stock){cart[id]=newQty;if(newQty===0)delete cart[id];document.getElementById(`qty-${id}`).value=newQty;updateCart()}}
-        function updateCart(){const cartDiv=document.getElementById('cart-items');const totalDiv=document.getElementById('total');const totalMini=document.getElementById('total-mini');const btn=document.getElementById('checkout-btn');let html='';let total=0;for(let id in cart){const product=products.find(p=>p.id==id);const qty=cart[id];const subtotal=product.price*qty;total+=subtotal;html+=`<div style="margin:5px 0">${product.name} x${qty} = ₱${subtotal}</div>`}const orderType=document.getElementById('order-type').value;if(orderType==='Delivery'&&total>0){total+=50;html+=`<div style="margin:5px 0">Delivery Fee = ₱50</div>`}cartDiv.innerHTML=html||'Cart is empty';totalDiv.textContent=total;totalMini.textContent=total;btn.disabled=total===0}
-        function checkout(){const name=document.getElementById('customer-name').value;const phone=document.getElementById('customer-phone').value;const address=document.getElementById('customer-address').value;const orderType=document.getElementById('order-type').value;const payment=document.getElementById('payment').value;if(!name||!phone||!address){alert('Please fill up all fields boss!');return}let message=`*NEW ORDER - DHAN SIOMAI*%0A%0A`;message+=`*Customer:* ${name}%0A`;message+=`*Phone:* ${phone}%0A`;message+=`*Type:* ${orderType}%0A`;message+=`*Address:* ${address}%0A`;message+=`*Payment:* ${payment}%0A%0A`;message+=`*ORDERS:*%0A`;let total=0;for(let id in cart){const product=products.find(p=>p.id==id);const qty=cart[id];const subtotal=product.price*qty;total+=subtotal;message+=`- ${product.name} x${qty} = ₱${subtotal}%0A`}if(orderType==='Delivery'){total+=50;message+=`- Delivery Fee = ₱50%0A`}message+=`%0A*TOTAL: ₱${total}*`;window.open(`https://wa.me/${yourNumber}?text=${message}`,'_blank')}
-        document.getElementById('order-type').addEventListener('change',updateCart);
-        window.onload=renderProducts;
-    </script>
+<div class="header">🥟 DHAN SIOMAI - ORDER NOW</div>
+<div class="container">
+<div id="categories"><div class="loading">Loading products... 🥟</div></div>
+</div>
+<button class="cart-bar" onclick="toggleCart()">🛒 VIEW CART - Total: ₱<span id="total-mini">0</span></button>
+<div class="cart" id="cart">
+<button class="close-cart" onclick="toggleCart()">×</button>
+<h3>🛒 Your Order</h3>
+<div id="cart-items">Cart is empty</div>
+<div style="font-size:22px;font-weight:bold;margin:10px 0;color:#FF6600">Total: ₱<span id="total">0</span></div>
+<label>Full Name:</label>
+<input type="text" id="customer-name" placeholder="Juan Dela Cruz">
+<label>Mobile Number:</label>
+<input type="tel" id="customer-phone" placeholder="09123456789">
+<label>Delivery Address:</label>
+<textarea id="customer-address" rows="2" placeholder="House #, Street, Brgy, City"></textarea>
+<label>Order Type:</label>
+<select id="order-type">
+<option value="Delivery">Delivery - ₱50 fee</option>
+<option value="Pickup">Pickup - Free</option>
+</select>
+<label>Payment:</label>
+<select id="payment">
+<option value="COD">Cash on Delivery</option>
+<option value="GCash">GCash - Send proof after</option>
+</select>
+<button class="checkout-btn" onclick="checkout()" id="checkout-btn" disabled>PLACE ORDER VIA WHATSAPP</button>
+</div>
+<script>
+// ⚠️ BOSS PALITAN MO TO NG APPS SCRIPT URL MO PAG NAKA-DEPLOY KA NA
+const API_URL = 'https://script.google.com/macros/s/AKfycbyoururlhere/exec';
+const yourNumber = '639052733253'; // ← WhatsApp number mo
+
+let products = [];
+let cart = {};
+
+function toggleCart(){document.getElementById('cart').classList.toggle('show')}
+
+async function loadProducts(){
+  try {
+    const res = await fetch(API_URL);
+    products = await res.json();
+    // Convert string to number para sure
+    products.forEach(p => {
+      p.id = Number(p.id);
+      p.price = Number(p.price);
+      p.stock = Number(p.stock);
+    });
+    renderProducts();
+  } catch(err) {
+    document.getElementById('categories').innerHTML = '<div class="loading">Failed to load. Check mo Apps Script URL boss!</div>';
+  }
+}
+
+function renderProducts(){
+  const container=document.getElementById('categories');
+  const cats=[...new Set(products.map(p=>p.cat))];
+  container.innerHTML=cats.map((cat,index)=>{
+    const catProducts=products.filter(p=>p.cat===cat);
+    return `<div class="category" data-cat="${index}">📁 ${cat} <span>▼</span></div>
+    <div class="category-items" id="cat-${index}">
+    ${catProducts.map(p=>`<div class="product">
+    <h3>${p.name}</h3>
+    <div class="price">₱${p.price}</div>
+    <span class="stock ${p.stock>0?'in':'out'}">${p.stock} pcs</span>
+    <div class="qty-controls">
+    <button class="qty-btn" onclick="updateQty(${p.id},-1)" ${p.stock===0?'disabled':''}>-</button>
+    <input type="number" class="qty-input" id="qty-${p.id}" value="0" min="0" max="${p.stock}" readonly>
+    <button class="qty-btn" onclick="updateQty(${p.id},1)" ${p.stock===0?'disabled':''}>+</button>
+    </div>`).join('')}
+    </div>`
+  }).join('');
+
+  document.querySelectorAll('.category').forEach(el=>{
+    el.addEventListener('click',function(){
+      const catIndex = this.getAttribute('data-cat');
+      document.getElementById(`cat-${catIndex}`).classList.toggle('show');
+    });
+  });
+}
+
+function updateQty(id,change){
+  const product=products.find(p=>p.id===id);
+  const current=cart[id]||0;
+  const newQty=current+change;
+  if(newQty>=0&&newQty<=product.stock){
+    cart[id]=newQty;
+    if(newQty===0)delete cart[id];
+    document.getElementById(`qty-${id}`).value=newQty;
+    updateCart()
+  }
+}
+
+function updateCart(){
+  const cartDiv=document.getElementById('cart-items');
+  const totalDiv=document.getElementById('total');
+  const totalMini=document.getElementById('total-mini');
+  const btn=document.getElementById('checkout-btn');
+  let html='';let total=0;
+  for(let id in cart){
+    const product=products.find(p=>p.id==id);
+    const qty=cart[id];
+    const subtotal=product.price*qty;
+    total+=subtotal;
+    html+=`<div style="margin:5px 0">${product.name} x${qty} = ₱${subtotal}</div>`
+  }
+  const orderType=document.getElementById('order-type').value;
+  if(orderType==='Delivery'&&total>0){
+    total+=50;
+    html+=`<div style="margin:5px 0">Delivery Fee = ₱50</div>`
+  }
+  cartDiv.innerHTML=html||'Cart is empty';
+  totalDiv.textContent=total;
+  totalMini.textContent=total;
+  btn.disabled=total===0
+}
+
+async function checkout(){
+  const name=document.getElementById('customer-name').value;
+  const phone=document.getElementById('customer-phone').value;
+  const address=document.getElementById('customer-address').value;
+  const orderType=document.getElementById('order-type').value;
+  const payment=document.getElementById('payment').value;
+  if(!name||!phone||!address){alert('Please fill up all fields boss!');return}
+
+  // Bawas stock sa Sheets
+  for(let id in cart){
+    const newStock = products.find(p=>p.id==id).stock - cart[id];
+    await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ id: Number(id), stock: newStock })
+    });
+  }
+
+  let message=`*NEW ORDER - DHAN SIOMAI*%0A%0A`;
+  message+=`*Customer:* ${name}%0A`;
+  message+=`*Phone:* ${phone}%0A`;
+  message+=`*Type:* ${orderType}%0A`;
+  message+=`*Address:* ${address}%0A`;
+  message+=`*Payment:* ${payment}%0A%0A`;
+  message+=`*ORDERS:*%0A`;
+  let total=0;
+  for(let id in cart){
+    const product=products.find(p=>p.id==id);
+    const qty=cart[id];
+    const subtotal=product.price*qty;
+    total+=subtotal;
+    message+=`- ${product.name} x${qty} = ₱${subtotal}%0A`
+  }
+  if(orderType==='Delivery'){
+    total+=50;
+    message+=`- Delivery Fee = ₱50%0A`
+  }
+  message+=`%0A*TOTAL: ₱${total}*`;
+  window.open(`https://wa.me/${yourNumber}?text=${message}`,'_blank');
+  setTimeout(()=>location.reload(), 2000); // Refresh para updated stock
+}
+
+document.getElementById('order-type').addEventListener('change',updateCart);
+window.onload=loadProducts;
+</script>
 </body>
 </html>
