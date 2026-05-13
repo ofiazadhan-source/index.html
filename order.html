@@ -5,29 +5,125 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DHAN SIOMAI ONLINE STORE</title>
 <style>
-body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; }
-.header { background: #ff6b35; color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 18px; }
-.category { background: #666; color: white; padding: 10px; margin: 10px 0 0 0; font-weight: bold; }
-.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; }
-.card { background: white; padding: 10px; border-radius: 8px; position: relative; }
-.card h4 { margin: 0 0 5px 0; font-size: 14px; }
-.price { color: #ff6b35; font-weight: bold; font-size: 16px; }
-.stock { background: #4CAF50; color: white; padding: 3px 8px; border-radius: 12px; display: inline-block; font-size: 12px; margin: 5px 0; }
-.soldout { position: absolute; top: 10px; right: 10px; background: #ff6b35; color: white; padding: 5px 10px; transform: rotate(15deg); font-weight: bold; }
-.qtybox { display: flex; margin-top: 8px; }
-.qtybox input { flex: 1; text-align: center; border: 1px solid #ff6b35; border-left: 0; border-right: 0; }
-.qtybox button { background: #ff6b35; color: white; border: none; padding: 5px 10px; cursor: pointer; }
-.qtybox button:first-child { border-radius: 5px 0 0 5px; }
-.qtybox button:last-child { border-radius: 0 5px 5px 0; }
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f5f5f5;
+  padding-bottom: 80px;
+}
+.header {
+  background: #ff6b35;
+  color: white;
+  padding: 15px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.category {
+  background: #666;
+  color: white;
+  padding: 10px;
+  margin: 10px 0 0 0;
+  font-weight: bold;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 10px;
+}
+.card {
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+  position: relative;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.card h4 {
+  margin: 0 0 5px 0;
+  font-size: 14px;
+  min-height: 32px;
+}
+.price {
+  color: #ff6b35;
+  font-weight: bold;
+  font-size: 16px;
+}
+.stock {
+  background: #4CAF50;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 12px;
+  display: inline-block;
+  font-size: 12px;
+  margin: 5px 0;
+}
+.soldout {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #ff6b35;
+  color: white;
+  padding: 5px 10px;
+  transform: rotate(15deg);
+  font-weight: bold;
+  font-size: 12px;
+}
+.qtybox {
+  display: flex;
+  margin-top: 8px;
+}
+.qtybox input {
+  flex: 1;
+  text-align: center;
+  border: 1px solid #ff6b35;
+  border-left: 0;
+  border-right: 0;
+  outline: none;
+}
+.qtybox button {
+  background: #ff6b35;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.qtybox button:first-child {
+  border-radius: 5px 0 0 5px;
+}
+.qtybox button:last-child {
+  border-radius: 0 5px 5px 0;
+}
+.qtybox button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+.cart-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ff6b35;
+  color: white;
+  padding: 15px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 16px;
+}
 </style>
 </head>
 <body>
 
 <div class="header">DHAN SIOMAI ONLINE STORE</div>
 <div id="productContainer"></div>
+<div class="cart-bar" id="cartBar">Cart: 0 items - ₱0</div>
 
 <script>
-const products = [
+const defaultProducts = [
   // 65's
   { cat: "65's", name: "Pork Siomai 65", price: 65 },
   { cat: "65's", name: "Chicken Siomai 65", price: 65 },
@@ -63,12 +159,15 @@ const products = [
   { cat: "Sauce", name: "Siopao Sauce", price: 5 }
 ];
 
+let cart = {};
+
 function renderProducts() {
   let stock = JSON.parse(localStorage.getItem('stock') || '{}');
+  let prices = JSON.parse(localStorage.getItem('prices') || '{}');
   let html = '';
   let currentCat = '';
 
-  products.forEach(p => {
+  defaultProducts.forEach(p => {
     if(p.cat!== currentCat) {
       if(currentCat!== '') html += '</div>';
       html += `<div class="category">📁 ${p.cat}</div><div class="grid">`;
@@ -76,25 +175,64 @@ function renderProducts() {
     }
 
     let qty = stock[p.name] || 0;
+    let price = prices[p.name] || p.price;
+    let cartQty = cart[p.name] || 0;
+
     html += `
     <div class="card">
       <h4>${p.name}</h4>
-      <div class="price">₱${p.price}</div>
+      <div class="price">₱${price}</div>
       <div class="stock">Stock: ${qty}</div>
       ${qty === 0? '<div class="soldout">SOLD OUT</div>' : ''}
       <div class="qtybox">
-        <button onclick="alert('Add to cart coming soon')">-</button>
-        <input type="text" value="0" readonly>
-        <button onclick="alert('Add to cart coming soon')" ${qty === 0? 'disabled' : ''}>+ ADD</button>
+        <button onclick="updateCart('${p.name}', -1, ${qty})">-</button>
+        <input type="text" value="${cartQty}" readonly id="qty-${p.name}">
+        <button onclick="updateCart('${p.name}', 1, ${qty})" ${qty === 0? 'disabled' : ''}>+ ADD</button>
       </div>
     </div>`;
   });
 
   html += '</div>';
   document.getElementById('productContainer').innerHTML = html;
+  updateCartBar();
+}
+
+function updateCart(name, change, maxStock) {
+  if (!cart[name]) cart[name] = 0;
+
+  cart[name] += change;
+  if (cart[name] < 0) cart[name] = 0;
+  if (cart[name] > maxStock) cart[name] = maxStock;
+
+  document.getElementById(`qty-${name}`).value = cart[name];
+  updateCartBar();
+}
+
+function updateCartBar() {
+  let prices = JSON.parse(localStorage.getItem('prices') || '{}');
+  let totalItems = 0;
+  let totalPrice = 0;
+
+  for (let item in cart) {
+    let qty = cart[item];
+    if (qty > 0) {
+      let product = defaultProducts.find(p => p.name === item);
+      let price = prices[item] || product.price;
+      totalItems += qty;
+      totalPrice += qty * price;
+    }
+  }
+
+  document.getElementById('cartBar').textContent =
+    `Cart: ${totalItems} items - ₱${totalPrice}`;
 }
 
 renderProducts();
+
+// Auto-refresh pag nagbago stock/price sa admin
+window.addEventListener('storage', () => {
+  renderProducts();
+});
 </script>
 
 </body>
