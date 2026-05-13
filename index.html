@@ -10,8 +10,9 @@ body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; }
 .card { background: white; padding: 15px; margin: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 .btn { background: #4CAF50; color: white; padding: 12px; border: none; width: 100%; border-radius: 5px; font-size: 16px; cursor: pointer; margin-top: 10px; }
 .btn-orange { background: #ff6b35; }
+.btn-blue { background: #2196F3; }
 select, input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-.toggle { background: #ff6b35; color: white; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+.toggle { background: #ff6b35; color: white; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
 </style>
 </head>
 <body>
@@ -34,40 +35,55 @@ select, input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #dd
   <button class="btn">Checkout & Save</button>
 </div>
 
+<!-- STOCK MANAGEMENT -->
 <div class="card">
-  <div class="toggle" onclick="toggleDiv('stockDiv')">📦 STOCK MANAGEMENT</div>
-  <div id="stockDiv" style="display:none; margin-top:15px;">
-    <select id="stockItem">
-      <option>Select Item</option>
-      <option>Pork Siomai 65</option>
-      <option>Chicken Siomai 65</option>
-      <option>Beef Siomai 65</option>
-      <option>Shrimp Siomai 65</option>
-      <option>Pork Siomai 30</option>
-      <option>Chicken Siomai 30</option>
-      <option>Beef Siomai 30</option>
-      <option>Shrimp Siomai 30</option>
-      <option>Japanese Siomai 30</option>
-      <option>Big Pork Siomai</option>
-      <option>Big Chicken Siomai</option>
-      <option>Big Beef Siomai</option>
-      <option>Big Japanese Siomai</option>
-      <option>Gyoza Dumplings</option>
-      <option>Sharksfin Dumplings</option>
-      <option>Hakaw Dumplings</option>
-      <option>Jumbo Asado Siopao</option>
-      <option>Jumbo Bola-Bola Siopao</option>
-      <option>Mini Asado Siopao</option>
-      <option>Mini Bola-Bola Siopao</option>
-      <option>Chili Garlic Sauce</option>
-      <option>Siopao Sauce</option>
-    </select>
+  <div class="toggle btn-orange" onclick="toggleDiv('stockDiv')">📦 STOCK MANAGEMENT</div>
+  <div id="stockDiv" style="display:none;">
+    <select id="stockItem"></select>
     <input type="number" id="stockQty" placeholder="Enter quantity to add">
     <button class="btn" onclick="addStock()">Add Stock</button>
   </div>
 </div>
 
+<!-- PRICE MANAGEMENT -->
+<div class="card">
+  <div class="toggle btn-blue" onclick="toggleDiv('priceDiv')">💰 PRICE MANAGEMENT</div>
+  <div id="priceDiv" style="display:none;">
+    <select id="priceItem" onchange="loadPrice()"></select>
+    <input type="number" id="priceInput" placeholder="Enter new price">
+    <button class="btn btn-blue" onclick="updatePrice()">Update Price</button>
+  </div>
+</div>
+
 <script>
+const items = [
+  "Pork Siomai 65","Chicken Siomai 65","Beef Siomai 65","Shrimp Siomai 65",
+  "Pork Siomai 30","Chicken Siomai 30","Beef Siomai 30","Shrimp Siomai 30","Japanese Siomai 30",
+  "Big Pork Siomai","Big Chicken Siomai","Big Beef Siomai","Big Japanese Siomai",
+  "Gyoza Dumplings","Sharksfin Dumplings","Hakaw Dumplings",
+  "Jumbo Asado Siopao","Jumbo Bola-Bola Siopao","Mini Asado Siopao","Mini Bola-Bola Siopao",
+  "Chili Garlic Sauce","Siopao Sauce"
+];
+
+const defaultPrices = {
+  "Pork Siomai 65":65,"Chicken Siomai 65":65,"Beef Siomai 65":65,"Shrimp Siomai 65":65,
+  "Pork Siomai 30":30,"Chicken Siomai 30":30,"Beef Siomai 30":30,"Shrimp Siomai 30":30,"Japanese Siomai 30":30,
+  "Big Pork Siomai":45,"Big Chicken Siomai":45,"Big Beef Siomai":45,"Big Japanese Siomai":45,
+  "Gyoza Dumplings":50,"Sharksfin Dumplings":55,"Hakaw Dumplings":60,
+  "Jumbo Asado Siopao":40,"Jumbo Bola-Bola Siopao":40,"Mini Asado Siopao":25,"Mini Bola-Bola Siopao":25,
+  "Chili Garlic Sauce":10,"Siopao Sauce":5
+};
+
+function initDropdowns() {
+  let stockSelect = document.getElementById('stockItem');
+  let priceSelect = document.getElementById('priceItem');
+
+  items.forEach(item => {
+    stockSelect.innerHTML += `<option>${item}</option>`;
+    priceSelect.innerHTML += `<option>${item}</option>`;
+  });
+}
+
 function toggleDiv(id) {
   document.getElementById(id).style.display =
     document.getElementById(id).style.display === 'none'? 'block' : 'none';
@@ -84,6 +100,26 @@ function addStock() {
   alert(qty + ' added to ' + item);
   document.getElementById('stockQty').value = '';
 }
+
+function loadPrice() {
+  let item = document.getElementById('priceItem').value;
+  let prices = JSON.parse(localStorage.getItem('prices') || '{}');
+  let price = prices[item] || defaultPrices[item];
+  document.getElementById('priceInput').value = price;
+}
+
+function updatePrice() {
+  let item = document.getElementById('priceItem').value;
+  let price = parseFloat(document.getElementById('priceInput').value);
+  if(!price || price <= 0) return alert('Enter valid price');
+
+  let prices = JSON.parse(localStorage.getItem('prices') || '{}');
+  prices[item] = price;
+  localStorage.setItem('prices', JSON.stringify(prices));
+  alert('Price updated for ' + item + ' to ₱' + price);
+}
+
+initDropdowns();
 </script>
 
 </body>
