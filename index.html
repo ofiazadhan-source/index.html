@@ -11,8 +11,11 @@ body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; }
 .btn { background: #4CAF50; color: white; padding: 12px; border: none; width: 100%; border-radius: 5px; font-size: 16px; cursor: pointer; margin-top: 10px; }
 .btn-orange { background: #ff6b35; }
 .btn-blue { background: #2196F3; }
+.btn-red { background: #f44336; }
 select, input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-.toggle { background: #ff6b35; color: white; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
+.toggle { padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 10px; color: white; }
+.order-list { max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 5px; }
+.order-item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; }
 </style>
 </head>
 <body>
@@ -27,19 +30,20 @@ select, input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #dd
 
 <div style="text-align: center; margin: 20px 0; color: #666;">ADMIN POS SYSTEM</div>
 
+<!-- TODAY'S SUMMARY -->
 <div class="card">
   <h3>Today's Summary</h3>
   <p>Sales: ₱<span id="sales">0</span></p>
   <p>Expenses: ₱<span id="expenses">0</span></p>
   <p><strong>Net: ₱<span id="net">0</span></strong></p>
-  <button class="btn">Checkout & Save</button>
+  <button class="btn btn-red" onclick="resetDay()">Reset Day</button>
 </div>
 
 <!-- STOCK MANAGEMENT -->
 <div class="card">
   <div class="toggle btn-orange" onclick="toggleDiv('stockDiv')">📦 STOCK MANAGEMENT</div>
   <div id="stockDiv" style="display:none;">
-    <select id="stockItem"></select>
+    <select id="stockItem"><option>Select Item</option></select>
     <input type="number" id="stockQty" placeholder="Enter quantity to add">
     <button class="btn" onclick="addStock()">Add Stock</button>
   </div>
@@ -49,7 +53,7 @@ select, input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #dd
 <div class="card">
   <div class="toggle btn-blue" onclick="toggleDiv('priceDiv')">💰 PRICE MANAGEMENT</div>
   <div id="priceDiv" style="display:none;">
-    <select id="priceItem" onchange="loadPrice()"></select>
+    <select id="priceItem" onchange="loadPrice()"><option>Select Item</option></select>
     <input type="number" id="priceInput" placeholder="Enter new price">
     <button class="btn btn-blue" onclick="updatePrice()">Update Price</button>
   </div>
@@ -66,7 +70,7 @@ const items = [
 ];
 
 const defaultPrices = {
-  "Pork Siomai 65":65,"Chicken Siomai 65":65,"Beef Siomai 65":65,"Shrimp Siomai 65":65,
+  "Pork Siomai 65":150,"Chicken Siomai 65":150,"Beef Siomai 65":65,"Shrimp Siomai 65":65,
   "Pork Siomai 30":30,"Chicken Siomai 30":30,"Beef Siomai 30":30,"Shrimp Siomai 30":30,"Japanese Siomai 30":30,
   "Big Pork Siomai":45,"Big Chicken Siomai":45,"Big Beef Siomai":45,"Big Japanese Siomai":45,
   "Gyoza Dumplings":50,"Sharksfin Dumplings":55,"Hakaw Dumplings":60,
@@ -74,14 +78,12 @@ const defaultPrices = {
   "Chili Garlic Sauce":10,"Siopao Sauce":5
 };
 
-function initDropdowns() {
-  let stockSelect = document.getElementById('stockItem');
-  let priceSelect = document.getElementById('priceItem');
-
+function init() {
   items.forEach(item => {
-    stockSelect.innerHTML += `<option>${item}</option>`;
-    priceSelect.innerHTML += `<option>${item}</option>`;
+    document.getElementById('stockItem').innerHTML += `<option>${item}</option>`;
+    document.getElementById('priceItem').innerHTML += `<option>${item}</option>`;
   });
+  loadSummary();
 }
 
 function toggleDiv(id) {
@@ -119,7 +121,34 @@ function updatePrice() {
   alert('Price updated for ' + item + ' to ₱' + price);
 }
 
-initDropdowns();
+function loadSummary() {
+  let summary = JSON.parse(localStorage.getItem('summary') || '{"sales":0,"expenses":0}');
+  document.getElementById('sales').textContent = summary.sales;
+  document.getElementById('expenses').textContent = summary.expenses;
+  document.getElementById('net').textContent = summary.sales - summary.expenses;
+}
+
+function resetDay() {
+  if(confirm('Reset today\'s sales and expenses?')) {
+    localStorage.setItem('summary', JSON.stringify({sales:0,expenses:0}));
+    loadSummary();
+    alert('Day reset!');
+  }
+}
+
+// Listen for checkout from order.html
+window.addEventListener('storage', function(e) {
+  if(e.key === 'checkout') {
+    let data = JSON.parse(e.newValue);
+    let summary = JSON.parse(localStorage.getItem('summary') || '{"sales":0,"expenses":0}');
+    summary.sales += data.total;
+    localStorage.setItem('summary', JSON.stringify(summary));
+    loadSummary();
+    localStorage.removeItem('checkout');
+  }
+});
+
+init();
 </script>
 
 </body>
