@@ -1,110 +1,139 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dhan Store - Order</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
-        .container { max-width: 600px; margin: 0 auto; }
-        h1 { text-align: center; color: #333; }
-        #products { display: grid; gap: 15px; }
-        .product { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .product h3 { margin: 0 0 10px 0; color: #222; }
-        .product p { margin: 5px 0; color: #666; }
-        .price { font-weight: bold; color: #e91e63; font-size: 18px; }
-        .stock { color: #4caf50; }
-        .out-stock { color: #f44336; }
-        button { background: #2196f3; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 10px; }
-        button:disabled { background: #ccc; cursor: not-allowed; }
-        #loading { text-align: center; padding: 20px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dhan Store - Order</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background: #f5f5f5;
+}
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+h1 {
+  text-align: center;
+  color: #333;
+}
+#products {
+  display: grid;
+  gap: 15px;
+}
+.product {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.product h3 {
+  margin: 0 0 10px 0;
+  color: #222;
+}
+.product p {
+  margin: 5px 0;
+  color: #666;
+}
+.price {
+  font-weight: bold;
+  color: #e91e63;
+  font-size: 18px;
+}
+.stock {
+  color: #4caf50;
+}
+.out-stock {
+  color: #f44336;
+}
+button {
+  background: #2196f3;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 10px;
+}
+button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+#loading {
+  text-align: center;
+  padding: 20px;
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>🛒 Dhan Store</h1>
-        <div id="loading">Loading products...</div>
-        <div id="products"></div>
-    </div>
+<div class="container">
+  <h1>🛒 Dhan Store</h1>
+  <div id="loading">Loading products...</div>
+  <div id="products"></div>
+</div>
 
-    <script>
-        // API MO GALING GOOGLE APPS SCRIPT
-        const API_URL = "https://script.google.com/macros/s/AKfycbwDc_wkRAFlQYAOHcoueY_77SSAbpE_ryfMP_KJ2L07SsNC3ne__MJd7J3Ti2vWX3-apw/exec";
-        
-        let allProducts = [];
+<script>
+// GOOGLE SHEET CSV URL MO
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPCCKm9dVSXdNw6XGIZtAecOoAiK-14jsA7mzHsIK9HqluWhVnYYuRcplCeh3zXOoyXm8ibt2BOqEU/pub?output=csv";
 
-        // 1. KUHA LAHAT NG PRODUCTS SA GOOGLE SHEETS
-        async function loadProducts() {
-            try {
-                const res = await fetch(API_URL);
-                allProducts = await res.json();
-                document.getElementById('loading').style.display = 'none';
-                displayProducts(allProducts);
-            } catch (err) {
-                document.getElementById('loading').innerHTML = 'Failed to load products. Check internet.';
-                console.error("Error loading:", err);
-            }
-        }
+let allProducts = [];
 
-        // 2. DISPLAY PRODUCTS SA PAGE
-        function displayProducts(products) {
-            const container = document.getElementById('products');
-            container.innerHTML = '';
-            
-            products.forEach(product => {
-                const isOutOfStock = product.stock <= 0;
-                container.innerHTML += `
-                    <div class="product">
-                        <h3>${product.name}</h3>
-                        <p>Category: ${product.category}</p>
-                        <p class="price">₱${product.price}</p>
-                        <p class="${isOutOfStock ? 'out-stock' : 'stock'}">
-                            Stock: ${product.stock} ${isOutOfStock ? '- OUT OF STOCK' : ''}
-                        </p>
-                        <button 
-                            onclick="buyProduct(${product.id}, ${product.stock})" 
-                            ${isOutOfStock ? 'disabled' : ''}
-                        >
-                            ${isOutOfStock ? 'Out of Stock' : 'Buy Now'}
-                        </button>
-                    </div>
-                `;
-            });
-        }
+// 1. KUHA LAHAT NG PRODUCTS SA GOOGLE SHEETS CSV
+async function loadProducts() {
+  try {
+    const res = await fetch(CSV_URL);
+    const text = await res.text();
 
-        // 3. BUY PRODUCT - BAWAS STOCK SA SHEETS
-        async function buyProduct(id, currentStock) {
-            if (currentStock <= 0) return;
-            
-            const newStock = currentStock - 1;
-            
-            try {
-                const res = await fetch(API_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ 
-                        id: id, 
-                        stock: newStock 
-                    })
-                });
-                
-                const result = await res.json();
-                
-                if (result.success) {
-                    alert('Order success! Check mo Google Sheets, bawas na stock.');
-                    loadProducts(); // Refresh para makita updated stock
-                } else {
-                    alert('Failed to order. Try again.');
-                }
-            } catch (err) {
-                alert('Error: Check internet connection');
-                console.error("Order error:", err);
-            }
-        }
+    // Convert CSV to array
+    const rows = text.split('\n').slice(1); // skip header
 
-        // START PAG OPEN NG PAGE
-        loadProducts();
-    </script>
+    allProducts = rows.map(row => {
+      const cols = row.split(',');
+      return {
+        id: parseInt(cols[0]),
+        category: cols[1],
+        name: cols[2],
+        price: parseFloat(cols[3]),
+        stock: parseInt(cols[4])
+      };
+    }).filter(p => p.name && p.name.trim()!== '');
+
+    document.getElementById('loading').style.display = 'none';
+    displayProducts(allProducts);
+  } catch (err) {
+    document.getElementById('loading').innerHTML = 'Failed to load products. Check internet.';
+    console.error("Error loading:", err);
+  }
+}
+
+// 2. DISPLAY PRODUCTS SA PAGE
+function displayProducts(products) {
+  const container = document.getElementById('products');
+  container.innerHTML = '';
+
+  products.forEach(product => {
+    const isOutOfStock = product.stock <= 0;
+    container.innerHTML += `
+      <div class="product">
+        <h3>${product.name}</h3>
+        <p>Category: ${product.category}</p>
+        <p class="price">₱${product.price}</p>
+        <p class="${isOutOfStock? 'out-stock' : 'stock'}">
+          Stock: ${product.stock} ${isOutOfStock? '- OUT OF STOCK' : ''}
+        </p>
+        <button ${isOutOfStock? 'disabled' : ''} onclick="alert('Buy feature needs Apps Script. For now, view only muna.')">
+          ${isOutOfStock? 'Out of Stock' : 'Buy Now'}
+        </button>
+      </div>
+    `;
+  });
+}
+
+// START PAG OPEN NG PAGE
+loadProducts();
+</script>
 </body>
 </html>
-
