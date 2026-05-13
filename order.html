@@ -19,12 +19,6 @@
       text-align: center;
       color: #333;
     }
-    #loading {
-      text-align: center;
-      font-size: 18px;
-      color: #666;
-      margin-top: 50px;
-    }
     #products {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -74,7 +68,6 @@
 <body>
   <div class="container">
     <h1>Dhan Store</h1>
-    <div id="loading">Loading products...</div>
     <div id="products"></div>
     <div id="cart">
       <h2>Cart</h2>
@@ -83,44 +76,16 @@
   </div>
 
   <script>
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPCCKm9dVSXdNw6XGIZtAecOoAiK-14jsA7mzHsIK9HqluWhVnYYuRcplCeh3zXOoyXm8ibt2BOqEU/pub?output=csv";
-
-    let allProducts = [];
+    // HARDCODED PRODUCTS - PALITAN MO DITO KAPAG MAY BAGONG ITEM
+    let allProducts = [
+      {id: 1, category: "Drinks", name: "Coke", price: 25, stock: 50},
+      {id: 2, category: "Snacks", name: "Chips", price: 15, stock: 100},
+      {id: 3, category: "Candy", name: "Chocolate", price: 20, stock: 80}
+    ];
+    
     let cart = [];
-
-    const loadingDiv = document.getElementById('loading');
     const productsDiv = document.getElementById('products');
     const cartItemsDiv = document.getElementById('cart-items');
-
-    // Load products from Google Sheets
-    async function loadProducts() {
-      try {
-        const res = await fetch(CSV_URL);
-        if (!res.ok) throw new Error('Failed to fetch CSV');
-
-        const text = await res.text();
-        const rows = text.split('\n').slice(1); // skip header
-
-        allProducts = rows
-         .filter(r => r.trim()!== '')
-         .map(row => {
-            const cols = row.split(',');
-            return {
-              id: parseInt(cols[0]),
-              category: cols[1],
-              name: cols[2],
-              price: parseFloat(cols[3]),
-              stock: parseInt(cols[4])
-            };
-          });
-
-        displayProducts();
-        loadingDiv.style.display = 'none';
-      } catch (err) {
-        loadingDiv.innerHTML = 'Error loading products. Check CSV link and make sure sheet is published.';
-        console.error(err);
-      }
-    }
 
     // Display products
     function displayProducts() {
@@ -168,7 +133,7 @@
     }
 
     // Run on page load
-    loadProducts();
+    displayProducts();
   </script>
 </body>
 </html>
