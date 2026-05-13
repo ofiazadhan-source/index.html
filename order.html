@@ -77,19 +77,17 @@ button:disabled {
 
 <script>
 // GOOGLE SHEET CSV URL MO
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPCCKm9dVSXdNw6XGIZtAecOoAiK-14jsA7mzHsIK9HqluWhVnYYuRcplCeh3zXOoyXm8ibt2BOqEU/pub?output=csv";
+const CSV_URLhttps://docs.google.com/spreadsheets/d/e/2PACX-1vTPCCKm9dVSXdNw6XGIZtAecOoAiK-14jsA7mzHsIK9HqluWhVnYYuRcplCeh3zXOoyXm8ibt2BOqEU/pub?output=csv
 
 let allProducts = [];
 
-// 1. KUHA LAHAT NG PRODUCTS SA GOOGLE SHEETS CSV
+// KUHA LAHAT NG PRODUCTS SA GOOGLE SHEETS CSV
 async function loadProducts() {
   try {
     const res = await fetch(CSV_URL);
     const text = await res.text();
 
-    // Convert CSV to array
-    const rows = text.split('\n').slice(1); // skip header
-
+    const rows = text.split('\n').slice(1);
     allProducts = rows.map(row => {
       const cols = row.split(',');
       return {
@@ -109,7 +107,7 @@ async function loadProducts() {
   }
 }
 
-// 2. DISPLAY PRODUCTS SA PAGE
+// DISPLAY PRODUCTS SA PAGE
 function displayProducts(products) {
   const container = document.getElementById('products');
   container.innerHTML = '';
