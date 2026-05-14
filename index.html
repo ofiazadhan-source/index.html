@@ -14,8 +14,10 @@ body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; }
 .btn-red { background: #f44336; }
 select, input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
 .toggle { padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 10px; color: white; }
-.order-list { max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 5px; }
-.order-item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; }
+.expense-item { display: flex; gap: 10px; margin-bottom: 10px; }
+.expense-item input { flex: 1; }
+.expense-list { max-height: 150px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 5px; margin: 10px 0; }
+.expense-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; }
 </style>
 </head>
 <body>
@@ -33,10 +35,21 @@ select, input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #dd
 <!-- TODAY'S SUMMARY -->
 <div class="card">
   <h3>Today's Summary</h3>
-  <p>Sales: ₱<span id="sales">0</span></p>
-  <p>Expenses: ₱<span id="expenses">0</span></p>
-  <p><strong>Net: ₱<span id="net">0</span></strong></p>
+  <p>Gross Sales: ₱<span id="sales">0</span></p>
+  <p>Total Expenses: ₱<span id="expenses">0</span></p>
+  <p style="font-size:18px;"><strong>Net Income: ₱<span id="net">0</span></strong></p>
   <button class="btn btn-red" onclick="resetDay()">Reset Day</button>
+</div>
+
+<!-- ADD EXPENSE -->
+<div class="card">
+  <div class="toggle btn-red" onclick="toggleDiv('expenseDiv')">💸 ADD EXPENSE</div>
+  <div id="expenseDiv" style="display:none;">
+    <input type="text" id="expenseName" placeholder="Expense name e.g. Gas, Rent">
+    <input type="number" id="expenseAmount" placeholder="Amount">
+    <button class="btn btn-red" onclick="addExpense()">Add Expense</button>
+    <div class="expense-list" id="expenseList"></div>
+  </div>
 </div>
 
 <!-- STOCK MANAGEMENT -->
@@ -84,6 +97,7 @@ function init() {
     document.getElementById('priceItem').innerHTML += `<option>${item}</option>`;
   });
   loadSummary();
+  loadExpenses();
 }
 
 function toggleDiv(id) {
@@ -121,17 +135,58 @@ function updatePrice() {
   alert('Price updated for ' + item + ' to ₱' + price);
 }
 
+function addExpense() {
+  let name = document.getElementById('expenseName').value.trim();
+  let amount = parseFloat(document.getElementById('expenseAmount').value);
+
+  if(!name ||!amount || amount <= 0) return alert('Enter expense name and valid amount');
+
+  let expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+  expenses.push({name: name, amount: amount, time: Date.now()});
+  localStorage.setItem('expenses', JSON.stringify(expenses));
+
+  document.getElementById('expenseName').value = '';
+  document.getElementById('expenseAmount').value = '';
+
+  loadExpenses();
+  loadSummary();
+}
+
+function loadExpenses() {
+  let expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+  let html = '';
+  let total = 0;
+
+  expenses.forEach((exp, index) => {
+    total += exp.amount;
+    html += `
+    <div class="expense-row">
+      <span>${exp.name}</span>
+      <span>₱${exp.amount}</span>
+    </div>`;
+  });
+
+  if(html === '') html = '<p style="text-align:center; color:#666;">No expenses yet</p>';
+  document.getElementById('expenseList').innerHTML = html;
+}
+
 function loadSummary() {
-  let summary = JSON.parse(localStorage.getItem('summary') || '{"sales":0,"expenses":0}');
+  let summary = JSON.parse(localStorage.getItem('summary') || '{"sales":0}');
+  let expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+  let totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+  let net = summary.sales - totalExpenses;
+
   document.getElementById('sales').textContent = summary.sales;
-  document.getElementById('expenses').textContent = summary.expenses;
-  document.getElementById('net').textContent = summary.sales - summary.expenses;
+  document.getElementById('expenses').textContent = totalExpenses;
+  document.getElementById('net').textContent = net;
 }
 
 function resetDay() {
-  if(confirm('Reset today\'s sales and expenses?')) {
-    localStorage.setItem('summary', JSON.stringify({sales:0,expenses:0}));
+  if(confirm('Reset today\'s sales and expenses? This cannot be undone.')) {
+    localStorage.setItem('summary', JSON.stringify({sales:0}));
+    localStorage.setItem('expenses', JSON.stringify([]));
     loadSummary();
+    loadExpenses();
     alert('Day reset!');
   }
 }
@@ -140,7 +195,7 @@ function resetDay() {
 window.addEventListener('storage', function(e) {
   if(e.key === 'checkout') {
     let data = JSON.parse(e.newValue);
-    let summary = JSON.parse(localStorage.getItem('summary') || '{"sales":0,"expenses":0}');
+    let summary = JSON.parse(localStorage.getItem('summary') || '{"sales":0}');
     summary.sales += data.total;
     localStorage.setItem('summary', JSON.stringify(summary));
     loadSummary();
