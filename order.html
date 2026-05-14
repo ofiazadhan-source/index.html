@@ -37,11 +37,11 @@ body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; padding-b
 .cart-item-price { font-weight: bold; color: #ff6b35; }
 .cart-total { margin-top: 15px; padding-top: 15px; border-top: 2px solid #ff6b35; font-size: 18px; font-weight: bold; text-align: right; }
 
-/* Print Receipt Style */
+/* Print Receipt Style - 58mm */
 @media print {
   body * { visibility: hidden; }
-.receipt,.receipt * { visibility: visible; }
-.receipt { position: absolute; left: 0; top: 0; width: 100%; }
+ .receipt,.receipt * { visibility: visible; }
+ .receipt { position: absolute; left: 0; top: 0; width: 100%; }
 }
 .receipt { display: none; }
 
@@ -133,8 +133,8 @@ function renderProducts() {
       ${remainingStock === 0? '<div class="soldout">SOLD OUT</div>' : ''}
       <div class="qtybox">
         <button onclick="updateCart('${p.name}', -1, ${qty})">-</button>
-        <input type="number" min="0" max="${qty}" value="${cartQty}" 
-               id="qty-${p.name}" 
+        <input type="number" min="0" max="${qty}" value="${cartQty}"
+               id="qty-${p.name}"
                oninput="setCartQty('${p.name}', this.value, ${qty})">
         <button onclick="updateCart('${p.name}', 1, ${qty})" ${remainingStock === 0? 'disabled' : ''}>+ ADD</button>
       </div>
@@ -162,7 +162,7 @@ function setCartQty(name, value, maxStock) {
   let qty = parseInt(value) || 0;
   if (qty < 0) qty = 0;
   if (qty > maxStock) qty = maxStock;
-  
+
   if (qty === 0) {
     delete cart[name];
   } else {
@@ -177,10 +177,10 @@ function setCartQty(name, value, maxStock) {
 function updateProductDisplay(name, maxStock) {
   let cartQty = cart[name] || 0;
   let remainingStock = maxStock - cartQty;
-  
+
   let stockEl = document.getElementById(`stock-${name}`);
   let qtyEl = document.getElementById(`qty-${name}`);
-  
+
   if(stockEl) {
     stockEl.textContent = remainingStock;
     stockEl.parentElement.className = remainingStock <= 5? 'stock stock-low' : 'stock';
@@ -307,46 +307,46 @@ function printReceipt(items, total, cash, change) {
   let dateStr = now.toLocaleString('en-PH');
 
   let receiptHTML = `
-  <div style="font-family: monospace; padding: 10px; width: 58mm; margin: 0 auto; font-size: 12px;">
+  <div style="font-family: 'Courier New', monospace; width: 58mm; margin: 0; padding: 2mm; font-size: 11px; line-height: 1.2;">
     <div style="text-align: center;">
-      <h3 style="margin: 0; font-size: 16px;">DHAN SIOMAI</h3>
-      <p style="margin: 3px 0; font-size: 11px;">Fresh Siomai & Dumplings</p>
-      <p style="margin: 3px 0; font-size: 10px;">${dateStr}</p>
-      <hr style="border: 1px dashed #000;">
+      <div style="font-size: 14px; font-weight: bold; margin: 0;">DHAN SIOMAI</div>
+      <div style="font-size: 10px; margin: 2px 0;">Fresh Siomai & Dumplings</div>
+      <div style="font-size: 9px; margin: 2px 0;">${dateStr}</div>
+      <div style="border-top: 1px dashed #000; margin: 4px 0;"></div>
     </div>
 
-    <div style="margin: 10px 0;">
+    <div style="margin: 4px 0;">
       ${items.map(i => `
-        <div style="margin-bottom: 6px;">
+        <div style="margin-bottom: 3px;">
           <div>${i.name}</div>
           <div style="display: flex; justify-content: space-between;">
-            <span>${i.qty} x ₱${i.price}</span>
-            <span>₱${i.subtotal}</span>
+            <span>${i.qty} x ${i.price}</span>
+            <span>${i.subtotal}</span>
           </div>
         </div>
       `).join('')}
     </div>
 
-    <hr style="border: 1px dashed #000;">
-    <div style="margin: 8px 0;">
+    <div style="border-top: 1px dashed #000; margin: 4px 0;"></div>
+    <div style="margin: 4px 0;">
       <div style="display: flex; justify-content: space-between;">
         <span>TOTAL:</span>
-        <span>₱${total}</span>
+        <span>${total}</span>
       </div>
       <div style="display: flex; justify-content: space-between;">
         <span>CASH:</span>
-        <span>₱${cash}</span>
+        <span>${cash}</span>
       </div>
       <div style="display: flex; justify-content: space-between; font-weight: bold;">
         <span>CHANGE:</span>
-        <span>₱${change}</span>
+        <span>${change}</span>
       </div>
     </div>
 
-    <hr style="border: 1px dashed #000;">
-    <div style="text-align: center; margin-top: 10px;">
-      <p style="margin: 5px 0;">Thank You, Come Again!</p>
-      <p style="font-size: 10px; margin: 0;">God Bless!</p>
+    <div style="border-top: 1px dashed #000; margin: 4px 0;"></div>
+    <div style="text-align: center; margin-top: 4px;">
+      <div>Thank You, Come Again!</div>
+      <div style="font-size: 9px;">God Bless!</div>
     </div>
   </div>
   `;
@@ -355,7 +355,7 @@ function printReceipt(items, total, cash, change) {
 
   setTimeout(() => {
     window.print();
-  }, 300);
+  }, 200);
 }
 
 document.getElementById('cartModal').onclick = function(e) {
