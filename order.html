@@ -278,19 +278,49 @@ function checkout() {
   if (Object.keys(cart).length === 0) return alert('Cart empty!');
 
   let total = 0, items = [];
+  let itemList = '';
+
   for (let name in cart) {
     let item = cart[name];
     total += item.price * item.qty;
     items.push({name, price:item.price, qty:item.qty, subtotal:item.price*item.qty});
+    itemList += `${name} x${item.qty} = ₱${item.price * item.qty}\n`;
   }
 
-  let cash = prompt(`Total: ₱${total}\nEnter Cash:`);
-  if (!cash || isNaN(cash)) return;
-  cash = parseFloat(cash);
-  let change = cash - total;
-  if (change < 0) return alert('Kulang pera!');
+  // Payment method
+  let payMethod = prompt(`=== ORDER ===\n${itemList}-------------------\nTOTAL: ₱${total}\n-------------------\nPiliin payment:\n1. COD - Cash on Delivery\n2. GCash\nType 1 or 2:`);
 
-  if (confirm(`Total: ₱${total}\nCash: ₱${cash}\nChange: ₱${change}\n\nPrint receipt?`)) {
+  if (!payMethod || (payMethod!= '1' && payMethod!= '2')) return alert('Invalid choice!');
+
+  let paymentType = payMethod == '1'? 'COD' : 'GCash';
+  let customerName = '';
+  let customerAddress = '';
+  let cash = 0;
+  let change = 0;
+
+  if (paymentType == 'COD') {
+    customerName = prompt('Enter Customer Name:');
+    if (!customerName) return;
+    customerAddress = prompt('Enter Delivery Address:');
+    if (!customerAddress) return;
+
+    cash = prompt(`COD Order\nTotal: ₱${total}\nEnter Cash Received:`);
+    if (!cash || isNaN(cash)) return;
+    cash = parseFloat(cash);
+    change = cash - total;
+    if (change < 0) return alert('Kulang pera!');
+  } else {
+    // GCash
+    cash = total;
+    change = 0;
+    alert(`GCash Payment\nTotal: ₱${total}\n\nSend payment to:\nGCash: 09052733253\nName: DHAN V\nTap OK after payment`);
+  }
+
+  let confirmMsg = `=== CONFIRM ORDER ===\n${itemList}-------------------\nPayment: ${paymentType}\n`;
+  if (customerName) confirmMsg += `Name: ${customerName}\nAddress: ${customerAddress}\n`;
+  confirmMsg += `Total: ₱${total}\nCash: ₱${cash}\nChange: ₱${change}\n\nPrint receipt?`;
+
+  if (confirm(confirmMsg)) {
     let sales = parseInt(localStorage.getItem('sales')) || 0;
     localStorage.setItem('sales', sales + total);
 
@@ -300,7 +330,10 @@ function checkout() {
       total: total,
       cash: cash,
       change: change,
-      items: items
+      items: items,
+      payment: paymentType,
+      customer: customerName,
+      address: customerAddress
     });
     localStorage.setItem('salesHistory', JSON.stringify(history));
 
@@ -310,23 +343,27 @@ function checkout() {
     });
     saveStock(stock);
 
-    printReceipt(items, total, cash, change);
+    printReceipt(items, total, cash, change, paymentType, customerName, customerAddress);
     cart = {};
     updateCartSummary();
     renderProducts();
   }
 }
 
-function printReceipt(items, total, cash, change) {
+function printReceipt(items, total, cash, change, payment, name, address) {
   let now = new Date().toLocaleString();
   let html = `
     <h3>DHAN SIOMAI</h3>
     <div style="text-align:center;">${now}</div>
-    <div class="line"></div>
+    <div style="text-align:center;">Payment: ${payment}</div>
   `;
+  if (name) html += `<div>Name: ${name}</div><div>Address: ${address}</div>`;
+  html += `<div class="line"></div>`;
+
   items.forEach(i => {
     html += `<div class="item"><span>${i.qty}x ${i.name}</span><span>₱${i.subtotal}</span></div>`;
   });
+
   html += `<div class="line"></div>
     <div class="item"><strong>TOTAL</strong><strong>₱${total}</strong></div>
     <div class="item"><span>Cash</span><span>₱${cash}</span></div>
