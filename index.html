@@ -18,6 +18,10 @@ select, input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #dd
 .expense-item input { flex: 1; }
 .expense-list { max-height: 150px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 5px; margin: 10px 0; }
 .expense-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; }
+.stock-list { max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 5px; margin: 10px 0; }
+.stock-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+.stock-low { color: #f44336; font-weight: bold; }
+.stock-ok { color: #4CAF50; }
 </style>
 </head>
 <body>
@@ -41,6 +45,14 @@ select, input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #dd
   <button class="btn btn-red" onclick="resetDay()">Reset Day</button>
 </div>
 
+<!-- CURRENT STOCK -->
+<div class="card">
+  <div class="toggle btn-orange" onclick="toggleDiv('stockViewDiv')">📦 CURRENT STOCK</div>
+  <div id="stockViewDiv" style="display:none;">
+    <div class="stock-list" id="stockList"></div>
+  </div>
+</div>
+
 <!-- ADD EXPENSE -->
 <div class="card">
   <div class="toggle btn-red" onclick="toggleDiv('expenseDiv')">💸 ADD EXPENSE</div>
@@ -54,7 +66,7 @@ select, input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #dd
 
 <!-- STOCK MANAGEMENT -->
 <div class="card">
-  <div class="toggle btn-orange" onclick="toggleDiv('stockDiv')">📦 STOCK MANAGEMENT</div>
+  <div class="toggle btn-orange" onclick="toggleDiv('stockDiv')">➕ ADD STOCK</div>
   <div id="stockDiv" style="display:none;">
     <select id="stockItem"><option>Select Item</option></select>
     <input type="number" id="stockQty" placeholder="Enter quantity to add">
@@ -98,6 +110,7 @@ function init() {
   });
   loadSummary();
   loadExpenses();
+  loadStockView();
 }
 
 function toggleDiv(id) {
@@ -115,6 +128,7 @@ function addStock() {
   localStorage.setItem('stock', JSON.stringify(stock));
   alert(qty + ' added to ' + item);
   document.getElementById('stockQty').value = '';
+  loadStockView();
 }
 
 function loadPrice() {
@@ -157,7 +171,7 @@ function loadExpenses() {
   let html = '';
   let total = 0;
 
-  expenses.forEach((exp, index) => {
+  expenses.forEach((exp) => {
     total += exp.amount;
     html += `
     <div class="expense-row">
@@ -168,6 +182,23 @@ function loadExpenses() {
 
   if(html === '') html = '<p style="text-align:center; color:#666;">No expenses yet</p>';
   document.getElementById('expenseList').innerHTML = html;
+}
+
+function loadStockView() {
+  let stock = JSON.parse(localStorage.getItem('stock') || '{}');
+  let html = '';
+
+  items.forEach(item => {
+    let qty = stock[item] || 0;
+    let cssClass = qty <= 5? 'stock-low' : 'stock-ok';
+    html += `
+    <div class="stock-row">
+      <span>${item}</span>
+      <span class="${cssClass}">Stock: ${qty}</span>
+    </div>`;
+  });
+
+  document.getElementById('stockList').innerHTML = html;
 }
 
 function loadSummary() {
@@ -191,14 +222,28 @@ function resetDay() {
   }
 }
 
-// Listen for checkout from order.html
+// Listen for checkout from order.html - auto update sales AND stock
 window.addEventListener('storage', function(e) {
   if(e.key === 'checkout') {
     let data = JSON.parse(e.newValue);
+
+    // Update sales
     let summary = JSON.parse(localStorage.getItem('summary') || '{"sales":0}');
     summary.sales += data.total;
     localStorage.setItem('summary', JSON.stringify(summary));
+
+    // Update stock - bawas na dito
+    if(data.items) {
+      let stock = JSON.parse(localStorage.getItem('stock') || '{}');
+      data.items.forEach(item => {
+        stock[item.name] = (stock[item.name] || 0) - item.qty;
+        if(stock[item.name] < 0) stock[item.name] = 0;
+      });
+      localStorage.setItem('stock', JSON.stringify(stock));
+    }
+
     loadSummary();
+    loadStockView();
     localStorage.removeItem('checkout');
   }
 });
