@@ -37,7 +37,7 @@ body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; padding-b
 .cart-item-price { font-weight: bold; color: #ff6b35; }
 .cart-total { margin-top: 15px; padding-top: 15px; border-top: 2px solid #ff6b35; font-size: 18px; font-weight: bold; text-align: right; }
 
-/* Print Receipt Style - 58mm Fixed */
+/* Print Receipt Style - 58mm */
 @media print {
   body * { visibility: hidden; }
  .receipt,.receipt * { visibility: visible; }
@@ -312,55 +312,55 @@ function printReceipt(items, total, cash, change) {
   let dateStr = now.toLocaleString('en-PH');
 
   let receiptHTML = `
-  <div style="font-family: 'Courier New', monospace; width: 58mm; margin: 0; padding: 2mm; font-size: 11px; line-height: 1.2;">
+  <div style="font-family: 'Courier New', monospace; width: 58mm; margin: 0; padding: 2mm; font-size: 10px; line-height: 1.1;">
     <div style="text-align: center;">
-      <div style="font-size: 14px; font-weight: bold; margin: 0;">DHAN SIOMAI</div>
-      <div style="font-size: 10px; margin: 2px 0;">Fresh Siomai & Dumplings</div>
-      <div style="font-size: 9px; margin: 2px 0;">${dateStr}</div>
-      <div style="border-top: 1px dashed #000; margin: 4px 0;"></div>
+      <div style="font-size: 13px; font-weight: bold;">DHAN SIOMAI</div>
+      <div style="font-size: 9px;">Fresh Siomai & Dumplings</div>
+      <div style="font-size: 8px;">${dateStr}</div>
+      <div style="border-top: 1px dashed #000; margin: 3px 0;"></div>
     </div>
 
-    <div style="margin: 4px 0;">
+    <div>
       ${items.map(i => `
-        <div style="margin-bottom: 3px;">
+        <div style="margin-bottom: 2px;">
           <div>${i.name}</div>
           <div style="display: flex; justify-content: space-between;">
             <span>${i.qty} x ${i.price}</span>
-            <span>${i.subtotal}</span>
+            <span>₱${i.subtotal}</span>
           </div>
         </div>
       `).join('')}
     </div>
 
-    <div style="border-top: 1px dashed #000; margin: 4px 0;"></div>
-    <div style="margin: 4px 0;">
+    <div style="border-top: 1px dashed #000; margin: 3px 0;"></div>
+    <div>
       <div style="display: flex; justify-content: space-between;">
-        <span>TOTAL:</span>
-        <span>${total}</span>
+        <span>TOTAL:</span><span>₱${total}</span>
       </div>
       <div style="display: flex; justify-content: space-between;">
-        <span>CASH:</span>
-        <span>${cash}</span>
+        <span>CASH:</span><span>₱${cash}</span>
       </div>
       <div style="display: flex; justify-content: space-between; font-weight: bold;">
-        <span>CHANGE:</span>
-        <span>${change}</span>
+        <span>CHANGE:</span><span>₱${change}</span>
       </div>
     </div>
 
-    <div style="border-top: 1px dashed #000; margin: 4px 0;"></div>
-    <div style="text-align: center; margin-top: 4px;">
+    <div style="border-top: 1px dashed #000; margin: 3px 0;"></div>
+    <div style="text-align: center;">
       <div>Thank You, Come Again!</div>
-      <div style="font-size: 9px;">God Bless!</div>
+      <div style="font-size: 8px;">God Bless!</div>
     </div>
   </div>
   `;
 
-  document.getElementById('receipt').innerHTML = receiptHTML;
-
+  let receiptDiv = document.getElementById('receipt');
+  receiptDiv.innerHTML = receiptHTML;
+  receiptDiv.style.display = 'block';
+  
   setTimeout(() => {
     window.print();
-  }, 200);
+    receiptDiv.style.display = 'none';
+  }, 600);
 }
 
 document.getElementById('cartModal').onclick = function(e) {
