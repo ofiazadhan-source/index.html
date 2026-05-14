@@ -19,17 +19,21 @@ header h1 { font-size: 18px; }
 .stock-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-bottom: 8px; }
 .stock-badge.green { background: #4caf50; color: white; }
 .stock-badge.red { background: #f44336; color: white; }
-.qty-control { display: flex; height: 35px; }
-.qty-control button { width: 35px; background: #ff6b35; color: white; border: none; font-size: 18px; font-weight: bold; }
-.qty-control button:disabled { background: #ccc; }
-.qty-control input { flex: 1; text-align: center; border: 1px solid #ddd; border-left: none; border-right: none; font-size: 14px; }
-.qty-control.add-btn { width: 60px; font-size: 12px; }
+.qty-control { display: flex; height: 38px; }
+.qty-control button { width: 38px; background: #ff6b35; color: white; border: none; font-size: 20px; font-weight: bold; cursor: pointer; }
+.qty-control button:active { background: #e55a2b; }
+.qty-control button:disabled { background: #ccc; cursor: not-allowed; }
+.qty-control input { flex: 1; text-align: center; border: 1px solid #ddd; border-left: none; border-right: none; font-size: 16px; font-weight: bold; }
+.qty-control.add-btn { width: 60px; font-size: 12px; background: #4caf50; }
 .bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #ff6b35; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
 .bottom-bar button { background: #4caf50; color: white; border: none; padding: 10px 25px; border-radius: 5px; font-weight: bold; font-size: 14px; }
+
+/* Print: receipt lang ang lalabas */
 @media print {
   body * { visibility: hidden; }
   #receipt, #receipt * { visibility: visible; }
-  #receipt { position: absolute; left: 0; top: 0; }
+  #receipt { position: absolute; left: 0; top: 0; width: 58mm; }
+  @page { margin: 0; size: 58mm auto; }
 }
 </style>
 </head>
@@ -67,11 +71,6 @@ const categories = [
     {name: "Big Chicken Siomai", price: 45},
     {name: "Big Beef Siomai", price: 45},
     {name: "Big Japanese Siomai", price: 45}
-  ]},
-  {name: "Dumplings", items: [
-    {name: "Gyoza Dumplings", price: 50},
-    {name: "Sharksfin Dumplings", price: 55},
-    {name: "Hakaw Dumplings", price: 60}
   ]}
 ];
 
@@ -107,7 +106,7 @@ function renderProducts() {
         </div>
         <div class="qty-control">
           <button ${isSoldOut? 'disabled' : ''} onclick="changeQty('${item.name}', -1)">-</button>
-          <input type="number" id="qty-${item.name}" value="0" min="0" max="${qty}" ${isSoldOut? 'disabled' : ''}>
+          <input type="number" id="qty-${item.name}" value="0" min="0" max="${qty}" ${isSoldOut? 'disabled' : ''} readonly>
           <button class="add-btn" ${isSoldOut? 'disabled' : ''} onclick="addToCart('${item.name}', ${item.price})">+ ADD</button>
         </div>
       </div>`;
@@ -121,6 +120,8 @@ function renderProducts() {
 
 function changeQty(name, delta) {
   let input = document.getElementById(`qty-${name}`);
+  if (!input) return;
+  
   let current = parseInt(input.value) || 0;
   let max = parseInt(input.max) || 0;
   let newQty = current + delta;
@@ -135,7 +136,7 @@ function addToCart(name, price) {
   let input = document.getElementById(`qty-${name}`);
   let qty = parseInt(input.value) || 0;
   
-  if (qty <= 0) return alert('Ilagay mo muna quantity!');
+  if (qty <= 0) return alert('Ilagay mo muna quantity gamit ang + button!');
   
   let stock = loadStock();
   let currentStock = stock[name] || 0;
@@ -144,11 +145,11 @@ function addToCart(name, price) {
     return alert(`Not enough stock! Available: ${currentStock}`);
   }
   
-  // Deduct stock immediately pag ADD
+  // Bawas stock agad pag ADD
   stock[name] = currentStock - qty;
   saveStock(stock);
   
-  // Add to cart
+  // Add sa cart
   if (cart[name]) {
     cart[name].qty += qty;
   } else {
@@ -205,27 +206,27 @@ function printReceipt(items, total, cash, change) {
   let dateStr = now.toLocaleString('en-PH');
 
   let receiptHTML = `
-  <div style="font-family: 'Courier New', monospace; width: 58mm; margin: 0; padding: 2mm; font-size: 10px; line-height: 1.1;">
+  <div style="font-family: 'Courier New', monospace; width: 58mm; margin: 0; padding: 2mm; font-size: 11px; line-height: 1.2;">
     <div style="text-align: center;">
-      <div style="font-size: 13px; font-weight: bold;">DHAN SIOMAI</div>
-      <div style="font-size: 9px;">Fresh Siomai & Dumplings</div>
-      <div style="font-size: 8px;">${dateStr}</div>
-      <div style="border-top: 1px dashed #000; margin: 3px 0;"></div>
+      <div style="font-size: 14px; font-weight: bold;">DHAN SIOMAI</div>
+      <div style="font-size: 10px;">Fresh Siomai & Dumplings</div>
+      <div style="font-size: 9px;">${dateStr}</div>
+      <div style="border-top: 1px dashed #000; margin: 4px 0;"></div>
     </div>
 
     <div>
       ${items.map(i => `
-        <div style="margin-bottom: 2px;">
+        <div style="margin-bottom: 3px;">
           <div>${i.name}</div>
           <div style="display: flex; justify-content: space-between;">
-            <span>${i.qty} x ${i.price}</span>
+            <span>${i.qty} x ₱${i.price}</span>
             <span>₱${i.subtotal}</span>
           </div>
         </div>
       `).join('')}
     </div>
 
-    <div style="border-top: 1px dashed #000; margin: 3px 0;"></div>
+    <div style="border-top: 1px dashed #000; margin: 4px 0;"></div>
     <div>
       <div style="display: flex; justify-content: space-between;">
         <span>TOTAL:</span><span>₱${total}</span>
@@ -238,10 +239,10 @@ function printReceipt(items, total, cash, change) {
       </div>
     </div>
 
-    <div style="border-top: 1px dashed #000; margin: 3px 0;"></div>
+    <div style="border-top: 1px dashed #000; margin: 4px 0;"></div>
     <div style="text-align: center;">
       <div>Thank You, Come Again!</div>
-      <div style="font-size: 8px;">God Bless!</div>
+      <div style="font-size: 9px;">God Bless!</div>
     </div>
   </div>
   `;
@@ -251,7 +252,7 @@ function printReceipt(items, total, cash, change) {
   
   setTimeout(() => {
     window.print();
-  }, 800);
+  }, 1000);
 }
 
 // Initialize stock if empty
@@ -259,7 +260,7 @@ if (!localStorage.getItem('stock')) {
   let initialStock = {};
   categories.forEach(cat => {
     cat.items.forEach(item => {
-      initialStock[item.name] = 50; // Default 50 each
+      initialStock[item.name] = 50;
     });
   });
   saveStock(initialStock);
