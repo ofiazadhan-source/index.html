@@ -35,6 +35,14 @@ body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; padding-b
 .cart-item-qty { color: #666; font-size: 13px; }
 .cart-item-price { font-weight: bold; color: #ff6b35; }
 .cart-total { margin-top: 15px; padding-top: 15px; border-top: 2px solid #ff6b35; font-size: 18px; font-weight: bold; text-align: right; }
+
+/* Print Receipt Style */
+@media print {
+  body * { visibility: hidden; }
+ .receipt,.receipt * { visibility: visible; }
+ .receipt { position: absolute; left: 0; top: 0; width: 100%; }
+}
+.receipt { display: none; }
 </style>
 </head>
 <body>
@@ -60,6 +68,9 @@ body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; padding-b
     <button class="btn" style="background:#4CAF50; width:100%; padding:15px; margin-top:15px; border:none; color:white; font-weight:bold; border-radius:5px;" onclick="checkout()">PROCEED TO CHECKOUT</button>
   </div>
 </div>
+
+<!-- Hidden Receipt for Printing -->
+<div class="receipt" id="receipt"></div>
 
 <script>
 const defaultProducts = [
@@ -208,19 +219,26 @@ function checkout() {
   let stock = JSON.parse(localStorage.getItem('stock') || '{}');
   let prices = JSON.parse(localStorage.getItem('prices') || '{}');
   let total = 0;
+  let itemsList = [];
 
+  // Reduce stock and calculate total
   for(let item in cart) {
     let qty = cart[item];
     if(qty > 0) {
       stock[item] = (stock[item] || 0) - qty;
       let product = defaultProducts.find(p => p.name === item);
       let price = prices[item] || product.price;
-      total += qty * price;
+      let subtotal = qty * price;
+      total += subtotal;
+      itemsList.push({name: item, qty: qty, price: price, subtotal: subtotal});
     }
   }
 
   localStorage.setItem('stock', JSON.stringify(stock));
   localStorage.setItem('checkout', JSON.stringify({total: total, time: Date.now()}));
+
+  // Print Receipt
+  printReceipt(itemsList, total);
 
   alert('Checkout successful! Total: ₱' + total);
   cart = {};
@@ -228,7 +246,52 @@ function checkout() {
   renderProducts();
 }
 
-// Close modal when clicking outside
+function printReceipt(items, total) {
+  let now = new Date();
+  let dateStr = now.toLocaleString('en-PH');
+
+  let receiptHTML = `
+  <div style="font-family: monospace; padding: 20px; max-width: 300px; margin: auto;">
+    <div style="text-align: center;">
+      <h2 style="margin: 0;">DHAN SIOMAI</h2>
+      <p style="margin: 5px 0;">Fresh Siomai & Dumplings</p>
+      <p style="margin: 5px 0; font-size: 12px;">${dateStr}</p>
+      <hr>
+    </div>
+
+    <div style="margin: 15px 0;">
+      ${items.map(i => `
+        <div style="margin-bottom: 8px;">
+          <div>${i.name}</div>
+          <div style="display: flex; justify-content: space-between;">
+            <span>${i.qty} x ₱${i.price}</span>
+            <span>₱${i.subtotal}</span>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+
+    <hr>
+    <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 18px; margin: 10px 0;">
+      <span>TOTAL:</span>
+      <span>₱${total}</span>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px;">
+      <p>Thank You, Come Again!</p>
+      <p style="font-size: 12px;">God Bless!</p>
+    </div>
+  </div>
+  `;
+
+  document.getElementById('receipt').innerHTML = receiptHTML;
+
+  // Open print dialog
+  setTimeout(() => {
+    window.print();
+  }, 500);
+}
+
 document.getElementById('cartModal').onclick = function(e) {
   if(e.target === this) closeCart();
 }
