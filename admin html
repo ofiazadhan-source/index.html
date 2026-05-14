@@ -1,1 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>DHAN SIOMAI Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+html, body {
+  width: 100%;
+  overflow-x: hidden;
+  font-family: 'Poppins', sans-serif;
+  background: #f5f5f5;
+  padding: 16px;
+}
 
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+h2 {
+  font-size: 18px;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.summary p {
+  font-size: 15px;
+  margin: 6px 0;
+}
+.summary.net {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2e7d32;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  color: white;
+  margin-top: 10px;
+  cursor: pointer;
+}
+.btn-red { background: #f44336; }
+.btn-orange { background: #ff6b35; }
+.btn-blue { background: #2196f3; }
+
+.stock-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+.stock-item:last-child { border-bottom: none; }
+.stock-qty { color: #4caf50; font-weight: 600; }
+
+.section-header {
+  padding: 12px;
+  border-radius: 8px;
+  color: white;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.header-orange { background: #ff6b35; }
+.header-red { background: #f44336; }
+.header-blue { background: #2196f3; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h2 style="color:#ff6b35; text-align:center;">Welcome!</h2>
+  <p style="text-align:center; font-size:14px; color:#666;">Fresh Siomai, Gyoza, Siopao<br>Delivered fresh daily</p>
+  <button class="btn-orange" onclick="location.href='order.html'">Order Now</button>
+</div>
+
+<div class="card summary">
+  <h2>Today's Summary</h2>
+  <p>Gross Sales: ₱<span id="sales">0</span></p>
+  <p>Total Expenses: ₱<span id="expenses">0</span></p>
+  <p class="net">Net Income: ₱<span id="net">0</span></p>
+  <button class="btn-red" onclick="resetDay()">Reset Day</button>
+</div>
+
+<div class="card">
+  <div class="section-header header-orange">📦 CURRENT STOCK</div>
+  <div id="stockList"></div>
+</div>
+
+<button class="btn-red" onclick="addExpense()">💸 ADD EXPENSE</button>
+<button class="btn-orange" onclick="addStock()">➕ ADD STOCK</button>
+<button class="btn-blue" onclick="priceManage()">💰 PRICE MANAGEMENT</button>
+
+<script>
+function loadStock() {
+  return JSON.parse(localStorage.getItem('stock') || '{}');
+}
+
+function saveStock(stock) {
+  localStorage.setItem('stock', JSON.stringify(stock));
+}
+
+function loadData() {
+  let sales = localStorage.getItem('sales') || 0;
+  let expenses = localStorage.getItem('expenses') || 0;
+  document.getElementById('sales').textContent = sales;
+  document.getElementById('expenses').textContent = expenses;
+  document.getElementById('net').textContent = sales - expenses;
+
+  let stock = loadStock();
+  let html = '';
+  for (let name in stock) {
+    html += `<div class="stock-item">
+      <span>${name}</span>
+      <span class="stock-qty">Stock: ${stock[name]}</span>
+    </div>`;
+  }
+  document.getElementById('stockList').innerHTML = html;
+}
+
+function addStock() {
+  let item = prompt('Item name:');
+  let qty = prompt('Quantity to add:');
+  if (!item ||!qty || isNaN(qty)) return;
+  let stock = loadStock();
+  stock[item] = (stock[item] || 0) + parseInt(qty);
+  saveStock(stock);
+  loadData();
+}
+
+function addExpense() {
+  let amount = prompt('Expense amount:');
+  if (!amount || isNaN(amount)) return;
+  let expenses = parseInt(localStorage.getItem('expenses') || 0);
+  expenses += parseInt(amount);
+  localStorage.setItem('expenses', expenses);
+  loadData();
+}
+
+function resetDay() {
+  if (confirm('Reset sales and expenses for today?')) {
+    localStorage.setItem('sales', 0);
+    localStorage.setItem('expenses', 0);
+    loadData();
+  }
+}
+
+function priceManage() {
+  alert('Price management coming soon!');
+}
+
+loadData();
+</script>
+</body>
+</html>
