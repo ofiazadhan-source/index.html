@@ -2,12 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>DHAN SIOMAI Online Store</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+html, body {
+  width: 100%;
+  overflow-x: hidden;
   font-family: 'Poppins', sans-serif;
   background: #f5f5f5;
   padding-bottom: 85px;
@@ -17,7 +24,7 @@ body {
 header {
   background: linear-gradient(135deg, #ff6b35, #ff4500);
   color: white;
-  padding: 20px 16px;
+  padding: 18px 16px;
   text-align: center;
   position: sticky;
   top: 0;
@@ -25,17 +32,17 @@ header {
   box-shadow: 0 4px 12px rgba(255,107,53,0.3);
 }
 header h1 {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
 }
 
-.container { padding: 16px; }
+.container { padding: 12px; }
 .section-title {
   background: white;
   color: #ff6b35;
-  padding: 12px 16px;
-  margin: 20px 0 12px 0;
-  font-size: 16px;
+  padding: 10px 14px;
+  margin: 16px 0 10px 0;
+  font-size: 15px;
   font-weight: 700;
   border-left: 4px solid #ff6b35;
   border-radius: 8px;
@@ -45,44 +52,33 @@ header h1 {
 .product-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 16px;
+  gap: 12px;
 }
 .product-card {
   background: white;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
 }
 
-.product-img {
-  width: 100%;
-  height: 140px;
-  background: linear-gradient(135deg, #ffe4d9, #ffd4c2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 48px;
-}
-
-.card-content { padding: 16px; }
 .product-card h3 {
-  font-size: 18px;
-  margin-bottom: 8px;
+  font-size: 16px;
+  margin-bottom: 6px;
   font-weight: 700;
 }
 .price-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 .price {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   color: #ff6b35;
 }
 .stock-badge {
-  padding: 6px 12px;
+  padding: 5px 10px;
   border-radius: 20px;
   font-size: 13px;
   font-weight: 600;
@@ -92,35 +88,36 @@ header h1 {
 
 .qty-control {
   display: flex;
-  height: 50px;
+  height: 46px;
   gap: 8px;
 }
-.qty-control button {
-  width: 50px;
-  background: #ff6b35;
-  color: white;
-  border: none;
-  border-radius: 12px;
+.qty-control button.minus {
+  width: 46px;
+  background: white;
+  color: #ff6b35;
+  border: 2px solid #ff6b35;
+  border-radius: 10px;
   font-size: 24px;
   font-weight: 700;
-  cursor: pointer;
 }
-.qty-control button:active { background: #e55a2b; }
 .qty-control input {
   flex: 1;
   text-align: center;
   border: 2px solid #ff6b35;
-  border-radius: 12px;
-  font-size: 20px;
+  border-radius: 10px;
+  font-size: 18px;
   font-weight: 700;
-  background: white;
 }
-.qty-control.add-btn {
-  width: 90px;
-  font-size: 14px;
+.qty-control button.add {
+  width: 80px;
   background: #4caf50;
-  border-radius: 12px;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
 }
+.qty-control button:active { opacity: 0.8; }
 
 .bottom-bar {
   position: fixed;
@@ -128,24 +125,23 @@ header h1 {
   left: 0;
   width: 100%;
   background: white;
-  padding: 14px 16px;
+  padding: 12px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   z-index: 100;
   box-shadow: 0 -4px 16px rgba(0,0,0,0.1);
-  border-radius: 20px 20px 0 0;
 }
 .bottom-bar #cartSummary {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
 }
 .bottom-bar button {
-  background: linear-gradient(135deg, #4caf50, #388e3c);
+  background: #4caf50;
   color: white;
   border: none;
-  padding: 14px 32px;
-  border-radius: 12px;
+  padding: 12px 28px;
+  border-radius: 10px;
   font-weight: 700;
   font-size: 15px;
 }
@@ -153,7 +149,7 @@ header h1 {
 </head>
 <body>
 <header>
-  <h1>DHAN SIOMAI 🍢</h1>
+  <h1>DHAN SIOMAI POS</h1>
 </header>
 
 <div class="container" id="container"></div>
@@ -163,22 +159,25 @@ header h1 {
   <button onclick="checkout()">CHECKOUT</button>
 </div>
 
-<div id="receipt"></div>
-
 <script>
 const categories = [
   {name: "Siomai 65", items: [
-    {name: "Pork Siomai 65", price: 150, emoji: "🥟"},
-    {name: "Chicken Siomai 65", price: 150, emoji: "🍗"},
-    {name: "Beef Siomai 65", price: 160, emoji: "🥩"},
-    {name: "Shrimp Siomai 65", price: 170, emoji: "🦐"}
+    {name: "Pork Siomai 65", price: 150},
+    {name: "Chicken Siomai 65", price: 150},
+    {name: "Beef Siomai 65", price: 160},
+    {name: "Shrimp Siomai 65", price: 170}
   ]},
   {name: "Siomai 30", items: [
-    {name: "Pork Siomai 30", price: 75, emoji: "🥟"},
-    {name: "Chicken Siomai 30", price: 75, emoji: "🍗"},
-    {name: "Beef Siomai 30", price: 80, emoji: "🥩"},
-    {name: "Shrimp Siomai 30", price: 85, emoji: "🦐"},
-    {name: "Japanese Siomai 30", price: 90, emoji: "🍣"}
+    {name: "Pork Siomai 30", price: 75},
+    {name: "Chicken Siomai 30", price: 75},
+    {name: "Beef Siomai 30", price: 80},
+    {name: "Shrimp Siomai 30", price: 85}
+  ]},
+  {name: "Siopao", items: [
+    {name: "Jumbo Asado Siopao", price: 45},
+    {name: "Jumbo Bola-Bola Siopao", price: 45},
+    {name: "Mini Asado Siopao", price: 25},
+    {name: "Mini Bola-Bola Siopao", price: 25}
   ]}
 ];
 
@@ -202,21 +201,17 @@ function renderProducts() {
 
     cat.items.forEach(item => {
       let qty = stock[item.name] || 0;
-
       html += `
       <div class="product-card">
-        <div class="product-img">${item.emoji}</div>
-        <div class="card-content">
-          <h3>${item.name}</h3>
-          <div class="price-row">
-            <div class="price">₱${item.price}</div>
-            <div class="stock-badge" id="stock-${item.name}">Stock: ${qty}</div>
-          </div>
-          <div class="qty-control">
-            <button onclick="changeQty('${item.name}', -1)">-</button>
-            <input type="number" id="qty-${item.name}" value="0" min="0" oninput="validateQty('${item.name}')">
-            <button class="add-btn" onclick="addToCart('${item.name}', ${item.price})">+ ADD</button>
-          </div>
+        <h3>${item.name}</h3>
+        <div class="price-row">
+          <div class="price">₱${item.price}</div>
+          <div class="stock-badge" id="stock-${item.name}">Stock: ${qty}</div>
+        </div>
+        <div class="qty-control">
+          <button class="minus" onclick="changeQty('${item.name}', -1)">-</button>
+          <input type="number" id="qty-${item.name}" value="0" min="0" oninput="validateQty('${item.name}')">
+          <button class="add" onclick="addToCart('${item.name}', ${item.price})">+ ADD</button>
         </div>
       </div>`;
     });
@@ -232,11 +227,9 @@ function changeQty(name, delta) {
   let current = parseInt(input.value) || 0;
   let stock = loadStock();
   let max = stock[name] || 0;
-
   let newQty = current + delta;
   if (newQty < 0) newQty = 0;
   if (newQty > max) newQty = max;
-
   input.value = newQty;
 }
 
@@ -245,7 +238,6 @@ function validateQty(name) {
   let stock = loadStock();
   let max = stock[name] || 0;
   let val = parseInt(input.value) || 0;
-
   if (val < 0) input.value = 0;
   if (val > max) input.value = max;
 }
@@ -253,21 +245,15 @@ function validateQty(name) {
 function addToCart(name, price) {
   let input = document.getElementById(`qty-${name}`);
   let qty = parseInt(input.value) || 0;
-
-  if (qty <= 0) return alert('Maglagay ka muna ng quantity!');
+  if (qty <= 0) return alert('Maglagay ng quantity!');
 
   let stock = loadStock();
   let currentStock = stock[name] || 0;
+  if (qty > currentStock) return alert(`Kulang stock! Available: ${currentStock}`);
 
-  if (qty > currentStock) {
-    return alert(`Kulang stock! Available: ${currentStock}`);
-  }
-
-  // Bawas stock
   stock[name] = currentStock - qty;
   saveStock(stock);
 
-  // Add sa cart
   if (cart[name]) {
     cart[name].qty += qty;
   } else {
@@ -288,44 +274,31 @@ function updateStockDisplay(name) {
 function updateCartSummary() {
   let totalQty = 0;
   let totalPrice = 0;
-
   for (let name in cart) {
     totalQty += cart[name].qty;
     totalPrice += cart[name].price * cart[name].qty;
   }
-
   document.getElementById('cartSummary').textContent = `Cart: ${totalQty} items - ₱${totalPrice}`;
 }
 
 function checkout() {
-  if (Object.keys(cart).length === 0) return alert('Cart is empty!');
-
+  if (Object.keys(cart).length === 0) return alert('Cart empty!');
   let total = 0;
-  let items = [];
-
   for (let name in cart) {
-    let item = cart[name];
-    let subtotal = item.price * item.qty;
-    total += subtotal;
-    items.push({name, price: item.price, qty: item.qty, subtotal});
+    total += cart[name].price * cart[name].qty;
   }
-
-  let cash = prompt(`Total: ₱${total}\nEnter Cash Amount:`);
-  if (!cash || isNaN(cash)) return alert('Invalid amount!');
-
+  let cash = prompt(`Total: ₱${total}\nEnter Cash:`);
+  if (!cash || isNaN(cash)) return;
   cash = parseFloat(cash);
   let change = cash - total;
-
-  if (change < 0) return alert('Insufficient cash!');
-
-  if (confirm(`Total: ₱${total}\nCash: ₱${cash}\nChange: ₱${change}\n\nConfirm checkout?`)) {
+  if (change < 0) return alert('Kulang pera!');
+  if (confirm(`Total: ₱${total}\nCash: ₱${cash}\nChange: ₱${change}\n\nConfirm?`)) {
     alert('Order placed!');
     cart = {};
     updateCartSummary();
   }
 }
 
-// Initialize stock kung wala pa
 if (!localStorage.getItem('stock')) {
   let initialStock = {};
   categories.forEach(cat => {
