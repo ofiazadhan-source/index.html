@@ -3,86 +3,85 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DHAN SIOMAI Online Order</title>
+<title>DHAN SIOMAI Online Store</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: Arial, sans-serif; background: #f5f5f5; padding-bottom: 80px; }
+body { font-family: Arial, sans-serif; background: #f5f5f5; padding-bottom: 70px; }
 header { background: #ff6b35; color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 100; }
-header h1 { font-size: 20px; }
+header h1 { font-size: 18px; }
 .container { padding: 15px; }
+.section-title { background: #555; color: white; padding: 8px 15px; margin: 15px -15px; font-size: 14px; font-weight: bold; }
 .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-.product-card { background: white; border-radius: 8px; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-.product-card h3 { font-size: 14px; margin-bottom: 5px; }
-.product-card p { font-size: 16px; font-weight: bold; color: #ff6b35; margin-bottom: 8px; }
-.product-card .stock { font-size: 12px; color: #666; margin-bottom: 8px; }
-.product-card button { width: 100%; background: #ff6b35; color: white; border: none; padding: 8px; border-radius: 5px; font-weight: bold; }
-.product-card button:disabled { background: #ccc; }
-.cart-btn { position: fixed; bottom: 20px; right: 20px; background: #ff6b35; color: white; border: none; width: 60px; height: 60px; border-radius: 50%; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-.cart-badge { position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; width: 22px; height: 22px; font-size: 12px; display: flex; align-items: center; justify-content: center; }
-.cart-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 200; }
-.cart-modal { position: fixed; bottom: 0; left: 0; width: 100%; background: white; border-radius: 15px 15px 0 0; max-height: 80vh; overflow-y: auto; padding: 20px; }
-.cart-item { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-.cart-total { font-size: 18px; font-weight: bold; margin: 15px 0; }
-.cart-modal button { width: 100%; padding: 12px; background: #ff6b35; color: white; border: none; border-radius: 5px; font-weight: bold; margin-top: 10px; }
-.close-btn { background: #ccc !important; color: #333 !important; }
+.product-card { background: white; border-radius: 8px; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: relative; overflow: hidden; }
+.sold-out-ribbon { position: absolute; top: 10px; right: -25px; background: #ff6b35; color: white; padding: 3px 30px; transform: rotate(45deg); font-size: 10px; font-weight: bold; }
+.product-card h3 { font-size: 14px; margin-bottom: 5px; padding-right: 40px; }
+.price { font-size: 16px; font-weight: bold; color: #ff6b35; margin-bottom: 8px; }
+.stock-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-bottom: 8px; }
+.stock-badge.green { background: #4caf50; color: white; }
+.stock-badge.red { background: #f44336; color: white; }
+.qty-control { display: flex; height: 35px; }
+.qty-control button { width: 35px; background: #ff6b35; color: white; border: none; font-size: 18px; font-weight: bold; }
+.qty-control button:disabled { background: #ccc; }
+.qty-control input { flex: 1; text-align: center; border: 1px solid #ddd; border-left: none; border-right: none; font-size: 14px; }
+.qty-control.add-btn { width: 60px; font-size: 12px; }
+.bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #ff6b35; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+.bottom-bar button { background: #4caf50; color: white; border: none; padding: 10px 25px; border-radius: 5px; font-weight: bold; font-size: 14px; }
 #receipt { display: none; }
-.sold-out { color: red; font-weight: bold; }
 </style>
 </head>
 <body>
 <header>
-  <h1>DHAN SIOMAI</h1>
-  <p>Fresh Siomai & Dumplings</p>
+  <h1>DHAN SIOMAI ONLINE STORE</h1>
 </header>
 
-<div class="container">
-  <div class="product-grid" id="productGrid"></div>
-</div>
+<div class="container" id="container"></div>
 
-<button class="cart-btn" onclick="openCart()">
-  🛒
-  <span class="cart-badge" id="cartBadge">0</span>
-</button>
-
-<div class="cart-overlay" id="cartOverlay">
-  <div class="cart-modal">
-    <h2>Your Cart</h2>
-    <div id="cartItems"></div>
-    <div class="cart-total">Total: ₱<span id="cartTotal">0</span></div>
-    <button onclick="checkout()">CHECKOUT</button>
-    <button class="close-btn" onclick="closeCart()">CLOSE</button>
-  </div>
+<div class="bottom-bar">
+  <div id="cartSummary">Cart: 0 items - ₱0</div>
+  <button onclick="checkout()">CHECKOUT</button>
 </div>
 
 <div id="receipt"></div>
 
 <script>
-const products = [
-  {name: "Pork Siomai 65", price: 150},
-  {name: "Chicken Siomai 65", price: 150},
-  {name: "Beef Siomai 65", price: 160},
-  {name: "Shrimp Siomai 65", price: 170},
-  {name: "Pork Siomai 30", price: 75},
-  {name: "Chicken Siomai 30", price: 75},
-  {name: "Beef Siomai 30", price: 80},
-  {name: "Shrimp Siomai 30", price: 85},
-  {name: "Japanese Siomai 30", price: 90},
-  {name: "Big Pork Siomai", price: 25},
-  {name: "Big Chicken Siomai", price: 25},
-  {name: "Big Beef Siomai", price: 28},
-  {name: "Big Japanese Siomai", price: 30},
-  {name: "Gyoza Dumplings", price: 120},
-  {name: "Sharksfin Dumplings", price: 120},
-  {name: "Hakaw Dumplings", price: 140},
-  {name: "Jumbo Asado Siopao", price: 45},
-  {name: "Jumbo Bola-Bola Siopao", price: 45},
-  {name: "Mini Asado Siopao", price: 25},
-  {name: "Mini Bola-Bola Siopao", price: 25},
-  {name: "Chili Garlic Sauce", price: 50},
-  {name: "Siopao Sauce", price: 30}
+const categories = [
+  {name: "Siomai 65", items: [
+    {name: "Pork Siomai 65", price: 150},
+    {name: "Chicken Siomai 65", price: 150},
+    {name: "Beef Siomai 65", price: 160},
+    {name: "Shrimp Siomai 65", price: 170}
+  ]},
+  {name: "Siomai 30", items: [
+    {name: "Pork Siomai 30", price: 75},
+    {name: "Chicken Siomai 30", price: 75},
+    {name: "Beef Siomai 30", price: 80},
+    {name: "Shrimp Siomai 30", price: 85},
+    {name: "Japanese Siomai 30", price: 90}
+  ]},
+  {name: "Big Siomai", items: [
+    {name: "Big Pork Siomai", price: 45},
+    {name: "Big Chicken Siomai", price: 45},
+    {name: "Big Beef Siomai", price: 45},
+    {name: "Big Japanese Siomai", price: 45}
+  ]},
+  {name: "Dumplings", items: [
+    {name: "Gyoza Dumplings", price: 50},
+    {name: "Sharksfin Dumplings", price: 55},
+    {name: "Hakaw Dumplings", price: 60}
+  ]},
+  {name: "Siopao", items: [
+    {name: "Jumbo Asado Siopao", price: 45},
+    {name: "Jumbo Bola-Bola Siopao", price: 45},
+    {name: "Mini Asado Siopao", price: 25},
+    {name: "Mini Bola-Bola Siopao", price: 25}
+  ]},
+  {name: "Sauce", items: [
+    {name: "Chili Garlic Sauce", price: 50},
+    {name: "Siopao Sauce", price: 30}
+  ]}
 ];
 
-let cart = [];
+let cart = {};
 
 function loadStock() {
   return JSON.parse(localStorage.getItem('stock') || '{}');
@@ -96,77 +95,85 @@ function renderProducts() {
   let stock = loadStock();
   let html = '';
   
-  products.forEach(p => {
-    let qty = stock[p.name] || 0;
-    html += `
-    <div class="product-card">
-      <h3>${p.name}</h3>
-      <p>₱${p.price}</p>
-      <div class="stock">Stock: ${qty}</div>
-      <button ${qty == 0 ? 'disabled' : ''} onclick="addToCart('${p.name}', ${p.price})">
-        ${qty == 0 ? 'SOLD OUT' : 'ADD TO CART'}
-      </button>
-    </div>`;
+  categories.forEach(cat => {
+    html += `<div class="section-title">📁 ${cat.name}</div>`;
+    html += `<div class="product-grid">`;
+    
+    cat.items.forEach(item => {
+      let qty = stock[item.name] || 0;
+      let isSoldOut = qty <= 0;
+      
+      html += `
+      <div class="product-card">
+        ${isSoldOut? '<div class="sold-out-ribbon">SOLD OUT</div>' : ''}
+        <h3>${item.name}</h3>
+        <div class="price">₱${item.price}</div>
+        <div class="stock-badge ${isSoldOut? 'red' : 'green'}">
+          Stock: ${qty}
+        </div>
+        <div class="qty-control">
+          <button ${isSoldOut? 'disabled' : ''} onclick="changeQty('${item.name}', -1)">-</button>
+          <input type="number" id="qty-${item.name}" value="0" min="0" max="${qty}" ${isSoldOut? 'disabled' : ''}>
+          <button class="add-btn" ${isSoldOut? 'disabled' : ''} onclick="addToCart('${item.name}', ${item.price})">+ ADD</button>
+        </div>
+      </div>`;
+    });
+    
+    html += `</div>`;
   });
   
-  document.getElementById('productGrid').innerHTML = html;
+  document.getElementById('container').innerHTML = html;
+}
+
+function changeQty(name, delta) {
+  let input = document.getElementById(`qty-${name}`);
+  let current = parseInt(input.value) || 0;
+  let max = parseInt(input.max) || 0;
+  let newQty = current + delta;
+  
+  if (newQty < 0) newQty = 0;
+  if (newQty > max) newQty = max;
+  
+  input.value = newQty;
 }
 
 function addToCart(name, price) {
-  let stock = loadStock();
-  if ((stock[name] || 0) <= 0) return;
+  let input = document.getElementById(`qty-${name}`);
+  let qty = parseInt(input.value) || 0;
   
-  let existing = cart.find(i => i.name === name);
-  if (existing) {
-    existing.qty++;
-  } else {
-    cart.push({name, price, qty: 1});
+  if (qty <= 0) return alert('Ilagay mo muna quantity!');
+  
+  cart[name] = {price, qty};
+  input.value = 0;
+  updateCartSummary();
+}
+
+function updateCartSummary() {
+  let totalQty = 0;
+  let totalPrice = 0;
+  
+  for (let name in cart) {
+    totalQty += cart[name].qty;
+    totalPrice += cart[name].price * cart[name].qty;
   }
   
-  updateCartBadge();
-}
-
-function updateCartBadge() {
-  let totalQty = cart.reduce((sum, i) => sum + i.qty, 0);
-  document.getElementById('cartBadge').textContent = totalQty;
-}
-
-function openCart() {
-  document.getElementById('cartOverlay').style.display = 'block';
-  renderCart();
-}
-
-function closeCart() {
-  document.getElementById('cartOverlay').style.display = 'none';
-}
-
-function renderCart() {
-  let html = '';
-  let total = 0;
-  
-  cart.forEach((item, index) => {
-    let subtotal = item.price * item.qty;
-    total += subtotal;
-    html += `
-    <div class="cart-item">
-      <div>
-        <div>${item.name}</div>
-        <div>${item.qty} x ₱${item.price}</div>
-      </div>
-      <div>₱${subtotal}</div>
-    </div>`;
-  });
-  
-  document.getElementById('cartItems').innerHTML = html || '<p>Cart is empty</p>';
-  document.getElementById('cartTotal').textContent = total;
+  document.getElementById('cartSummary').textContent = `Cart: ${totalQty} items - ₱${totalPrice}`;
 }
 
 function checkout() {
-  if (cart.length === 0) return alert('Cart is empty!');
+  if (Object.keys(cart).length === 0) return alert('Cart is empty!');
   
-  let total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+  let total = 0;
+  let items = [];
+  
+  for (let name in cart) {
+    let item = cart[name];
+    let subtotal = item.price * item.qty;
+    total += subtotal;
+    items.push({name, price: item.price, qty: item.qty, subtotal});
+  }
+  
   let cash = prompt(`Total: ₱${total}\nEnter Cash Amount:`);
-  
   if (!cash || isNaN(cash)) return alert('Invalid amount!');
   
   cash = parseFloat(cash);
@@ -175,18 +182,16 @@ function checkout() {
   if (change < 0) return alert('Insufficient cash!');
   
   if (confirm(`Total: ₱${total}\nCash: ₱${cash}\nChange: ₱${change}\n\nConfirm checkout?`)) {
-    // Update stock
+    // Deduct stock
     let stock = loadStock();
-    cart.forEach(item => {
+    items.forEach(item => {
       stock[item.name] = (stock[item.name] || 0) - item.qty;
     });
     saveStock(stock);
     
-    printReceipt(cart, total, cash, change);
-    
-    cart = [];
-    updateCartBadge();
-    closeCart();
+    printReceipt(items, total, cash, change);
+    cart = {};
+    updateCartSummary();
     renderProducts();
   }
 }
@@ -210,7 +215,7 @@ function printReceipt(items, total, cash, change) {
           <div>${i.name}</div>
           <div style="display: flex; justify-content: space-between;">
             <span>${i.qty} x ${i.price}</span>
-            <span>₱${i.subtotal || i.price * i.qty}</span>
+            <span>₱${i.subtotal}</span>
           </div>
         </div>
       `).join('')}
