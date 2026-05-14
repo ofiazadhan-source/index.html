@@ -26,7 +26,11 @@ header h1 { font-size: 18px; }
 .qty-control.add-btn { width: 60px; font-size: 12px; }
 .bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #ff6b35; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
 .bottom-bar button { background: #4caf50; color: white; border: none; padding: 10px 25px; border-radius: 5px; font-weight: bold; font-size: 14px; }
-#receipt { display: none; }
+@media print {
+  body * { visibility: hidden; }
+  #receipt, #receipt * { visibility: visible; }
+  #receipt { position: absolute; left: 0; top: 0; }
+}
 </style>
 </head>
 <body>
@@ -68,16 +72,6 @@ const categories = [
     {name: "Gyoza Dumplings", price: 50},
     {name: "Sharksfin Dumplings", price: 55},
     {name: "Hakaw Dumplings", price: 60}
-  ]},
-  {name: "Siopao", items: [
-    {name: "Jumbo Asado Siopao", price: 45},
-    {name: "Jumbo Bola-Bola Siopao", price: 45},
-    {name: "Mini Asado Siopao", price: 25},
-    {name: "Mini Bola-Bola Siopao", price: 25}
-  ]},
-  {name: "Sauce", items: [
-    {name: "Chili Garlic Sauce", price: 50},
-    {name: "Siopao Sauce", price: 30}
   ]}
 ];
 
@@ -143,9 +137,27 @@ function addToCart(name, price) {
   
   if (qty <= 0) return alert('Ilagay mo muna quantity!');
   
-  cart[name] = {price, qty};
+  let stock = loadStock();
+  let currentStock = stock[name] || 0;
+  
+  if (qty > currentStock) {
+    return alert(`Not enough stock! Available: ${currentStock}`);
+  }
+  
+  // Deduct stock immediately pag ADD
+  stock[name] = currentStock - qty;
+  saveStock(stock);
+  
+  // Add to cart
+  if (cart[name]) {
+    cart[name].qty += qty;
+  } else {
+    cart[name] = {price, qty};
+  }
+  
   input.value = 0;
   updateCartSummary();
+  renderProducts();
 }
 
 function updateCartSummary() {
@@ -182,17 +194,9 @@ function checkout() {
   if (change < 0) return alert('Insufficient cash!');
   
   if (confirm(`Total: ₱${total}\nCash: ₱${cash}\nChange: ₱${change}\n\nConfirm checkout?`)) {
-    // Deduct stock
-    let stock = loadStock();
-    items.forEach(item => {
-      stock[item.name] = (stock[item.name] || 0) - item.qty;
-    });
-    saveStock(stock);
-    
     printReceipt(items, total, cash, change);
     cart = {};
     updateCartSummary();
-    renderProducts();
   }
 }
 
@@ -244,14 +248,21 @@ function printReceipt(items, total, cash, change) {
 
   let receiptDiv = document.getElementById('receipt');
   receiptDiv.innerHTML = receiptHTML;
-  receiptDiv.style.display = 'block';
   
   setTimeout(() => {
     window.print();
-    setTimeout(() => {
-      receiptDiv.style.display = 'none';
-    }, 1000);
-  }, 1200);
+  }, 800);
+}
+
+// Initialize stock if empty
+if (!localStorage.getItem('stock')) {
+  let initialStock = {};
+  categories.forEach(cat => {
+    cat.items.forEach(item => {
+      initialStock[item.name] = 50; // Default 50 each
+    });
+  });
+  saveStock(initialStock);
 }
 
 renderProducts();
