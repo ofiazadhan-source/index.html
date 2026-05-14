@@ -13,9 +13,10 @@ body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; padding-b
 .card h4 { margin: 0 0 5px 0; font-size: 14px; min-height: 32px; }
 .price { color: #ff6b35; font-weight: bold; font-size: 16px; }
 .stock { background: #4CAF50; color: white; padding: 3px 8px; border-radius: 12px; display: inline-block; font-size: 12px; margin: 5px 0; }
+.stock-low { background: #f44336; }
 .soldout { position: absolute; top: 10px; right: 10px; background: #ff6b35; color: white; padding: 5px 10px; transform: rotate(15deg); font-weight: bold; font-size: 12px; }
 .qtybox { display: flex; margin-top: 8px; }
-.qtybox input { flex: 1; text-align: center; border: 1px solid #ff6b35; border-left: 0; border-right: 0; outline: none; }
+.qtybox input { flex: 1; text-align: center; border: 1px solid #ff6b35; border-left: 0; border-right: 0; outline: none; font-size: 16px; }
 .qtybox button { background: #ff6b35; color: white; border: none; padding: 8px 12px; cursor: pointer; font-weight: bold; }
 .qtybox button:first-child { border-radius: 5px 0 0 5px; }
 .qtybox button:last-child { border-radius: 0 5px 5px 0; }
@@ -43,6 +44,11 @@ body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; padding-b
 .receipt { position: absolute; left: 0; top: 0; width: 100%; }
 }
 .receipt { display: none; }
+
+@page {
+  size: 58mm auto;
+  margin: 0;
+}
 </style>
 </head>
 <body>
@@ -116,17 +122,21 @@ function renderProducts() {
     let qty = stock[p.name] || 0;
     let price = prices[p.name] || p.price;
     let cartQty = cart[p.name] || 0;
+    let remainingStock = qty - cartQty;
+    let stockClass = remainingStock <= 5? 'stock-low' : '';
 
     html += `
     <div class="card">
       <h4>${p.name}</h4>
       <div class="price">₱${price}</div>
-      <div class="stock">Stock: ${qty}</div>
-      ${qty === 0? '<div class="soldout">SOLD OUT</div>' : ''}
+      <div class="stock ${stockClass}">Stock: <span id="stock-${p.name}">${remainingStock}</span></div>
+      ${remainingStock === 0? '<div class="soldout">SOLD OUT</div>' : ''}
       <div class="qtybox">
         <button onclick="updateCart('${p.name}', -1, ${qty})">-</button>
-        <input type="text" value="${cartQty}" readonly id="qty-${p.name}">
-        <button onclick="updateCart('${p.name}', 1, ${qty})" ${qty === 0? 'disabled' : ''}>+ ADD</button>
+        <input type="number" min="0" max="${qty}" value="${cartQty}" 
+               id="qty-${p.name}" 
+               oninput="setCartQty('${p.name}', this.value, ${qty})">
+        <button onclick="updateCart('${p.name}', 1, ${qty})" ${remainingStock === 0? 'disabled' : ''}>+ ADD</button>
       </div>
     </div>`;
   });
@@ -143,9 +153,39 @@ function updateCart(name, change, maxStock) {
   if (cart[name] > maxStock) cart[name] = maxStock;
   if (cart[name] === 0) delete cart[name];
 
-  document.getElementById(`qty-${name}`).value = cart[name] || 0;
+  updateProductDisplay(name, maxStock);
   updateCartBar();
   renderCartItems();
+}
+
+function setCartQty(name, value, maxStock) {
+  let qty = parseInt(value) || 0;
+  if (qty < 0) qty = 0;
+  if (qty > maxStock) qty = maxStock;
+  
+  if (qty === 0) {
+    delete cart[name];
+  } else {
+    cart[name] = qty;
+  }
+
+  updateProductDisplay(name, maxStock);
+  updateCartBar();
+  renderCartItems();
+}
+
+function updateProductDisplay(name, maxStock) {
+  let cartQty = cart[name] || 0;
+  let remainingStock = maxStock - cartQty;
+  
+  let stockEl = document.getElementById(`stock-${name}`);
+  let qtyEl = document.getElementById(`qty-${name}`);
+  
+  if(stockEl) {
+    stockEl.textContent = remainingStock;
+    stockEl.parentElement.className = remainingStock <= 5? 'stock stock-low' : 'stock';
+  }
+  if(qtyEl) qtyEl.value = cartQty;
 }
 
 function updateCartBar() {
@@ -214,7 +254,6 @@ function checkout() {
   let totalItems = Object.values(cart).reduce((a,b) => a+b, 0);
   if(totalItems === 0) return alert('Cart is empty!');
 
-  // Calculate total first
   let prices = JSON.parse(localStorage.getItem('prices') || '{}');
   let total = 0;
   let itemsList = [];
@@ -230,9 +269,8 @@ function checkout() {
     }
   }
 
-  // Ask for cash amount
   let cash = prompt(`Total: ₱${total}\n\nEnter Cash Amount:`);
-  if(cash === null) return; // Cancelled
+  if(cash === null) return;
   cash = parseFloat(cash);
 
   if(isNaN(cash) || cash < total) {
@@ -244,7 +282,6 @@ function checkout() {
 
   if(!confirm(`Total: ₱${total}\nCash: ₱${cash}\nChange: ₱${change}\n\nConfirm checkout?`)) return;
 
-  // Process checkout
   let stock = JSON.parse(localStorage.getItem('stock') || '{}');
 
   for(let item in cart) {
@@ -255,7 +292,7 @@ function checkout() {
   }
 
   localStorage.setItem('stock', JSON.stringify(stock));
-  localStorage.setItem('checkout', JSON.stringify({total: total, time: Date.now()}));
+  localStorage.setItem('checkout', JSON.stringify({total: total, items: itemsList, time: Date.now()}));
 
   printReceipt(itemsList, total, cash, change);
 
@@ -270,17 +307,17 @@ function printReceipt(items, total, cash, change) {
   let dateStr = now.toLocaleString('en-PH');
 
   let receiptHTML = `
-  <div style="font-family: monospace; padding: 20px; max-width: 300px; margin: auto;">
+  <div style="font-family: monospace; padding: 10px; width: 58mm; margin: 0 auto; font-size: 12px;">
     <div style="text-align: center;">
-      <h2 style="margin: 0;">DHAN SIOMAI</h2>
-      <p style="margin: 5px 0;">Fresh Siomai & Dumplings</p>
-      <p style="margin: 5px 0; font-size: 12px;">${dateStr}</p>
-      <hr>
+      <h3 style="margin: 0; font-size: 16px;">DHAN SIOMAI</h3>
+      <p style="margin: 3px 0; font-size: 11px;">Fresh Siomai & Dumplings</p>
+      <p style="margin: 3px 0; font-size: 10px;">${dateStr}</p>
+      <hr style="border: 1px dashed #000;">
     </div>
 
-    <div style="margin: 15px 0;">
+    <div style="margin: 10px 0;">
       ${items.map(i => `
-        <div style="margin-bottom: 8px;">
+        <div style="margin-bottom: 6px;">
           <div>${i.name}</div>
           <div style="display: flex; justify-content: space-between;">
             <span>${i.qty} x ₱${i.price}</span>
@@ -290,8 +327,8 @@ function printReceipt(items, total, cash, change) {
       `).join('')}
     </div>
 
-    <hr>
-    <div style="margin: 10px 0;">
+    <hr style="border: 1px dashed #000;">
+    <div style="margin: 8px 0;">
       <div style="display: flex; justify-content: space-between;">
         <span>TOTAL:</span>
         <span>₱${total}</span>
@@ -300,15 +337,16 @@ function printReceipt(items, total, cash, change) {
         <span>CASH:</span>
         <span>₱${cash}</span>
       </div>
-      <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 18px;">
+      <div style="display: flex; justify-content: space-between; font-weight: bold;">
         <span>CHANGE:</span>
         <span>₱${change}</span>
       </div>
     </div>
 
-    <div style="text-align: center; margin-top: 20px;">
-      <p>Thank You, Come Again!</p>
-      <p style="font-size: 12px;">God Bless!</p>
+    <hr style="border: 1px dashed #000;">
+    <div style="text-align: center; margin-top: 10px;">
+      <p style="margin: 5px 0;">Thank You, Come Again!</p>
+      <p style="font-size: 10px; margin: 0;">God Bless!</p>
     </div>
   </div>
   `;
@@ -317,7 +355,7 @@ function printReceipt(items, total, cash, change) {
 
   setTimeout(() => {
     window.print();
-  }, 500);
+  }, 300);
 }
 
 document.getElementById('cartModal').onclick = function(e) {
