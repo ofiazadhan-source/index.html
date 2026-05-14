@@ -6,76 +6,137 @@
 <title>DHAN SIOMAI Online Store</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: Arial, sans-serif; background: #f5f5f5; padding-bottom: 70px; }
-header { background: #ff6b35; color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 100; }
-header h1 { font-size: 18px; }
-.container { padding: 15px; }
-.section-title { background: #555; color: white; padding: 10px 15px; margin: 20px -15px 12px -15px; font-size: 15px; font-weight: bold; }
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f8f9fa;
+  padding-bottom: 80px;
+  color: #333;
+}
 
-.product-grid { 
-  display: grid; 
-  grid-template-columns: 1fr; 
-  gap: 12px; 
+header {
+  background: linear-gradient(135deg, #ff6b35, #ff8c42);
+  color: white;
+  padding: 18px;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
-.product-card { 
-  background: white; 
-  border-radius: 10px; 
-  padding: 15px; 
-  box-shadow: 0 2px 6px rgba(0,0,0,0.12); 
+header h1 { font-size: 19px; font-weight: 700; letter-spacing: 0.5px; }
+
+.container { padding: 16px; }
+.section-title {
+  background: #2c3e50;
+  color: white;
+  padding: 12px 16px;
+  margin: 24px -16px 14px -16px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 0 8px 8px 0;
 }
-.product-card h3 { 
-  font-size: 16px; 
-  margin-bottom: 8px; 
+
+.product-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
 }
-.price { 
-  font-size: 18px; 
-  font-weight: bold; 
-  color: #ff6b35; 
-  margin-bottom: 10px; 
+.product-card {
+  background: white;
+  border-radius: 14px;
+  padding: 0;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  overflow: hidden;
+  transition: transform 0.2s;
 }
-.stock-badge { 
-  display: inline-block; 
-  padding: 4px 12px; 
-  border-radius: 12px; 
-  font-size: 13px; 
-  font-weight: bold; 
-  margin-bottom: 12px; 
-  background: #4caf50; 
-  color: white; 
+.product-card:active { transform: scale(0.98); }
+
+.card-content {
+  padding: 16px;
 }
-.qty-control { 
-  display: flex; 
-  height: 45px; 
-  gap: 0; 
+.product-card h3 {
+  font-size: 17px;
+  margin-bottom: 6px;
+  font-weight: 600;
 }
-.qty-control button { 
-  width: 45px; 
-  background: #ff6b35; 
-  color: white; 
-  border: none; 
-  font-size: 24px; 
-  font-weight: bold; 
-  cursor: pointer; 
+.price {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ff6b35;
+  margin-bottom: 10px;
+}
+.stock-badge {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 14px;
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.qty-control {
+  display: flex;
+  height: 48px;
+  border-top: 1px solid #f0f0f0;
+}
+.qty-control button {
+  width: 50px;
+  background: #ff6b35;
+  color: white;
+  border: none;
+  font-size: 26px;
+  font-weight: 600;
+  cursor: pointer;
 }
 .qty-control button:active { background: #e55a2b; }
-.qty-control input { 
-  flex: 1; 
-  text-align: center; 
-  border: 1px solid #ddd; 
-  border-left: none; 
-  border-right: none; 
-  font-size: 20px; 
-  font-weight: bold; 
-  background: white; 
+.qty-control input {
+  flex: 1;
+  text-align: center;
+  border: none;
+  font-size: 20px;
+  font-weight: 700;
+  background: white;
+  color: #333;
 }
-.qty-control.add-btn { 
-  width: 80px; 
-  font-size: 14px; 
-  background: #4caf50; 
+.qty-control.add-btn {
+  width: 110px;
+  font-size: 15px;
+  background: #4caf50;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
-.bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #ff6b35; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
-.bottom-bar button { background: #4caf50; color: white; border: none; padding: 10px 25px; border-radius: 5px; font-weight: bold; font-size: 14px; }
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+}
+.bottom-bar #cartSummary {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+}
+.bottom-bar button {
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 15px;
+  box-shadow: 0 3px 8px rgba(76,175,80,0.3);
+}
+.bottom-bar button:active { background: #3d9142; }
 
 @media print {
   body * { visibility: hidden; }
@@ -150,19 +211,21 @@ function saveStock(stock) {
 function renderProducts() {
   let stock = loadStock();
   let html = '';
-  
+
   categories.forEach(cat => {
     html += `<div class="section-title">📁 ${cat.name}</div>`;
     html += `<div class="product-grid">`;
-    
+
     cat.items.forEach(item => {
       let qty = stock[item.name] || 0;
-      
+
       html += `
       <div class="product-card">
-        <h3>${item.name}</h3>
-        <div class="price">₱${item.price}</div>
-        <div class="stock-badge">Stock: ${qty}</div>
+        <div class="card-content">
+          <h3>${item.name}</h3>
+          <div class="price">₱${item.price}</div>
+          <div class="stock-badge">Stock: ${qty}</div>
+        </div>
         <div class="qty-control">
           <button onclick="changeQty('${item.name}', -1)">-</button>
           <input type="text" id="qty-${item.name}" value="0" readonly>
@@ -170,50 +233,50 @@ function renderProducts() {
         </div>
       </div>`;
     });
-    
+
     html += `</div>`;
   });
-  
+
   document.getElementById('container').innerHTML = html;
 }
 
 function changeQty(name, delta) {
   let input = document.getElementById(`qty-${name}`);
   if (!input) return;
-  
+
   let current = parseInt(input.value) || 0;
   let stock = loadStock();
   let max = stock[name] || 0;
   let newQty = current + delta;
-  
+
   if (newQty < 0) newQty = 0;
   if (newQty > max) newQty = max;
-  
+
   input.value = newQty;
 }
 
 function addToCart(name, price) {
   let input = document.getElementById(`qty-${name}`);
   let qty = parseInt(input.value) || 0;
-  
+
   if (qty <= 0) return alert('Tap + para magdag ng quantity!');
-  
+
   let stock = loadStock();
   let currentStock = stock[name] || 0;
-  
+
   if (qty > currentStock) {
     return alert(`Not enough stock! Available: ${currentStock}`);
   }
-  
+
   stock[name] = currentStock - qty;
   saveStock(stock);
-  
+
   if (cart[name]) {
     cart[name].qty += qty;
   } else {
     cart[name] = {price, qty};
   }
-  
+
   input.value = 0;
   updateCartSummary();
   renderProducts();
@@ -222,36 +285,36 @@ function addToCart(name, price) {
 function updateCartSummary() {
   let totalQty = 0;
   let totalPrice = 0;
-  
+
   for (let name in cart) {
     totalQty += cart[name].qty;
     totalPrice += cart[name].price * cart[name].qty;
   }
-  
+
   document.getElementById('cartSummary').textContent = `Cart: ${totalQty} items - ₱${totalPrice}`;
 }
 
 function checkout() {
   if (Object.keys(cart).length === 0) return alert('Cart is empty!');
-  
+
   let total = 0;
   let items = [];
-  
+
   for (let name in cart) {
     let item = cart[name];
     let subtotal = item.price * item.qty;
     total += subtotal;
     items.push({name, price: item.price, qty: item.qty, subtotal});
   }
-  
+
   let cash = prompt(`Total: ₱${total}\nEnter Cash Amount:`);
   if (!cash || isNaN(cash)) return alert('Invalid amount!');
-  
+
   cash = parseFloat(cash);
   let change = cash - total;
-  
+
   if (change < 0) return alert('Insufficient cash!');
-  
+
   if (confirm(`Total: ₱${total}\nCash: ₱${cash}\nChange: ₱${change}\n\nConfirm checkout?`)) {
     printReceipt(items, total, cash, change);
     cart = {};
@@ -307,7 +370,7 @@ function printReceipt(items, total, cash, change) {
 
   let receiptDiv = document.getElementById('receipt');
   receiptDiv.innerHTML = receiptHTML;
-  
+
   setTimeout(() => {
     window.print();
   }, 1000);
