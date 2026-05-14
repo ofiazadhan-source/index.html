@@ -160,11 +160,9 @@ function addToCart(name, price) {
     return alert(`Not enough stock! Available: ${currentStock}`);
   }
   
-  // Bawas stock agad pag ADD
   stock[name] = currentStock - qty;
   saveStock(stock);
   
-  // Add sa cart
   if (cart[name]) {
     cart[name].qty += qty;
   } else {
@@ -270,7 +268,6 @@ function printReceipt(items, total, cash, change) {
   }, 1000);
 }
 
-// Initialize stock if empty
 if (!localStorage.getItem('stock')) {
   let initialStock = {};
   categories.forEach(cat => {
