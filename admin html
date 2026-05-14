@@ -6,86 +6,28 @@
 <title>DHAN SIOMAI Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-}
-html, body {
-  width: 100%;
-  overflow-x: hidden;
-  font-family: 'Poppins', sans-serif;
-  background: #f5f5f5;
-  padding: 16px;
-}
-
-.card {
-  background: white;
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-
-h2 {
-  font-size: 18px;
-  margin-bottom: 12px;
-  color: #333;
-}
-
-.summary p {
-  font-size: 15px;
-  margin: 6px 0;
-}
-.summary.net {
-  font-size: 20px;
-  font-weight: 700;
-  color: #2e7d32;
-}
-
-button {
-  width: 100%;
-  padding: 14px;
-  border: none;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 700;
-  color: white;
-  margin-top: 10px;
-  cursor: pointer;
-}
-.btn-red { background: #f44336; }
-.btn-orange { background: #ff6b35; }
-.btn-blue { background: #2196f3; }
-
-.stock-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
-  font-size: 14px;
-}
-.stock-item:last-child { border-bottom: none; }
-.stock-qty { color: #4caf50; font-weight: 600; }
-
-.section-header {
-  padding: 12px;
-  border-radius: 8px;
-  color: white;
-  font-weight: 700;
-  margin-bottom: 10px;
-}
-.header-orange { background: #ff6b35; }
-.header-red { background: #f44336; }
-.header-blue { background: #2196f3; }
+* {margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html, body {width:100%; overflow-x:hidden; font-family:'Poppins', sans-serif; background:#f5f5f5; padding:16px;}
+.card {background:white; border-radius:12px; padding:16px; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+h2 {font-size:18px; margin-bottom:12px; color:#333;}
+.summary p {font-size:15px; margin:6px 0;}
+.summary.net {font-size:20px; font-weight:700; color:#2e7d32;}
+button {width:100%; padding:14px; border:none; border-radius:10px; font-size:15px; font-weight:700; color:white; margin-top:10px; cursor:pointer;}
+.btn-red {background:#f44336;}
+.btn-orange {background:#ff6b35;}
+.btn-green {background:#4caf50;}
+.btn-blue {background:#2196f3;}
+.stock-item {display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #eee; font-size:14px;}
+.section-header {padding:12px; border-radius:8px; color:white; font-weight:700; margin-bottom:10px;}
+.header-orange {background:#ff6b35;}
+input, select {width:100%; padding:12px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd; font-family:'Poppins', sans-serif;}
 </style>
 </head>
 <body>
 
 <div class="card">
   <h2 style="color:#ff6b35; text-align:center;">Welcome!</h2>
-  <p style="text-align:center; font-size:14px; color:#666;">Fresh Siomai, Gyoza, Siopao<br>Delivered fresh daily</p>
+  <p style="text-align:center; font-size:14px; color:#666;">Fresh Siomai, Gyoza, Siopao</p>
   <button class="btn-orange" onclick="location.href='order.html'">Order Now</button>
 </div>
 
@@ -102,17 +44,76 @@ button {
   <div id="stockList"></div>
 </div>
 
+<div class="card">
+  <div class="section-header header-orange">➕ ADD STOCK</div>
+  <select id="itemSelect"><option value="">Select Item</option></select>
+  <input type="number" id="qtyInput" placeholder="Enter quantity to add">
+  <button class="btn-green" onclick="addStock()">Add Stock</button>
+</div>
+
+<div class="card">
+  <div class="section-header header-orange">💰 PRICE MANAGEMENT</div>
+  <select id="priceItemSelect"><option value="">Select Item</option></select>
+  <input type="number" id="priceInput" placeholder="Enter new price">
+  <button class="btn-blue" onclick="updatePrice()">Update Price</button>
+</div>
+
 <button class="btn-red" onclick="addExpense()">💸 ADD EXPENSE</button>
-<button class="btn-orange" onclick="addStock()">➕ ADD STOCK</button>
-<button class="btn-blue" onclick="priceManage()">💰 PRICE MANAGEMENT</button>
 
 <script>
-function loadStock() {
-  return JSON.parse(localStorage.getItem('stock') || '{}');
-}
+const categories = [
+  {name: "Siomai 65", items: [
+    {name: "Pork Siomai 65", price: 150},
+    {name: "Chicken Siomai 65", price: 150},
+    {name: "Beef Siomai 65", price: 160},
+    {name: "Shrimp Siomai 65", price: 170}
+  ]},
+  {name: "Siomai 30", items: [
+    {name: "Pork Siomai 30", price: 75},
+    {name: "Chicken Siomai 30", price: 75},
+    {name: "Beef Siomai 30", price: 80},
+    {name: "Shrimp Siomai 30", price: 85},
+    {name: "Japanese Siomai 30", price: 90}
+  ]},
+  {name: "Big Siomai", items: [
+    {name: "Big Pork Siomai", price: 45},
+    {name: "Big Chicken Siomai", price: 45},
+    {name: "Big Beef Siomai", price: 45},
+    {name: "Big Japanese Siomai", price: 45}
+  ]},
+  {name: "Dumplings", items: [
+    {name: "Gyoza Dumplings", price: 50},
+    {name: "Sharksfin Dumplings", price: 55},
+    {name: "Hakaw Dumplings", price: 60}
+  ]},
+  {name: "Siopao", items: [
+    {name: "Jumbo Asado Siopao", price: 45},
+    {name: "Jumbo Bola-Bola Siopao", price: 45},
+    {name: "Mini Asado Siopao", price: 25},
+    {name: "Mini Bola-Bola Siopao", price: 25}
+  ]},
+  {name: "Sauce", items: [
+    {name: "Chili Garlic Sauce", price: 50},
+    {name: "Siopao Sauce", price: 30}
+  ]}
+];
 
-function saveStock(stock) {
-  localStorage.setItem('stock', JSON.stringify(stock));
+function loadStock() {return JSON.parse(localStorage.getItem('stock') || '{}');}
+function saveStock(stock) {localStorage.setItem('stock', JSON.stringify(stock));}
+function loadPrices() {return JSON.parse(localStorage.getItem('prices') || '{}');}
+function savePrices(prices) {localStorage.setItem('prices', JSON.stringify(prices));}
+
+function initData() {
+  let stock = loadStock();
+  let prices = loadPrices();
+  categories.forEach(cat => {
+    cat.items.forEach(item => {
+      if (stock[item.name] === undefined) stock[item.name] = 0;
+      if (prices[item.name] === undefined) prices[item.name] = item.price;
+    });
+  });
+  saveStock(stock);
+  savePrices(prices);
 }
 
 function loadData() {
@@ -124,23 +125,47 @@ function loadData() {
 
   let stock = loadStock();
   let html = '';
-  for (let name in stock) {
-    html += `<div class="stock-item">
-      <span>${name}</span>
-      <span class="stock-qty">Stock: ${stock[name]}</span>
-    </div>`;
-  }
+  categories.forEach(cat => {
+    cat.items.forEach(item => {
+      html += `<div class="stock-item"><span>${item.name}</span><span>Stock: ${stock[item.name] || 0} | ₱${loadPrices()[item.name]}</span></div>`;
+    });
+  });
   document.getElementById('stockList').innerHTML = html;
+
+  let dropdown = document.getElementById('itemSelect');
+  let priceDropdown = document.getElementById('priceItemSelect');
+  dropdown.innerHTML = '<option value="">Select Item</option>';
+  priceDropdown.innerHTML = '<option value="">Select Item</option>';
+  categories.forEach(cat => {
+    cat.items.forEach(item => {
+      dropdown.innerHTML += `<option value="${item.name}">${item.name}</option>`;
+      priceDropdown.innerHTML += `<option value="${item.name}">${item.name}</option>`;
+    });
+  });
 }
 
 function addStock() {
-  let item = prompt('Item name:');
-  let qty = prompt('Quantity to add:');
-  if (!item ||!qty || isNaN(qty)) return;
+  let item = document.getElementById('itemSelect').value;
+  let qty = document.getElementById('qtyInput').value;
+  if (!item ||!qty || isNaN(qty)) return alert('Pili ka item at maglagay ng quantity');
   let stock = loadStock();
   stock[item] = (stock[item] || 0) + parseInt(qty);
   saveStock(stock);
+  document.getElementById('qtyInput').value = '';
   loadData();
+  alert(item + ' stock updated!');
+}
+
+function updatePrice() {
+  let item = document.getElementById('priceItemSelect').value;
+  let price = document.getElementById('priceInput').value;
+  if (!item ||!price || isNaN(price)) return alert('Pili ka item at maglagay ng price');
+  let prices = loadPrices();
+  prices[item] = parseInt(price);
+  savePrices(prices);
+  document.getElementById('priceInput').value = '';
+  loadData();
+  alert(item + ' price updated!');
 }
 
 function addExpense() {
@@ -150,6 +175,7 @@ function addExpense() {
   expenses += parseInt(amount);
   localStorage.setItem('expenses', expenses);
   loadData();
+  alert('Expense added! Deducted agad sa Net Income.');
 }
 
 function resetDay() {
@@ -160,10 +186,7 @@ function resetDay() {
   }
 }
 
-function priceManage() {
-  alert('Price management coming soon!');
-}
-
+initData();
 loadData();
 </script>
 </body>
