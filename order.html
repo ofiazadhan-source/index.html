@@ -4,108 +4,122 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DHAN SIOMAI Online Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background: #f8f9fa;
-  padding-bottom: 80px;
-  color: #333;
+  font-family: 'Poppins', sans-serif;
+  background: #f5f5f5;
+  padding-bottom: 85px;
+  color: #1a1a1a;
 }
 
 header {
-  background: linear-gradient(135deg, #ff6b35, #ff8c42);
+  background: linear-gradient(135deg, #ff6b35, #ff4500);
   color: white;
-  padding: 18px;
+  padding: 20px 16px;
   text-align: center;
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(255,107,53,0.3);
 }
-header h1 { font-size: 19px; font-weight: 700; letter-spacing: 0.5px; }
+header h1 {
+  font-size: 20px;
+  font-weight: 700;
+}
 
 .container { padding: 16px; }
 .section-title {
-  background: #2c3e50;
-  color: white;
+  background: white;
+  color: #ff6b35;
   padding: 12px 16px;
-  margin: 24px -16px 14px -16px;
-  font-size: 15px;
-  font-weight: 600;
-  border-radius: 0 8px 8px 0;
+  margin: 20px 0 12px 0;
+  font-size: 16px;
+  font-weight: 700;
+  border-left: 4px solid #ff6b35;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
 .product-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 14px;
+  gap: 16px;
 }
 .product-card {
   background: white;
-  border-radius: 14px;
-  padding: 0;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  border-radius: 16px;
   overflow: hidden;
-  transition: transform 0.2s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
-.product-card:active { transform: scale(0.98); }
 
-.card-content {
-  padding: 16px;
+.product-img {
+  width: 100%;
+  height: 140px;
+  background: linear-gradient(135deg, #ffe4d9, #ffd4c2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
 }
+
+.card-content { padding: 16px; }
 .product-card h3 {
-  font-size: 17px;
-  margin-bottom: 6px;
-  font-weight: 600;
+  font-size: 18px;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
 }
 .price {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   color: #ff6b35;
-  margin-bottom: 10px;
 }
 .stock-badge {
-  display: inline-block;
-  padding: 5px 12px;
+  padding: 6px 12px;
   border-radius: 20px;
   font-size: 13px;
   font-weight: 600;
-  margin-bottom: 14px;
   background: #e8f5e9;
   color: #2e7d32;
 }
 
 .qty-control {
   display: flex;
-  height: 48px;
-  border-top: 1px solid #f0f0f0;
+  height: 50px;
+  gap: 8px;
 }
 .qty-control button {
   width: 50px;
   background: #ff6b35;
   color: white;
   border: none;
-  font-size: 26px;
-  font-weight: 600;
+  border-radius: 12px;
+  font-size: 24px;
+  font-weight: 700;
   cursor: pointer;
 }
 .qty-control button:active { background: #e55a2b; }
 .qty-control input {
   flex: 1;
   text-align: center;
-  border: none;
+  border: 2px solid #ff6b35;
+  border-radius: 12px;
   font-size: 20px;
   font-weight: 700;
   background: white;
-  color: #333;
 }
 .qty-control.add-btn {
-  width: 110px;
-  font-size: 15px;
+  width: 90px;
+  font-size: 14px;
   background: #4caf50;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+  border-radius: 12px;
 }
 
 .bottom-bar {
@@ -119,36 +133,27 @@ header h1 { font-size: 19px; font-weight: 700; letter-spacing: 0.5px; }
   justify-content: space-between;
   align-items: center;
   z-index: 100;
-  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.1);
+  border-radius: 20px 20px 0 0;
 }
 .bottom-bar #cartSummary {
   font-size: 15px;
   font-weight: 600;
-  color: #333;
 }
 .bottom-bar button {
-  background: #4caf50;
+  background: linear-gradient(135deg, #4caf50, #388e3c);
   color: white;
   border: none;
-  padding: 12px 28px;
-  border-radius: 8px;
+  padding: 14px 32px;
+  border-radius: 12px;
   font-weight: 700;
   font-size: 15px;
-  box-shadow: 0 3px 8px rgba(76,175,80,0.3);
-}
-.bottom-bar button:active { background: #3d9142; }
-
-@media print {
-  body * { visibility: hidden; }
-  #receipt, #receipt * { visibility: visible; }
-  #receipt { position: absolute; left: 0; top: 0; width: 58mm; }
-  @page { margin: 0; size: 58mm auto; }
 }
 </style>
 </head>
 <body>
 <header>
-  <h1>DHAN SIOMAI ONLINE STORE</h1>
+  <h1>DHAN SIOMAI 🍢</h1>
 </header>
 
 <div class="container" id="container"></div>
@@ -163,38 +168,17 @@ header h1 { font-size: 19px; font-weight: 700; letter-spacing: 0.5px; }
 <script>
 const categories = [
   {name: "Siomai 65", items: [
-    {name: "Pork Siomai 65", price: 150},
-    {name: "Chicken Siomai 65", price: 150},
-    {name: "Beef Siomai 65", price: 160},
-    {name: "Shrimp Siomai 65", price: 170}
+    {name: "Pork Siomai 65", price: 150, emoji: "🥟"},
+    {name: "Chicken Siomai 65", price: 150, emoji: "🍗"},
+    {name: "Beef Siomai 65", price: 160, emoji: "🥩"},
+    {name: "Shrimp Siomai 65", price: 170, emoji: "🦐"}
   ]},
   {name: "Siomai 30", items: [
-    {name: "Pork Siomai 30", price: 75},
-    {name: "Chicken Siomai 30", price: 75},
-    {name: "Beef Siomai 30", price: 80},
-    {name: "Shrimp Siomai 30", price: 85},
-    {name: "Japanese Siomai 30", price: 90}
-  ]},
-  {name: "Big Siomai", items: [
-    {name: "Big Pork Siomai", price: 45},
-    {name: "Big Chicken Siomai", price: 45},
-    {name: "Big Beef Siomai", price: 45},
-    {name: "Big Japanese Siomai", price: 45}
-  ]},
-  {name: "Dumplings", items: [
-    {name: "Gyoza Dumplings", price: 50},
-    {name: "Sharksfin Dumplings", price: 55},
-    {name: "Hakaw Dumplings", price: 60}
-  ]},
-  {name: "Siopao", items: [
-    {name: "Jumbo Asado Siopao", price: 45},
-    {name: "Jumbo Bola-Bola Siopao", price: 45},
-    {name: "Mini Asado Siopao", price: 25},
-    {name: "Mini Bola-Bola Siopao", price: 25}
-  ]},
-  {name: "Sauce", items: [
-    {name: "Chili Garlic Sauce", price: 50},
-    {name: "Siopao Sauce", price: 30}
+    {name: "Pork Siomai 30", price: 75, emoji: "🥟"},
+    {name: "Chicken Siomai 30", price: 75, emoji: "🍗"},
+    {name: "Beef Siomai 30", price: 80, emoji: "🥩"},
+    {name: "Shrimp Siomai 30", price: 85, emoji: "🦐"},
+    {name: "Japanese Siomai 30", price: 90, emoji: "🍣"}
   ]}
 ];
 
@@ -221,15 +205,18 @@ function renderProducts() {
 
       html += `
       <div class="product-card">
+        <div class="product-img">${item.emoji}</div>
         <div class="card-content">
           <h3>${item.name}</h3>
-          <div class="price">₱${item.price}</div>
-          <div class="stock-badge">Stock: ${qty}</div>
-        </div>
-        <div class="qty-control">
-          <button onclick="changeQty('${item.name}', -1)">-</button>
-          <input type="text" id="qty-${item.name}" value="0" readonly>
-          <button class="add-btn" onclick="addToCart('${item.name}', ${item.price})">+ ADD</button>
+          <div class="price-row">
+            <div class="price">₱${item.price}</div>
+            <div class="stock-badge" id="stock-${item.name}">Stock: ${qty}</div>
+          </div>
+          <div class="qty-control">
+            <button onclick="changeQty('${item.name}', -1)">-</button>
+            <input type="number" id="qty-${item.name}" value="0" min="0" oninput="validateQty('${item.name}')">
+            <button class="add-btn" onclick="addToCart('${item.name}', ${item.price})">+ ADD</button>
+          </div>
         </div>
       </div>`;
     });
@@ -242,35 +229,45 @@ function renderProducts() {
 
 function changeQty(name, delta) {
   let input = document.getElementById(`qty-${name}`);
-  if (!input) return;
-
   let current = parseInt(input.value) || 0;
   let stock = loadStock();
   let max = stock[name] || 0;
-  let newQty = current + delta;
 
+  let newQty = current + delta;
   if (newQty < 0) newQty = 0;
   if (newQty > max) newQty = max;
 
   input.value = newQty;
 }
 
+function validateQty(name) {
+  let input = document.getElementById(`qty-${name}`);
+  let stock = loadStock();
+  let max = stock[name] || 0;
+  let val = parseInt(input.value) || 0;
+
+  if (val < 0) input.value = 0;
+  if (val > max) input.value = max;
+}
+
 function addToCart(name, price) {
   let input = document.getElementById(`qty-${name}`);
   let qty = parseInt(input.value) || 0;
 
-  if (qty <= 0) return alert('Tap + para magdag ng quantity!');
+  if (qty <= 0) return alert('Maglagay ka muna ng quantity!');
 
   let stock = loadStock();
   let currentStock = stock[name] || 0;
 
   if (qty > currentStock) {
-    return alert(`Not enough stock! Available: ${currentStock}`);
+    return alert(`Kulang stock! Available: ${currentStock}`);
   }
 
+  // Bawas stock
   stock[name] = currentStock - qty;
   saveStock(stock);
 
+  // Add sa cart
   if (cart[name]) {
     cart[name].qty += qty;
   } else {
@@ -279,7 +276,13 @@ function addToCart(name, price) {
 
   input.value = 0;
   updateCartSummary();
-  renderProducts();
+  updateStockDisplay(name);
+}
+
+function updateStockDisplay(name) {
+  let stock = loadStock();
+  let qty = stock[name] || 0;
+  document.getElementById(`stock-${name}`).textContent = `Stock: ${qty}`;
 }
 
 function updateCartSummary() {
@@ -316,66 +319,13 @@ function checkout() {
   if (change < 0) return alert('Insufficient cash!');
 
   if (confirm(`Total: ₱${total}\nCash: ₱${cash}\nChange: ₱${change}\n\nConfirm checkout?`)) {
-    printReceipt(items, total, cash, change);
+    alert('Order placed!');
     cart = {};
     updateCartSummary();
   }
 }
 
-function printReceipt(items, total, cash, change) {
-  let now = new Date();
-  let dateStr = now.toLocaleString('en-PH');
-
-  let receiptHTML = `
-  <div style="font-family: 'Courier New', monospace; width: 58mm; margin: 0; padding: 2mm; font-size: 11px; line-height: 1.2;">
-    <div style="text-align: center;">
-      <div style="font-size: 14px; font-weight: bold;">DHAN SIOMAI</div>
-      <div style="font-size: 10px;">Fresh Siomai & Dumplings</div>
-      <div style="font-size: 9px;">${dateStr}</div>
-      <div style="border-top: 1px dashed #000; margin: 4px 0;"></div>
-    </div>
-
-    <div>
-      ${items.map(i => `
-        <div style="margin-bottom: 3px;">
-          <div>${i.name}</div>
-          <div style="display: flex; justify-content: space-between;">
-            <span>${i.qty} x ₱${i.price}</span>
-            <span>₱${i.subtotal}</span>
-          </div>
-        </div>
-      `).join('')}
-    </div>
-
-    <div style="border-top: 1px dashed #000; margin: 4px 0;"></div>
-    <div>
-      <div style="display: flex; justify-content: space-between;">
-        <span>TOTAL:</span><span>₱${total}</span>
-      </div>
-      <div style="display: flex; justify-content: space-between;">
-        <span>CASH:</span><span>₱${cash}</span>
-      </div>
-      <div style="display: flex; justify-content: space-between; font-weight: bold;">
-        <span>CHANGE:</span><span>₱${change}</span>
-      </div>
-    </div>
-
-    <div style="border-top: 1px dashed #000; margin: 4px 0;"></div>
-    <div style="text-align: center;">
-      <div>Thank You, Come Again!</div>
-      <div style="font-size: 9px;">God Bless!</div>
-    </div>
-  </div>
-  `;
-
-  let receiptDiv = document.getElementById('receipt');
-  receiptDiv.innerHTML = receiptHTML;
-
-  setTimeout(() => {
-    window.print();
-  }, 1000);
-}
-
+// Initialize stock kung wala pa
 if (!localStorage.getItem('stock')) {
   let initialStock = {};
   categories.forEach(cat => {
