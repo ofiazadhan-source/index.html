@@ -19,16 +19,15 @@ header h1 { font-size: 18px; }
 .stock-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-bottom: 8px; }
 .stock-badge.green { background: #4caf50; color: white; }
 .stock-badge.red { background: #f44336; color: white; }
-.qty-control { display: flex; height: 38px; }
-.qty-control button { width: 38px; background: #ff6b35; color: white; border: none; font-size: 20px; font-weight: bold; cursor: pointer; }
+.qty-control { display: flex; height: 40px; }
+.qty-control button { width: 40px; background: #ff6b35; color: white; border: none; font-size: 22px; font-weight: bold; cursor: pointer; }
 .qty-control button:active { background: #e55a2b; }
 .qty-control button:disabled { background: #ccc; cursor: not-allowed; }
-.qty-control input { flex: 1; text-align: center; border: 1px solid #ddd; border-left: none; border-right: none; font-size: 16px; font-weight: bold; }
+.qty-control input { flex: 1; text-align: center; border: 1px solid #ddd; border-left: none; border-right: none; font-size: 18px; font-weight: bold; background: white; }
 .qty-control.add-btn { width: 60px; font-size: 12px; background: #4caf50; }
 .bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #ff6b35; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
 .bottom-bar button { background: #4caf50; color: white; border: none; padding: 10px 25px; border-radius: 5px; font-weight: bold; font-size: 14px; }
 
-/* Print: receipt lang ang lalabas */
 @media print {
   body * { visibility: hidden; }
   #receipt, #receipt * { visibility: visible; }
@@ -71,6 +70,21 @@ const categories = [
     {name: "Big Chicken Siomai", price: 45},
     {name: "Big Beef Siomai", price: 45},
     {name: "Big Japanese Siomai", price: 45}
+  ]},
+  {name: "Dumplings", items: [
+    {name: "Gyoza Dumplings", price: 50},
+    {name: "Sharksfin Dumplings", price: 55},
+    {name: "Hakaw Dumplings", price: 60}
+  ]},
+  {name: "Siopao", items: [
+    {name: "Jumbo Asado Siopao", price: 45},
+    {name: "Jumbo Bola-Bola Siopao", price: 45},
+    {name: "Mini Asado Siopao", price: 25},
+    {name: "Mini Bola-Bola Siopao", price: 25}
+  ]},
+  {name: "Sauce", items: [
+    {name: "Chili Garlic Sauce", price: 50},
+    {name: "Siopao Sauce", price: 30}
   ]}
 ];
 
@@ -106,7 +120,7 @@ function renderProducts() {
         </div>
         <div class="qty-control">
           <button ${isSoldOut? 'disabled' : ''} onclick="changeQty('${item.name}', -1)">-</button>
-          <input type="number" id="qty-${item.name}" value="0" min="0" max="${qty}" ${isSoldOut? 'disabled' : ''} readonly>
+          <input type="text" id="qty-${item.name}" value="0" readonly>
           <button class="add-btn" ${isSoldOut? 'disabled' : ''} onclick="addToCart('${item.name}', ${item.price})">+ ADD</button>
         </div>
       </div>`;
@@ -123,7 +137,8 @@ function changeQty(name, delta) {
   if (!input) return;
   
   let current = parseInt(input.value) || 0;
-  let max = parseInt(input.max) || 0;
+  let stock = loadStock();
+  let max = stock[name] || 0;
   let newQty = current + delta;
   
   if (newQty < 0) newQty = 0;
@@ -136,7 +151,7 @@ function addToCart(name, price) {
   let input = document.getElementById(`qty-${name}`);
   let qty = parseInt(input.value) || 0;
   
-  if (qty <= 0) return alert('Ilagay mo muna quantity gamit ang + button!');
+  if (qty <= 0) return alert('Tap + para magdag ng quantity!');
   
   let stock = loadStock();
   let currentStock = stock[name] || 0;
