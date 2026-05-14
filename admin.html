@@ -17,50 +17,80 @@ button {width:100%; padding:14px; border:none; border-radius:10px; font-size:15p
 .btn-orange {background:#ff6b35;}
 .btn-green {background:#4caf50;}
 .btn-blue {background:#2196f3;}
-.stock-item {display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #eee; font-size:14px;}
+.btn-gray {background:#757575;}
+.stock-item,.history-item {display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #eee; font-size:14px;}
 .section-header {padding:12px; border-radius:8px; color:white; font-weight:700; margin-bottom:10px;}
 .header-orange {background:#ff6b35;}
 input, select {width:100%; padding:12px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd; font-family:'Poppins', sans-serif;}
+.login-box {max-width:350px; margin:50px auto;}
+#mainApp {display:none;}
+#loginScreen {display:block;}
+.history-item {flex-direction:column; gap:4px;}
+.history-header {display:flex; justify-content:space-between; font-weight:600;}
+.history-items {font-size:13px; color:#666;}
 </style>
 </head>
 <body>
 
-<div class="card">
-  <h2 style="color:#ff6b35; text-align:center;">Welcome!</h2>
-  <p style="text-align:center; font-size:14px; color:#666;">Fresh Siomai, Gyoza, Siopao</p>
-  <button class="btn-orange" onclick="location.href='order.html'">Order Now</button>
+<div id="loginScreen" class="login-box">
+  <div class="card">
+    <h2 style="text-align:center; color:#2196f3;">🔒 Admin Login</h2>
+    <input type="password" id="adminPass" placeholder="Enter Password" onkeypress="if(event.key==='Enter') login()">
+    <button class="btn-blue" onclick="login()">LOGIN</button>
+    <p style="text-align:center; font-size:12px; color:#666; margin-top:10px;">Default: admin123</p>
+  </div>
 </div>
 
-<div class="card summary">
-  <h2>Today's Summary</h2>
-  <p>Gross Sales: ₱<span id="sales">0</span></p>
-  <p>Total Expenses: ₱<span id="expenses">0</span></p>
-  <p class="net">Net Income: ₱<span id="net">0</span></p>
-  <button class="btn-red" onclick="resetDay()">Reset Day</button>
+<div id="mainApp">
+  <div class="card">
+    <h2 style="color:#ff6b35; text-align:center;">Welcome!</h2>
+    <p style="text-align:center; font-size:14px; color:#666;">Fresh Siomai, Gyoza, Siopao</p>
+    <button class="btn-orange" onclick="location.href='order.html'">Order Now</button>
+    <button class="btn-gray" onclick="logout()">Logout</button>
+  </div>
+
+  <div class="card summary">
+    <h2>Today's Summary</h2>
+    <p>Gross Sales: ₱<span id="sales">0</span></p>
+    <p>Total Expenses: ₱<span id="expenses">0</span></p>
+    <p class="net">Net Income: ₱<span id="net">0</span></p>
+    <button class="btn-red" onclick="resetDay()">Reset Day</button>
+    <button class="btn-blue" onclick="printReport()">🖨️ Print Daily Report</button>
+  </div>
+
+  <div class="card">
+    <div class="section-header header-orange">📦 CURRENT STOCK</div>
+    <div id="stockList"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-header header-orange">➕ ADD STOCK</div>
+    <select id="itemSelect"><option value="">Select Item</option></select>
+    <input type="number" id="qtyInput" placeholder="Enter quantity to add">
+    <button class="btn-green" onclick="addStock()">Add Stock</button>
+  </div>
+
+  <div class="card">
+    <div class="section-header header-orange">💰 PRICE MANAGEMENT</div>
+    <select id="priceItemSelect"><option value="">Select Item</option></select>
+    <input type="number" id="priceInput" placeholder="Enter new price">
+    <button class="btn-blue" onclick="updatePrice()">Update Price</button>
+  </div>
+
+  <div class="card">
+    <div class="section-header header-orange">📜 SALES HISTORY</div>
+    <div id="salesHistory"></div>
+    <button class="btn-red" onclick="clearHistory()">Clear History</button>
+  </div>
+
+  <button class="btn-red" onclick="addExpense()">💸 ADD EXPENSE</button>
 </div>
 
-<div class="card">
-  <div class="section-header header-orange">📦 CURRENT STOCK</div>
-  <div id="stockList"></div>
-</div>
-
-<div class="card">
-  <div class="section-header header-orange">➕ ADD STOCK</div>
-  <select id="itemSelect"><option value="">Select Item</option></select>
-  <input type="number" id="qtyInput" placeholder="Enter quantity to add">
-  <button class="btn-green" onclick="addStock()">Add Stock</button>
-</div>
-
-<div class="card">
-  <div class="section-header header-orange">💰 PRICE MANAGEMENT</div>
-  <select id="priceItemSelect"><option value="">Select Item</option></select>
-  <input type="number" id="priceInput" placeholder="Enter new price">
-  <button class="btn-blue" onclick="updatePrice()">Update Price</button>
-</div>
-
-<button class="btn-red" onclick="addExpense()">💸 ADD EXPENSE</button>
+<div id="reportPrint" style="display:none;"></div>
 
 <script>
+const ADMIN_PASSWORD = "admin123";
+
 const categories = [
   {name: "Siomai 65", items: [
     {name: "Pork Siomai 65", price: 150},
@@ -98,10 +128,39 @@ const categories = [
   ]}
 ];
 
+function login() {
+  let pass = document.getElementById('adminPass').value;
+  if (pass === ADMIN_PASSWORD) {
+    localStorage.setItem('loggedIn', 'true');
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+    initData();
+    loadData();
+  } else {
+    alert('Wrong password!');
+  }
+}
+
+function logout() {
+  localStorage.removeItem('loggedIn');
+  location.reload();
+}
+
+function checkLogin() {
+  if (localStorage.getItem('loggedIn') === 'true') {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+    initData();
+    loadData();
+  }
+}
+
 function loadStock() {return JSON.parse(localStorage.getItem('stock') || '{}');}
 function saveStock(stock) {localStorage.setItem('stock', JSON.stringify(stock));}
 function loadPrices() {return JSON.parse(localStorage.getItem('prices') || '{}');}
 function savePrices(prices) {localStorage.setItem('prices', JSON.stringify(prices));}
+function loadHistory() {return JSON.parse(localStorage.getItem('salesHistory') || '[]');}
+function saveHistory(history) {localStorage.setItem('salesHistory', JSON.stringify(history));}
 
 function initData() {
   let stock = loadStock();
@@ -117,8 +176,8 @@ function initData() {
 }
 
 function loadData() {
-  let sales = localStorage.getItem('sales') || 0;
-  let expenses = localStorage.getItem('expenses') || 0;
+  let sales = parseInt(localStorage.getItem('sales')) || 0;
+  let expenses = parseInt(localStorage.getItem('expenses')) || 0;
   document.getElementById('sales').textContent = sales;
   document.getElementById('expenses').textContent = expenses;
   document.getElementById('net').textContent = sales - expenses;
@@ -127,10 +186,27 @@ function loadData() {
   let html = '';
   categories.forEach(cat => {
     cat.items.forEach(item => {
-      html += `<div class="stock-item"><span>${item.name}</span><span>Stock: ${stock[item.name] || 0} | ₱${loadPrices()[item.name]}</span></div>`;
+      let qty = stock[item.name] || 0;
+      let price = loadPrices()[item.name] || item.price;
+      html += `<div class="stock-item"><span>${item.name}</span><span>Stock: ${qty} | ₱${price}</span></div>`;
     });
   });
   document.getElementById('stockList').innerHTML = html;
+
+  let history = loadHistory();
+  let historyHtml = '';
+  history.slice().reverse().forEach(h => {
+    historyHtml += `<div class="history-item">
+      <div class="history-header">
+        <span>${h.time}</span>
+        <span>₱${h.total}</span>
+      </div>
+      <div class="history-items">
+        ${h.items.map(i => `${i.qty}x ${i.name}`).join(', ')}
+      </div>
+    </div>`;
+  });
+  document.getElementById('salesHistory').innerHTML = historyHtml || '<p style="text-align:center; color:#999;">No sales yet</p>';
 
   let dropdown = document.getElementById('itemSelect');
   let priceDropdown = document.getElementById('priceItemSelect');
@@ -171,7 +247,7 @@ function updatePrice() {
 function addExpense() {
   let amount = prompt('Expense amount:');
   if (!amount || isNaN(amount)) return;
-  let expenses = parseInt(localStorage.getItem('expenses') || 0);
+  let expenses = parseInt(localStorage.getItem('expenses')) || 0;
   expenses += parseInt(amount);
   localStorage.setItem('expenses', expenses);
   loadData();
@@ -186,8 +262,48 @@ function resetDay() {
   }
 }
 
-initData();
-loadData();
+function clearHistory() {
+  if (confirm('Delete all sales history?')) {
+    localStorage.removeItem('salesHistory');
+    loadData();
+  }
+}
+
+function printReport() {
+  let sales = parseInt(localStorage.getItem('sales')) || 0;
+  let expenses = parseInt(localStorage.getItem('expenses')) || 0;
+  let net = sales - expenses;
+  let history = loadHistory();
+  let now = new Date().toLocaleString();
+
+  let html = `
+    <h3 style="text-align:center;">DHAN SIOMAI</h3>
+    <div style="text-align:center;">Daily Sales Report</div>
+    <div style="text-align:center;">${now}</div>
+    <hr>
+    <p>Gross Sales: ₱${sales}</p>
+    <p>Total Expenses: ₱${expenses}</p>
+    <p><strong>Net Income: ₱${net}</strong></p>
+    <hr>
+    <p><strong>Transactions: ${history.length}</strong></p>
+    ${history.map(h => `<div>${h.time} - ₱${h.total}</div>`).join('')}
+    <hr>
+    <div style="text-align:center;">THANK YOU!</div>
+  `;
+
+  document.getElementById('reportPrint').innerHTML = html;
+  window.print();
+}
+
+checkLogin();
 </script>
+<style>
+@media print {
+  body * {visibility:hidden;}
+  #reportPrint, #reportPrint * {visibility:visible;}
+  #reportPrint {display:block!important; position:absolute; left:0; top:0; width:58mm; font-family:'Courier New', monospace; font-size:12px;}
+  @page {margin:0; size:58mm auto;}
+}
+</style>
 </body>
 </html>
