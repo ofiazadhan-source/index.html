@@ -13,18 +13,14 @@ header h1 { font-size: 18px; }
 .section-title { background: #555; color: white; padding: 8px 15px; margin: 15px -15px; font-size: 14px; font-weight: bold; }
 .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .product-card { background: white; border-radius: 8px; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: relative; overflow: hidden; }
-.sold-out-ribbon { position: absolute; top: 10px; right: -25px; background: #ff6b35; color: white; padding: 3px 30px; transform: rotate(45deg); font-size: 10px; font-weight: bold; }
-.product-card h3 { font-size: 14px; margin-bottom: 5px; padding-right: 40px; }
+.product-card h3 { font-size: 14px; margin-bottom: 5px; }
 .price { font-size: 16px; font-weight: bold; color: #ff6b35; margin-bottom: 8px; }
-.stock-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-bottom: 8px; }
-.stock-badge.green { background: #4caf50; color: white; }
-.stock-badge.red { background: #f44336; color: white; }
-.qty-control { display: flex; height: 40px; }
+.stock-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-bottom: 8px; background: #4caf50; color: white; }
+.qty-control { display: flex; height: 40px; gap: 0; }
 .qty-control button { width: 40px; background: #ff6b35; color: white; border: none; font-size: 22px; font-weight: bold; cursor: pointer; }
 .qty-control button:active { background: #e55a2b; }
-.qty-control button:disabled { background: #ccc; cursor: not-allowed; }
 .qty-control input { flex: 1; text-align: center; border: 1px solid #ddd; border-left: none; border-right: none; font-size: 18px; font-weight: bold; background: white; }
-.qty-control.add-btn { width: 60px; font-size: 12px; background: #4caf50; }
+.qty-control.add-btn { width: 60px!important; font-size: 12px!important; background: #4caf50!important; display: block!important; }
 .bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #ff6b35; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
 .bottom-bar button { background: #4caf50; color: white; border: none; padding: 10px 25px; border-radius: 5px; font-weight: bold; font-size: 14px; }
 
@@ -108,20 +104,16 @@ function renderProducts() {
     
     cat.items.forEach(item => {
       let qty = stock[item.name] || 0;
-      let isSoldOut = qty <= 0;
       
       html += `
       <div class="product-card">
-        ${isSoldOut? '<div class="sold-out-ribbon">SOLD OUT</div>' : ''}
         <h3>${item.name}</h3>
         <div class="price">₱${item.price}</div>
-        <div class="stock-badge ${isSoldOut? 'red' : 'green'}">
-          Stock: ${qty}
-        </div>
+        <div class="stock-badge">Stock: ${qty}</div>
         <div class="qty-control">
-          <button ${isSoldOut? 'disabled' : ''} onclick="changeQty('${item.name}', -1)">-</button>
+          <button onclick="changeQty('${item.name}', -1)">-</button>
           <input type="text" id="qty-${item.name}" value="0" readonly>
-          <button class="add-btn" ${isSoldOut? 'disabled' : ''} onclick="addToCart('${item.name}', ${item.price})">+ ADD</button>
+          <button class="add-btn" onclick="addToCart('${item.name}', ${item.price})">+ ADD</button>
         </div>
       </div>`;
     });
