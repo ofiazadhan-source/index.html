@@ -45,17 +45,45 @@ h2 {color:#ff6b35; margin-bottom:15px; font-size:18px;}
 .stat-sales {background:#28a745;}
 .stat-expenses {background:#dc3545;}
 .stat-profit {background:#17a2b8;}
-table {width:100%; border-collapse:collapse; font-size:14px;}
-th, td {padding:10px; text-align:left; border-bottom:1px solid #eee;}
-th {background:#ff6b35; color:white; font-weight:600;}
-.item-qty {
-  color:#666; 
-  font-size:12px; 
-  background:#f0f0f0;
-  padding:2px 6px;
-  border-radius:8px;
-  margin-left:5px;
+
+/* Category Folder */
+.category-folder {
+  margin-bottom:12px;
+  border:1px solid #e0e0e0;
+  border-radius:10px;
+  overflow:hidden;
 }
+.category-header {
+  background:#fff3f0;
+  padding:12px 15px;
+  font-weight:700;
+  color:#ff6b35;
+  cursor:pointer;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  user-select:none;
+}
+.category-header:hover {background:#ffe8e3;}
+.category-header.arrow {
+  transition:transform 0.3s;
+}
+.category-folder.active.arrow {
+  transform:rotate(90deg);
+}
+.category-content {
+  display:none;
+  padding:0;
+}
+.category-folder.active.category-content {
+  display:block;
+}
+
+table {width:100%; border-collapse:collapse; font-size:14px;}
+th, td {padding:10px 15px; text-align:left; border-bottom:1px solid #eee;}
+th {background:#ff6b35; color:white; font-weight:600;}
+tr:last-child td {border-bottom:none;}
+
 .item-tag {
   padding:4px 8px;
   border-radius:6px;
@@ -67,6 +95,14 @@ th {background:#ff6b35; color:white; font-weight:600;}
 .item-beef {background:#4caf50; color:white;}
 .item-shrimp {background:#ffffff; color:#333; border:1px solid #ddd;}
 .item-japanese {background:#000; color:white;}
+.item-qty {
+  color:#666; 
+  font-size:12px; 
+  background:#f0f0f0;
+  padding:2px 6px;
+  border-radius:8px;
+  margin-left:5px;
+}
 .logout-btn {
   position:absolute; top:15px; right:15px;
   background:rgba(255,255,255,0.2); border:1px solid white;
@@ -110,10 +146,7 @@ th {background:#ff6b35; color:white; font-weight:600;}
 
   <div class="card">
     <h2>📦 Products & Stock</h2>
-    <table id="productsTable">
-      <thead><tr><th>Product</th><th>Stock</th><th>Price</th></tr></thead>
-      <tbody></tbody>
-    </table>
+    <div id="productsContainer"></div>
   </div>
 
   <div class="card">
@@ -127,6 +160,15 @@ th {background:#ff6b35; color:white; font-weight:600;}
 
 <script>
 const VIEWER_PASSWORD = "viewer123"; // Palitan mo to
+
+const categories = {
+  "Siomai 65": ["Pork Siomai 65", "Chicken Siomai 65", "Beef Siomai 65", "Shrimp Siomai 65"],
+  "Siomai 30": ["Pork Siomai 30", "Chicken Siomai 30", "Beef Siomai 30", "Shrimp Siomai 30", "Japanese Siomai 30"],
+  "Big Siomai": ["Big Pork Siomai", "Big Chicken Siomai", "Big Beef Siomai", "Big Japanese Siomai"],
+  "Dumplings": ["Gyoza Dumplings", "Sharksfin Dumplings", "Hakaw Dumplings"],
+  "Siopao": ["Jumbo Asado Siopao", "Jumbo Bola-Bola Siopao", "Mini Asado Siopao", "Mini Bola-Bola Siopao"],
+  "Sauce": ["Chili Garlic Sauce", "Siopao Sauce"]
+};
 
 if(sessionStorage.getItem('viewerLoggedIn') === 'true') {
   showMainContent();
@@ -162,6 +204,10 @@ function getItemClass(itemName) {
   return '';
 }
 
+function toggleCategory(id) {
+  document.getElementById(id).classList.toggle('active');
+}
+
 function updateDashboard() {
   let salesHistory = JSON.parse(localStorage.getItem('salesHistory')) || [];
   let stock = JSON.parse(localStorage.getItem('stock')) || {};
@@ -176,21 +222,42 @@ function updateDashboard() {
   document.getElementById('totalExpenses').textContent = '₱' + totalExpenses.toLocaleString();
   document.getElementById('netProfit').textContent = '₱' + (totalSales - totalExpenses).toLocaleString();
 
-  // Products table
-  let prodBody = document.querySelector('#productsTable tbody');
-  prodBody.innerHTML = '';
-  let productNames = Object.keys(stock);
-  if(productNames.length === 0) {
-    prodBody.innerHTML = '<tr><td colspan="3" class="no-data">No products yet</td></tr>';
-  } else {
-    productNames.forEach(name => {
-      prodBody.innerHTML += `<tr>
-        <td>${name}</td>
-        <td>${stock[name] || 0}</td>
-        <td>₱${prices[name] || 0}</td>
-      </tr>`;
+  // Products table - grouped by category
+  let prodContainer = document.getElementById('productsContainer');
+  prodContainer.innerHTML = '';
+  
+  Object.keys(categories).forEach((catName, idx) => {
+    let folderId = 'cat-' + idx;
+    let items = categories[catName];
+    let hasItems = items.some(name => stock[name]!== undefined || prices[name]!== undefined);
+    
+    if(!hasItems) return;
+    
+    let folderHTML = `
+      <div class="category-folder" id="${folderId}">
+        <div class="category-header" onclick="toggleCategory('${folderId}')">
+          <span>📁 ${catName}</span>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="category-content">
+          <table>
+            <thead><tr><th>Product</th><th>Stock</th><th>Price</th></tr></thead>
+            <tbody>
+    `;
+    
+    items.forEach(name => {
+      if(stock[name]!== undefined || prices[name]!== undefined) {
+        folderHTML += `<tr>
+          <td>${name}</td>
+          <td>${stock[name] || 0}</td>
+          <td>₱${prices[name] || 0}</td>
+        </tr>`;
+      }
     });
-  }
+    
+    folderHTML += `</tbody></table></div></div>`;
+    prodContainer.innerHTML += folderHTML;
+  });
 
   // Sales table - breakdown per item with color coding
   let salesBody = document.querySelector('#salesTable tbody');
@@ -203,10 +270,10 @@ function updateDashboard() {
         let isFirstRow = index === 0;
         let itemClass = getItemClass(item.name);
         salesBody.innerHTML += `<tr>
-          <td>${isFirstRow ? s.time : ''}</td>
+          <td>${isFirstRow? s.time : ''}</td>
           <td><span class="item-tag ${itemClass}">${item.name}</span> <span class="item-qty">x${item.qty}</span></td>
-          <td>${isFirstRow ? item.qty : ''}</td>
-          <td>${isFirstRow ? '₱' + s.total : '₱' + item.subtotal}</td>
+          <td>${isFirstRow? item.qty : ''}</td>
+          <td>${isFirstRow? '₱' + s.total : '₱' + item.subtotal}</td>
         </tr>`;
       });
     });
