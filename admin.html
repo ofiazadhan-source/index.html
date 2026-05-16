@@ -3,307 +3,235 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>DHAN SIOMAI Admin</title>
+<title>DHAN SIOMAI - Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-* {margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-html, body {width:100%; overflow-x:hidden; font-family:'Poppins', sans-serif; background:#f5f5f5; padding:16px;}
-.card {background:white; border-radius:12px; padding:16px; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,0.08);}
-h2 {font-size:18px; margin-bottom:12px; color:#333;}
-.summary p {font-size:15px; margin:6px 0;}
-.summary.net {font-size:20px; font-weight:700; color:#2e7d32;}
-button {width:100%; padding:14px; border:none; border-radius:10px; font-size:15px; font-weight:700; color:white; margin-top:10px; cursor:pointer;}
-.btn-red {background:#f44336;}
-.btn-orange {background:#ff6b35;}
-.btn-green {background:#4caf50;}
-.btn-blue {background:#2196f3;}
-.btn-gray {background:#757575;}
-.stock-item,.history-item {display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #eee; font-size:14px;}
-.section-header {padding:12px; border-radius:8px; color:white; font-weight:700; margin-bottom:10px;}
-.header-orange {background:#ff6b35;}
-input, select {width:100%; padding:12px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd; font-family:'Poppins', sans-serif;}
-.login-box {max-width:350px; margin:50px auto;}
-#mainApp {display:none;}
-#loginScreen {display:block;}
-.history-item {flex-direction:column; gap:4px;}
-.history-header {display:flex; justify-content:space-between; font-weight:600;}
-.history-items {font-size:13px; color:#666;}
+* {margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif;}
+body {background:#f5f5f5; padding:20px;}
+.header {
+  background:linear-gradient(135deg, #ff6b35, #ff4500);
+  color:white; padding:20px; border-radius:15px; margin-bottom:20px;
+  text-align:center;
+}
+.card {
+  background:white; border-radius:15px; padding:20px; margin-bottom:15px;
+  box-shadow:0 3px 10px rgba(0,0,0,0.1);
+}
+h2 {color:#ff6b35; margin-bottom:15px; font-size:18px;}
+input, select, button {
+  width:100%; padding:14px; margin-bottom:12px;
+  border:2px solid #ddd; border-radius:10px; font-size:16px;
+}
+button {
+  background:#ff6b35; color:white; border:none; font-weight:700;
+  cursor:pointer;
+}
+.btn-green {background:#28a745;}
+.btn-red {background:#dc3545;}
+.btn-blue {background:#17a2b8;}
+.stats {
+  display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;
+}
+.stat-box {padding:15px; border-radius:12px; color:white; text-align:center;}
+.stat-sales {background:#28a745;}
+.stat-expenses {background:#dc3545;}
+.stat-profit {background:#17a2b8;}
+table {width:100%; border-collapse:collapse; font-size:14px;}
+th, td {padding:10px; text-align:left; border-bottom:1px solid #eee;}
+th {background:#ff6b35; color:white;}
+.expense-item {
+  display:flex; justify-content:space-between; padding:12px;
+  border-bottom:1px solid #eee;
+}
+.expense-item:last-child {border-bottom:none;}
 </style>
 </head>
 <body>
 
-<div id="loginScreen" class="login-box">
-  <div class="card">
-    <h2 style="text-align:center; color:#2196f3;">🔒 Admin Login</h2>
-    <input type="password" id="adminPass" placeholder="Enter Password" onkeypress="if(event.key==='Enter') login()">
-    <button class="btn-blue" onclick="login()">LOGIN</button>
-    <p style="text-align:center; font-size:12px; color:#666; margin-top:10px;">Default: admin123</p>
+<div class="header">
+  <h1>🔥 DHAN SIOMAI</h1>
+  <p>Admin Dashboard</p>
+</div>
+
+<div class="stats">
+  <div class="stat-box stat-sales">
+    <div>Total Sales</div>
+    <h3 id="totalSales">₱0</h3>
+  </div>
+  <div class="stat-box stat-expenses">
+    <div>Expenses</div>
+    <h3 id="totalExpenses">₱0</h3>
+  </div>
+  <div class="stat-box stat-profit">
+    <div>Net Profit</div>
+    <h3 id="netProfit">₱0</h3>
   </div>
 </div>
 
-<div id="mainApp">
-  <div class="card">
-    <h2 style="color:#ff6b35; text-align:center;">Welcome!</h2>
-    <p style="text-align:center; font-size:14px; color:#666;">Fresh Siomai, Gyoza, Siopao</p>
-    <button class="btn-orange" onclick="location.href='order.html'">Order Now</button>
-    <button class="btn-gray" onclick="logout()">Logout</button>
-  </div>
-
-  <div class="card summary">
-    <h2>Today's Summary</h2>
-    <p>Gross Sales: ₱<span id="sales">0</span></p>
-    <p>Total Expenses: ₱<span id="expenses">0</span></p>
-    <p class="net">Net Income: ₱<span id="net">0</span></p>
-    <button class="btn-red" onclick="resetDay()">Reset Day</button>
-    <button class="btn-blue" onclick="printReport()">🖨️ Print Daily Report</button>
-  </div>
-
-  <div class="card">
-    <div class="section-header header-orange">📦 CURRENT STOCK</div>
-    <div id="stockList"></div>
-  </div>
-
-  <div class="card">
-    <div class="section-header header-orange">➕ ADD STOCK</div>
-    <select id="itemSelect"><option value="">Select Item</option></select>
-    <input type="number" id="qtyInput" placeholder="Enter quantity to add">
-    <button class="btn-green" onclick="addStock()">Add Stock</button>
-  </div>
-
-  <div class="card">
-    <div class="section-header header-orange">💰 PRICE MANAGEMENT</div>
-    <select id="priceItemSelect"><option value="">Select Item</option></select>
-    <input type="number" id="priceInput" placeholder="Enter new price">
-    <button class="btn-blue" onclick="updatePrice()">Update Price</button>
-  </div>
-
-  <div class="card">
-    <div class="section-header header-orange">📜 SALES HISTORY</div>
-    <div id="salesHistory"></div>
-    <button class="btn-red" onclick="clearHistory()">Clear History</button>
-  </div>
-
-  <button class="btn-red" onclick="addExpense()">💸 ADD EXPENSE</button>
+<div class="card">
+  <h2>➕ Add Stock</h2>
+  <select id="stockItem"></select>
+  <input type="number" id="stockQty" placeholder="Quantity to add">
+  <button class="btn-green" onclick="addStock()">Add Stock</button>
 </div>
 
-<div id="reportPrint" style="display:none;"></div>
+<div class="card">
+  <h2>💰 PRICE MANAGEMENT</h2>
+  <select id="priceItem" onchange="loadPrice()">
+    <option value="">Select Item</option>
+  </select>
+  <input type="number" id="priceValue" placeholder="Enter new price">
+  <button class="btn-blue" onclick="updatePrice()">Update Price</button>
+</div>
+
+<div class="card">
+  <h2>📦 Products & Stock</h2>
+  <div id="productsList"></div>
+</div>
+
+<div class="card">
+  <h2>💸 Expenses</h2>
+  <button class="btn-red" onclick="addExpense()">➕ ADD EXPENSE</button>
+  <div id="expenseList"></div>
+  <button class="btn-red" onclick="clearExpenses()">Clear History</button>
+</div>
 
 <script>
-const ADMIN_PASSWORD = "admin123";
-
-const categories = [
-  {name: "Siomai 65", items: [
-    {name: "Pork Siomai 65", price: 150},
-    {name: "Chicken Siomai 65", price: 150},
-    {name: "Beef Siomai 65", price: 160},
-    {name: "Shrimp Siomai 65", price: 170}
-  ]},
-  {name: "Siomai 30", items: [
-    {name: "Pork Siomai 30", price: 75},
-    {name: "Chicken Siomai 30", price: 75},
-    {name: "Beef Siomai 30", price: 80},
-    {name: "Shrimp Siomai 30", price: 85},
-    {name: "Japanese Siomai 30", price: 90}
-  ]},
-  {name: "Big Siomai", items: [
-    {name: "Big Pork Siomai", price: 45},
-    {name: "Big Chicken Siomai", price: 45},
-    {name: "Big Beef Siomai", price: 45},
-    {name: "Big Japanese Siomai", price: 45}
-  ]},
-  {name: "Dumplings", items: [
-    {name: "Gyoza Dumplings", price: 50},
-    {name: "Sharksfin Dumplings", price: 55},
-    {name: "Hakaw Dumplings", price: 60}
-  ]},
-  {name: "Siopao", items: [
-    {name: "Jumbo Asado Siopao", price: 45},
-    {name: "Jumbo Bola-Bola Siopao", price: 45},
-    {name: "Mini Asado Siopao", price: 25},
-    {name: "Mini Bola-Bola Siopao", price: 25}
-  ]},
-  {name: "Sauce", items: [
-    {name: "Chili Garlic Sauce", price: 50},
-    {name: "Siopao Sauce", price: 30}
-  ]}
+const products = [
+  "Pork Siomai 65", "Chicken Siomai 65", "Beef Siomai 65", "Shrimp Siomai 65",
+  "Pork Siomai 30", "Chicken Siomai 30", "Beef Siomai 30", "Shrimp Siomai 30", "Japanese Siomai 30",
+  "Big Pork Siomai", "Big Chicken Siomai", "Big Beef Siomai", "Big Japanese Siomai",
+  "Gyoza Dumplings", "Sharksfin Dumplings", "Hakaw Dumplings",
+  "Jumbo Asado Siopao", "Jumbo Bola-Bola Siopao", "Mini Asado Siopao", "Mini Bola-Bola Siopao",
+  "Chili Garlic Sauce", "Siopao Sauce"
 ];
 
-function login() {
-  let pass = document.getElementById('adminPass').value;
-  if (pass === ADMIN_PASSWORD) {
-    localStorage.setItem('loggedIn', 'true');
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'block';
-    initData();
-    loadData();
-  } else {
-    alert('Wrong password!');
-  }
-}
+const commonExpenses = [
+  "Gasul", "Plastic", "Kuryente", "Tubig", "Internet",
+  "Sahod", "Rent", "Transport", "Other"
+];
 
-function logout() {
-  localStorage.removeItem('loggedIn');
-  location.reload();
-}
+window.onload = function() {
+  // Load products sa dropdown
+  let stockSelect = document.getElementById('stockItem');
+  let priceSelect = document.getElementById('priceItem');
 
-function checkLogin() {
-  if (localStorage.getItem('loggedIn') === 'true') {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'block';
-    initData();
-    loadData();
-  }
-}
-
-function loadStock() {return JSON.parse(localStorage.getItem('stock') || '{}');}
-function saveStock(stock) {localStorage.setItem('stock', JSON.stringify(stock));}
-function loadPrices() {return JSON.parse(localStorage.getItem('prices') || '{}');}
-function savePrices(prices) {localStorage.setItem('prices', JSON.stringify(prices));}
-function loadHistory() {return JSON.parse(localStorage.getItem('salesHistory') || '[]');}
-function saveHistory(history) {localStorage.setItem('salesHistory', JSON.stringify(history));}
-
-function initData() {
-  let stock = loadStock();
-  let prices = loadPrices();
-  categories.forEach(cat => {
-    cat.items.forEach(item => {
-      if (stock[item.name] === undefined) stock[item.name] = 0;
-      if (prices[item.name] === undefined) prices[item.name] = item.price;
-    });
+  products.forEach(p => {
+    stockSelect.innerHTML += `<option value="${p}">${p}</option>`;
+    priceSelect.innerHTML += `<option value="${p}">${p}</option>`;
   });
-  saveStock(stock);
-  savePrices(prices);
-}
 
-function loadData() {
-  let sales = parseInt(localStorage.getItem('sales')) || 0;
-  let expenses = parseInt(localStorage.getItem('expenses')) || 0;
-  document.getElementById('sales').textContent = sales;
-  document.getElementById('expenses').textContent = expenses;
-  document.getElementById('net').textContent = sales - expenses;
-
-  let stock = loadStock();
-  let html = '';
-  categories.forEach(cat => {
-    cat.items.forEach(item => {
-      let qty = stock[item.name] || 0;
-      let price = loadPrices()[item.name] || item.price;
-      html += `<div class="stock-item"><span>${item.name}</span><span>Stock: ${qty} | ₱${price}</span></div>`;
-    });
-  });
-  document.getElementById('stockList').innerHTML = html;
-
-  let history = loadHistory();
-  let historyHtml = '';
-  history.slice().reverse().forEach(h => {
-    historyHtml += `<div class="history-item">
-      <div class="history-header">
-        <span>${h.time}</span>
-        <span>₱${h.total}</span>
-      </div>
-      <div class="history-items">
-        ${h.items.map(i => `${i.qty}x ${i.name}`).join(', ')}
-      </div>
-    </div>`;
-  });
-  document.getElementById('salesHistory').innerHTML = historyHtml || '<p style="text-align:center; color:#999;">No sales yet</p>';
-
-  let dropdown = document.getElementById('itemSelect');
-  let priceDropdown = document.getElementById('priceItemSelect');
-  dropdown.innerHTML = '<option value="">Select Item</option>';
-  priceDropdown.innerHTML = '<option value="">Select Item</option>';
-  categories.forEach(cat => {
-    cat.items.forEach(item => {
-      dropdown.innerHTML += `<option value="${item.name}">${item.name}</option>`;
-      priceDropdown.innerHTML += `<option value="${item.name}">${item.name}</option>`;
-    });
-  });
+  updateDashboard();
 }
 
 function addStock() {
-  let item = document.getElementById('itemSelect').value;
-  let qty = document.getElementById('qtyInput').value;
-  if (!item ||!qty || isNaN(qty)) return alert('Pili ka item at maglagay ng quantity');
-  let stock = loadStock();
-  stock[item] = (stock[item] || 0) + parseInt(qty);
-  saveStock(stock);
-  document.getElementById('qtyInput').value = '';
-  loadData();
-  alert(item + ' stock updated!');
+  let item = document.getElementById('stockItem').value;
+  let qty = parseInt(document.getElementById('stockQty').value);
+  if(!qty || qty <= 0) return alert("Invalid quantity!");
+
+  let stock = JSON.parse(localStorage.getItem('stock')) || {};
+  stock[item] = (stock[item] || 0) + qty;
+  localStorage.setItem('stock', JSON.stringify(stock));
+
+  document.getElementById('stockQty').value = '';
+  updateDashboard();
+  alert("Stock added!");
+}
+
+function loadPrice() {
+  let item = document.getElementById('priceItem').value;
+  let prices = JSON.parse(localStorage.getItem('prices')) || {};
+  document.getElementById('priceValue').value = prices[item] || '';
 }
 
 function updatePrice() {
-  let item = document.getElementById('priceItemSelect').value;
-  let price = document.getElementById('priceInput').value;
-  if (!item ||!price || isNaN(price)) return alert('Pili ka item at maglagay ng price');
-  let prices = loadPrices();
-  prices[item] = parseInt(price);
-  savePrices(prices);
-  document.getElementById('priceInput').value = '';
-  loadData();
-  alert(item + ' price updated!');
+  let item = document.getElementById('priceItem').value;
+  let price = parseFloat(document.getElementById('priceValue').value);
+  if(!item || isNaN(price)) return alert("Select item and enter price!");
+
+  let prices = JSON.parse(localStorage.getItem('prices')) || {};
+  prices[item] = price;
+  localStorage.setItem('prices', JSON.stringify(prices));
+
+  alert("Price updated!");
 }
 
 function addExpense() {
-  let amount = prompt('Expense amount:');
-  if (!amount || isNaN(amount)) return;
-  let expenses = parseInt(localStorage.getItem('expenses')) || 0;
-  expenses += parseInt(amount);
-  localStorage.setItem('expenses', expenses);
-  loadData();
-  alert('Expense added! Deducted agad sa Net Income.');
+  let desc = prompt("Piliin ang expense:\n1. Gasul\n2. Plastic\n3. Kuryente\n4. Tubig\n5. Internet\n6. Sahod\n7. Rent\n8. Transport\n9. Other");
+
+  let expenseName = "";
+  if(desc === "1") expenseName = "Gasul";
+  else if(desc === "2") expenseName = "Plastic";
+  else if(desc === "3") expenseName = "Kuryente";
+  else if(desc === "4") expenseName = "Tubig";
+  else if(desc === "5") expenseName = "Internet";
+  else if(desc === "6") expenseName = "Sahod";
+  else if(desc === "7") expenseName = "Rent";
+  else if(desc === "8") expenseName = "Transport";
+  else if(desc === "9") expenseName = prompt("Ilagay ang expense name:");
+  else return;
+
+  let amount = prompt("Magkano:");
+  if(!amount || isNaN(amount)) return alert("Invalid amount!");
+
+  let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+  expenses.push({
+    name: expenseName,
+    amount: parseFloat(amount),
+    time: new Date().toLocaleString()
+  });
+  localStorage.setItem('expenses', JSON.stringify(expenses));
+
+  updateDashboard();
 }
 
-function resetDay() {
-  if (confirm('Reset sales and expenses for today?')) {
-    localStorage.setItem('sales', 0);
-    localStorage.setItem('expenses', 0);
-    loadData();
+function clearExpenses() {
+  if(confirm("Clear all expenses?")) {
+    localStorage.removeItem('expenses');
+    updateDashboard();
   }
 }
 
-function clearHistory() {
-  if (confirm('Delete all sales history?')) {
-    localStorage.removeItem('salesHistory');
-    loadData();
+function updateDashboard() {
+  let salesHistory = JSON.parse(localStorage.getItem('salesHistory')) || [];
+  let stock = JSON.parse(localStorage.getItem('stock')) || {};
+  let prices = JSON.parse(localStorage.getItem('prices')) || {};
+  let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+
+  let totalSales = salesHistory.reduce((sum, s) => sum + s.total, 0);
+  let totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
+
+  document.getElementById('totalSales').textContent = '₱' + totalSales.toLocaleString();
+  document.getElementById('totalExpenses').textContent = '₱' + totalExpenses.toLocaleString();
+  document.getElementById('netProfit').textContent = '₱' + (totalSales - totalExpenses).toLocaleString();
+
+  // Products list
+  let prodList = document.getElementById('productsList');
+  prodList.innerHTML = '';
+  products.forEach(name => {
+    prodList.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee;">
+      <strong>${name}</strong><br>
+      Stock: ${stock[name] || 0} | Price: ₱${prices[name] || 0}
+    </div>`;
+  });
+
+  // Expenses list
+  let expenseList = document.getElementById('expenseList');
+  expenseList.innerHTML = '';
+  if(expenses.length === 0) {
+    expenseList.innerHTML = '<div style="text-align:center; color:#999; padding:20px;">No expenses yet</div>';
+  } else {
+    expenses.slice(-10).reverse().forEach(e => {
+      expenseList.innerHTML += `<div class="expense-item">
+        <div>
+          <strong>${e.name}</strong><br>
+          <small>${e.time}</small>
+        </div>
+        <div style="color:red; font-weight:700;">-₱${e.amount}</div>
+      </div>`;
+    });
   }
 }
-
-function printReport() {
-  let sales = parseInt(localStorage.getItem('sales')) || 0;
-  let expenses = parseInt(localStorage.getItem('expenses')) || 0;
-  let net = sales - expenses;
-  let history = loadHistory();
-  let now = new Date().toLocaleString();
-
-  let html = `
-    <h3 style="text-align:center;">DHAN SIOMAI</h3>
-    <div style="text-align:center;">Daily Sales Report</div>
-    <div style="text-align:center;">${now}</div>
-    <hr>
-    <p>Gross Sales: ₱${sales}</p>
-    <p>Total Expenses: ₱${expenses}</p>
-    <p><strong>Net Income: ₱${net}</strong></p>
-    <hr>
-    <p><strong>Transactions: ${history.length}</strong></p>
-    ${history.map(h => `<div>${h.time} - ₱${h.total}</div>`).join('')}
-    <hr>
-    <div style="text-align:center;">THANK YOU!</div>
-  `;
-
-  document.getElementById('reportPrint').innerHTML = html;
-  window.print();
-}
-
-checkLogin();
 </script>
-<style>
-@media print {
-  body * {visibility:hidden;}
-  #reportPrint, #reportPrint * {visibility:visible;}
-  #reportPrint {display:block!important; position:absolute; left:0; top:0; width:58mm; font-family:'Courier New', monospace; font-size:12px;}
-  @page {margin:0; size:58mm auto;}
-}
-</style>
 </body>
 </html>
