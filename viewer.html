@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>DHAN SIOMAI - Viewer</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+* {margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif;}
+body {background:#f5f5f5; padding:20px;}
+.login-overlay {
+  position:fixed; top:0; left:0; width:100%; height:100%;
+  background:linear-gradient(135deg, #ff6b35, #ff4500);
+  display:flex; align-items:center; justify-content:center; z-index:9999;
+}
+.login-box {
+  background:white; padding:30px 25px; border-radius:20px;
+  width:90%; max-width:350px; text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);
+}
+.login-box input {
+  width:100%; padding:14px; margin-bottom:12px;
+  border:2px solid #ddd; border-radius:10px; font-size:16px;
+}
+.login-box button {
+  width:100%; padding:14px; background:#ff6b35; color:white;
+  border:none; border-radius:10px; font-size:16px; font-weight:700; cursor:pointer;
+}
+.main-content {display:none;}
+.header {
+  background:linear-gradient(135deg, #ff6b35, #ff4500);
+  color:white; padding:20px; border-radius:15px; margin-bottom:20px;
+  text-align:center; position:relative;
+}
+.card {
+  background:white; border-radius:15px; padding:20px; margin-bottom:15px;
+  box-shadow:0 3px 10px rgba(0,0,0,0.1);
+}
+.stats {
+  display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:20px;
+}
+.stat-box {padding:15px; border-radius:12px; color:white; text-align:center;}
+.stat-sales {background:#28a745;}
+.stat-expenses {background:#dc3545;}
+.stat-profit {background:#17a2b8;}
+table {width:100%; border-collapse:collapse; font-size:14px;}
+th, td {padding:10px; text-align:left; border-bottom:1px solid #eee;}
+th {background:#ff6b35; color:white;}
+.logout-btn {
+  position:absolute; top:15px; right:15px;
+  background:rgba(255,255,255,0.2); border:1px solid white;
+  color:white; padding:8px 15px; border-radius:8px; cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h2>👁️ Viewer Login</h2>
+    <input type="password" id="viewerPass" placeholder="Enter Password">
+    <button onclick="checkPassword()">Login</button>
+    <p style="margin-top:10px; font-size:12px; color:#999;">Default: viewer123</p>
+  </div>
+</div>
+
+<div class="main-content" id="mainContent">
+  <div class="header">
+    <button class="logout-btn" onclick="logout()">Logout</button>
+    <h1>👁️ Viewer Mode</h1>
+    <p>Read Only - Sales, Expenses, Stock, Price</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat-box stat-sales">
+      <div>Total Sales</div>
+      <h3 id="totalSales">₱0</h3>
+    </div>
+    <div class="stat-box stat-expenses">
+      <div>Expenses</div>
+      <h3 id="totalExpenses">₱0</h3>
+    </div>
+    <div class="stat-box stat-profit">
+      <div>Net Profit</div>
+      <h3 id="netProfit">₱0</h3>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📦 Products & Stock</h2>
+    <table id="productsTable">
+      <thead><tr><th>Product</th><th>Stock</th><th>Price</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>💰 Recent Sales</h2>
+    <table id="salesTable">
+      <thead><tr><th>Date</th><th>Item</th><th>Qty</th><th>Amount</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const VIEWER_PASSWORD = "viewer123"; // Palitan mo to
+
+if(sessionStorage.getItem('viewerLoggedIn') === 'true') {
+  showMainContent();
+}
+
+function checkPassword() {
+  if(document.getElementById('viewerPass').value === VIEWER_PASSWORD) {
+    sessionStorage.setItem('viewerLoggedIn', 'true');
+    showMainContent();
+  } else {
+    alert('Wrong password!');
+  }
+}
+
+function showMainContent() {
+  document.getElementById('loginOverlay').style.display = 'none';
+  document.getElementById('mainContent').style.display = 'block';
+  updateDashboard();
+  setInterval(updateDashboard, 5000);
+}
+
+function logout() {
+  sessionStorage.removeItem('viewerLoggedIn');
+  location.reload();
+}
+
+function updateDashboard() {
+  let salesHistory = JSON.parse(localStorage.getItem('salesHistory')) || [];
+  let stock = JSON.parse(localStorage.getItem('stock')) || {};
+  let prices = JSON.parse(localStorage.getItem('prices')) || {};
+  let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+
+  let totalSales = salesHistory.reduce((sum, s) => sum + s.total, 0);
+  let totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
+  
+  document.getElementById('totalSales').textContent = '₱' + totalSales.toLocaleString();
+  document.getElementById('totalExpenses').textContent = '₱' + totalExpenses.toLocaleString();
+  document.getElementById('netProfit').textContent = '₱' + (totalSales - totalExpenses).toLocaleString();
+
+  // Products table
+  let prodBody = document.querySelector('#productsTable tbody');
+  prodBody.innerHTML = '';
+  Object.keys(stock).forEach(name => {
+    prodBody.innerHTML += `<tr>
+      <td>${name}</td>
+      <td>${stock[name] || 0}</td>
+      <td>₱${prices[name] || 0}</td>
+    </tr>`;
+  });
+
+  // Sales table
+  let salesBody = document.querySelector('#salesTable tbody');
+  salesBody.innerHTML = '';
+  salesHistory.slice(-20).reverse().forEach(s => {
+    let qty = s.items.reduce((sum, i) => sum + i.qty, 0);
+    salesBody.innerHTML += `<tr>
+      <td>${s.time}</td>
+      <td>${s.items.map(i => i.name).join(', ')}</td>
+      <td>${qty}</td>
+      <td>₱${s.total}</td>
+    </tr>`;
+  });
+}
+</script>
+</body>
+</html>
