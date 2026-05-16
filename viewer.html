@@ -159,16 +159,7 @@ tr:last-child td {border-bottom:none;}
 </div>
 
 <script>
-const VIEWER_PASSWORD = "viewer123"; // Palitan mo to
-
-const categories = {
-  "Siomai 65": ["Pork Siomai 65", "Chicken Siomai 65", "Beef Siomai 65", "Shrimp Siomai 65"],
-  "Siomai 30": ["Pork Siomai 30", "Chicken Siomai 30", "Beef Siomai 30", "Shrimp Siomai 30", "Japanese Siomai 30"],
-  "Big Siomai": ["Big Pork Siomai", "Big Chicken Siomai", "Big Beef Siomai", "Big Japanese Siomai"],
-  "Dumplings": ["Gyoza Dumplings", "Sharksfin Dumplings", "Hakaw Dumplings"],
-  "Siopao": ["Jumbo Asado Siopao", "Jumbo Bola-Bola Siopao", "Mini Asado Siopao", "Mini Bola-Bola Siopao"],
-  "Sauce": ["Chili Garlic Sauce", "Siopao Sauce"]
-};
+const VIEWER_PASSWORD = "viewer123";
 
 if(sessionStorage.getItem('viewerLoggedIn') === 'true') {
   showMainContent();
@@ -204,6 +195,16 @@ function getItemClass(itemName) {
   return '';
 }
 
+function getCategory(name) {
+  if(name.includes('Siomai 65')) return 'Siomai 65';
+  if(name.includes('Siomai 30')) return 'Siomai 30';
+  if(name.includes('Big') && name.includes('Siomai')) return 'Big Siomai';
+  if(name.includes('Dumplings')) return 'Dumplings';
+  if(name.includes('Siopao')) return 'Siopao';
+  if(name.includes('Sauce')) return 'Sauce';
+  return 'Others';
+}
+
 function toggleCategory(id) {
   document.getElementById(id).classList.toggle('active');
 }
@@ -222,44 +223,53 @@ function updateDashboard() {
   document.getElementById('totalExpenses').textContent = '₱' + totalExpenses.toLocaleString();
   document.getElementById('netProfit').textContent = '₱' + (totalSales - totalExpenses).toLocaleString();
 
+  // Group products by category automatically
+  let grouped = {};
+  Object.keys(stock).forEach(name => {
+    let cat = getCategory(name);
+    if(!grouped[cat]) grouped[cat] = [];
+    grouped[cat].push(name);
+  });
+
   // Products table - grouped by category
   let prodContainer = document.getElementById('productsContainer');
   prodContainer.innerHTML = '';
 
-  Object.keys(categories).forEach((catName, idx) => {
-    let folderId = 'cat-' + idx;
-    let items = categories[catName];
-    let hasItems = items.some(name => stock[name]!== undefined || prices[name]!== undefined);
+  if(Object.keys(grouped).length === 0) {
+    prodContainer.innerHTML = '<div class="no-data">No products yet</div>';
+  } else {
+    let idx = 0;
+    Object.keys(grouped).sort().forEach(catName => {
+      let folderId = 'cat-' + idx;
+      let items = grouped[catName];
+      
+      let folderHTML = `
+        <div class="category-folder" id="${folderId}">
+          <div class="category-header" onclick="toggleCategory('${folderId}')">
+            <span>📁 ${catName}</span>
+            <span class="arrow">▶</span>
+          </div>
+          <div class="category-content">
+            <table>
+              <thead><tr><th>Product</th><th>Stock</th><th>Price</th></tr></thead>
+              <tbody>
+      `;
 
-    if(!hasItems) return;
-
-    let folderHTML = `
-      <div class="category-folder" id="${folderId}">
-        <div class="category-header" onclick="toggleCategory('${folderId}')">
-          <span>📁 ${catName}</span>
-          <span class="arrow">▶</span>
-        </div>
-        <div class="category-content">
-          <table>
-            <thead><tr><th>Product</th><th>Stock</th><th>Price</th></tr></thead>
-            <tbody>
-    `;
-
-    items.forEach(name => {
-      if(stock[name]!== undefined || prices[name]!== undefined) {
+      items.forEach(name => {
         folderHTML += `<tr>
           <td>${name}</td>
           <td>${stock[name] || 0}</td>
           <td>₱${prices[name] || 0}</td>
         </tr>`;
-      }
+      });
+
+      folderHTML += `</tbody></table></div></div>`;
+      prodContainer.innerHTML += folderHTML;
+      idx++;
     });
+  }
 
-    folderHTML += `</tbody></table></div></div>`;
-    prodContainer.innerHTML += folderHTML;
-  });
-
-  // Sales table - breakdown per item with color coding
+  // Sales table
   let salesBody = document.querySelector('#salesTable tbody');
   salesBody.innerHTML = '';
   if(salesHistory.length === 0) {
