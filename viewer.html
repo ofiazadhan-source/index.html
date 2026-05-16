@@ -96,8 +96,8 @@ tr:last-child td {border-bottom:none;}
 .item-shrimp {background:#ffffff; color:#333; border:1px solid #ddd;}
 .item-japanese {background:#000; color:white;}
 .item-qty {
-  color:#666; 
-  font-size:12px; 
+  color:#666;
+  font-size:12px;
   background:#f0f0f0;
   padding:2px 6px;
   border-radius:8px;
@@ -217,7 +217,7 @@ function updateDashboard() {
   // Totals
   let totalSales = salesHistory.reduce((sum, s) => sum + s.total, 0);
   let totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
-  
+
   document.getElementById('totalSales').textContent = '₱' + totalSales.toLocaleString();
   document.getElementById('totalExpenses').textContent = '₱' + totalExpenses.toLocaleString();
   document.getElementById('netProfit').textContent = '₱' + (totalSales - totalExpenses).toLocaleString();
@@ -225,14 +225,14 @@ function updateDashboard() {
   // Products table - grouped by category
   let prodContainer = document.getElementById('productsContainer');
   prodContainer.innerHTML = '';
-  
+
   Object.keys(categories).forEach((catName, idx) => {
     let folderId = 'cat-' + idx;
     let items = categories[catName];
     let hasItems = items.some(name => stock[name]!== undefined || prices[name]!== undefined);
-    
+
     if(!hasItems) return;
-    
+
     let folderHTML = `
       <div class="category-folder" id="${folderId}">
         <div class="category-header" onclick="toggleCategory('${folderId}')">
@@ -244,7 +244,7 @@ function updateDashboard() {
             <thead><tr><th>Product</th><th>Stock</th><th>Price</th></tr></thead>
             <tbody>
     `;
-    
+
     items.forEach(name => {
       if(stock[name]!== undefined || prices[name]!== undefined) {
         folderHTML += `<tr>
@@ -254,7 +254,7 @@ function updateDashboard() {
         </tr>`;
       }
     });
-    
+
     folderHTML += `</tbody></table></div></div>`;
     prodContainer.innerHTML += folderHTML;
   });
