@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 * {margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif;}
-body {background:#f5f5f5; padding:20px;}
+body {background:#f5f5f5; color:#333; padding:20px;}
 .login-overlay {
   position:fixed; top:0; left:0; width:100%; height:100%;
   background:linear-gradient(135deg, #ff6b35, #ff4500);
@@ -18,6 +18,7 @@ body {background:#f5f5f5; padding:20px;}
   width:90%; max-width:350px; text-align:center;
   box-shadow:0 10px 30px rgba(0,0,0,0.3);
 }
+.login-box h2 {color:#ff6b35; margin-bottom:20px;}
 .login-box input {
   width:100%; padding:14px; margin-bottom:12px;
   border:2px solid #ddd; border-radius:10px; font-size:16px;
@@ -36,6 +37,7 @@ body {background:#f5f5f5; padding:20px;}
   background:white; border-radius:15px; padding:20px; margin-bottom:15px;
   box-shadow:0 3px 10px rgba(0,0,0,0.1);
 }
+h2 {color:#ff6b35; margin-bottom:15px; font-size:18px;}
 .stats {
   display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:20px;
 }
@@ -45,12 +47,32 @@ body {background:#f5f5f5; padding:20px;}
 .stat-profit {background:#17a2b8;}
 table {width:100%; border-collapse:collapse; font-size:14px;}
 th, td {padding:10px; text-align:left; border-bottom:1px solid #eee;}
-th {background:#ff6b35; color:white;}
+th {background:#ff6b35; color:white; font-weight:600;}
+.item-qty {
+  color:#666; 
+  font-size:12px; 
+  background:#f0f0f0;
+  padding:2px 6px;
+  border-radius:8px;
+  margin-left:5px;
+}
+.item-tag {
+  padding:4px 8px;
+  border-radius:6px;
+  font-weight:600;
+  display:inline-block;
+}
+.item-pork {background:#ff4d4d; color:white;}
+.item-chicken {background:#ffeb3b; color:#333;}
+.item-beef {background:#4caf50; color:white;}
+.item-shrimp {background:#ffffff; color:#333; border:1px solid #ddd;}
+.item-japanese {background:#000; color:white;}
 .logout-btn {
   position:absolute; top:15px; right:15px;
   background:rgba(255,255,255,0.2); border:1px solid white;
   color:white; padding:8px 15px; border-radius:8px; cursor:pointer;
 }
+.no-data {text-align:center; color:#999; padding:20px;}
 </style>
 </head>
 <body>
@@ -97,7 +119,7 @@ th {background:#ff6b35; color:white;}
   <div class="card">
     <h2>💰 Recent Sales</h2>
     <table id="salesTable">
-      <thead><tr><th>Date</th><th>Item</th><th>Qty</th><th>Amount</th></tr></thead>
+      <thead><tr><th>Date</th><th>Item</th><th>Qty</th><th>Subtotal</th></tr></thead>
       <tbody></tbody>
     </table>
   </div>
@@ -131,12 +153,22 @@ function logout() {
   location.reload();
 }
 
+function getItemClass(itemName) {
+  if(itemName.includes('Pork')) return 'item-pork';
+  if(itemName.includes('Chicken')) return 'item-chicken';
+  if(itemName.includes('Beef')) return 'item-beef';
+  if(itemName.includes('Shrimp')) return 'item-shrimp';
+  if(itemName.includes('Japanese')) return 'item-japanese';
+  return '';
+}
+
 function updateDashboard() {
   let salesHistory = JSON.parse(localStorage.getItem('salesHistory')) || [];
   let stock = JSON.parse(localStorage.getItem('stock')) || {};
   let prices = JSON.parse(localStorage.getItem('prices')) || {};
   let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
 
+  // Totals
   let totalSales = salesHistory.reduce((sum, s) => sum + s.total, 0);
   let totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
   
@@ -147,27 +179,43 @@ function updateDashboard() {
   // Products table
   let prodBody = document.querySelector('#productsTable tbody');
   prodBody.innerHTML = '';
-  Object.keys(stock).forEach(name => {
-    prodBody.innerHTML += `<tr>
-      <td>${name}</td>
-      <td>${stock[name] || 0}</td>
-      <td>₱${prices[name] || 0}</td>
-    </tr>`;
-  });
+  let productNames = Object.keys(stock);
+  if(productNames.length === 0) {
+    prodBody.innerHTML = '<tr><td colspan="3" class="no-data">No products yet</td></tr>';
+  } else {
+    productNames.forEach(name => {
+      prodBody.innerHTML += `<tr>
+        <td>${name}</td>
+        <td>${stock[name] || 0}</td>
+        <td>₱${prices[name] || 0}</td>
+      </tr>`;
+    });
+  }
 
-  // Sales table
+  // Sales table - breakdown per item with color coding
   let salesBody = document.querySelector('#salesTable tbody');
   salesBody.innerHTML = '';
-  salesHistory.slice(-20).reverse().forEach(s => {
-    let qty = s.items.reduce((sum, i) => sum + i.qty, 0);
-    salesBody.innerHTML += `<tr>
-      <td>${s.time}</td>
-      <td>${s.items.map(i => i.name).join(', ')}</td>
-      <td>${qty}</td>
-      <td>₱${s.total}</td>
-    </tr>`;
-  });
+  if(salesHistory.length === 0) {
+    salesBody.innerHTML = '<tr><td colspan="4" class="no-data">No sales yet</td></tr>';
+  } else {
+    salesHistory.slice(-20).reverse().forEach(s => {
+      s.items.forEach((item, index) => {
+        let isFirstRow = index === 0;
+        let itemClass = getItemClass(item.name);
+        salesBody.innerHTML += `<tr>
+          <td>${isFirstRow ? s.time : ''}</td>
+          <td><span class="item-tag ${itemClass}">${item.name}</span> <span class="item-qty">x${item.qty}</span></td>
+          <td>${isFirstRow ? item.qty : ''}</td>
+          <td>${isFirstRow ? '₱' + s.total : '₱' + item.subtotal}</td>
+        </tr>`;
+      });
+    });
+  }
 }
+
+document.getElementById('viewerPass').addEventListener('keypress', function(e) {
+  if(e.key === 'Enter') checkPassword();
+});
 </script>
 </body>
 </html>
