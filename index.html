@@ -20,17 +20,19 @@ body {background:#f5f5f5; padding-bottom:100px;}
 }
 .category-header {
   background:#fff3f0; padding:15px; font-weight:700; color:#ff6b35;
-  cursor:pointer; display:flex; justify-content:space-between;
+  cursor:pointer; display:flex; justify-content:space-between; align-items:center;
 }
-.category-content {display:none; padding:10px;}
-.category-folder.active.category-content {display:block;}
-.category-folder.active.arrow {transform:rotate(90deg);}
-.arrow {transition:transform 0.3s;}
+.category-content {
+  display:none;
+  padding:10px;
+}
+.arrow {
+  transition:transform 0.3s;
+}
 .product-card {
   display:flex; align-items:center; padding:12px; border-bottom:1px solid #eee;
 }
 .product-card:last-child {border-bottom:none;}
-.product-card img {width:50px; height:50px; border-radius:10px; margin-right:12px;}
 .product-info {flex:1;}
 .product-info h4 {font-size:15px; margin-bottom:3px;}
 .product-info p {color:#ff6b35; font-weight:700;}
@@ -116,16 +118,21 @@ function renderProducts() {
   });
 
   let container = document.getElementById('productsContainer');
+  container.innerHTML = '';
   let idx = 0;
+
   Object.keys(grouped).forEach(cat => {
     let folderId = 'cat' + idx;
+    let contentId = 'content' + idx;
+    let arrowId = 'arrow' + idx;
+
     let html = `
-      <div class="category-folder" id="${folderId}">
-        <div class="category-header" onclick="toggleCat('${folderId}')">
+      <div class="category-folder">
+        <div class="category-header" onclick="toggleFolder('${contentId}', '${arrowId}')">
           <span>📁 ${cat}</span>
-          <span class="arrow">▶</span>
+          <span class="arrow" id="${arrowId}">▶</span>
         </div>
-        <div class="category-content">
+        <div class="category-content" id="${contentId}">
     `;
 
     grouped[cat].forEach(p => {
@@ -156,8 +163,17 @@ function renderProducts() {
   });
 }
 
-function toggleCat(id) {
-  document.getElementById(id).classList.toggle('active');
+function toggleFolder(contentId, arrowId) {
+  let content = document.getElementById(contentId);
+  let arrow = document.getElementById(arrowId);
+
+  if(content.style.display === 'block') {
+    content.style.display = 'none';
+    arrow.style.transform = 'rotate(0deg)';
+  } else {
+    content.style.display = 'block';
+    arrow.style.transform = 'rotate(90deg)';
+  }
 }
 
 function updateQty(name, change) {
