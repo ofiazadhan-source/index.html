@@ -16,14 +16,16 @@ h2 {color:#ff6b35; margin-bottom:10px; text-align:center;}
 .cart-item {display:flex; justify-content:space-between; padding:8px 0; font-size:14px;}
 .divider {border-bottom:1px dashed #ddd; margin:10px 0;}
 .total-row {display:flex; justify-content:space-between; font-size:18px; font-weight:700; margin-top:10px;}
+.payment-info {background:#f9f9f9; padding:10px; border-radius:8px; margin-top:15px; font-size:14px;}
+.payment-info div {padding:4px 0;}
 .btn-group {display:flex; gap:10px; margin-top:20px;}
 .btn {flex:1; padding:12px; border:none; border-radius:8px; font-weight:700; cursor:pointer; font-size:16px;}
 .btn-print {background:#ff6b35; color:white;}
 .btn-back {background:#666; color:white;}
 @media print {
   body {background:white; padding:0;}
- .container {box-shadow:none; padding:0;}
- .btn-group {display:none;}
+.container {box-shadow:none; padding:0;}
+.btn-group {display:none;}
 }
 </style>
 </head>
@@ -47,6 +49,8 @@ h2 {color:#ff6b35; margin-bottom:10px; text-align:center;}
     <span>Total Amount:</span>
     <span id="totalPrice">₱0</span>
   </div>
+
+  <div class="payment-info" id="paymentInfo"></div>
   
   <div class="divider"></div>
   <p style="text-align:center; font-size:12px; color:#666; margin-top:15px;">
@@ -61,13 +65,12 @@ h2 {color:#ff6b35; margin-bottom:10px; text-align:center;}
 
 <script>
 window.onload = function() {
-  // Set receipt number and date
   document.getElementById('receiptNo').textContent = Math.floor(Math.random() * 100000);
   document.getElementById('dateTime').textContent = new Date().toLocaleString('en-PH');
 
-  // Load cart from URL
   const urlParams = new URLSearchParams(window.location.search);
   const cartData = urlParams.get('cart');
+  const paymentData = urlParams.get('payment');
   
   if(!cartData) {
     document.getElementById('cartList').innerHTML = '<p style="text-align:center;">Walang items sa cart</p>';
@@ -96,6 +99,27 @@ window.onload = function() {
   document.getElementById('cartList').innerHTML = html;
   document.getElementById('totalItems').textContent = totalItems;
   document.getElementById('totalPrice').textContent = '₱' + total;
+
+  // Payment info
+  if(paymentData) {
+    const payment = JSON.parse(decodeURIComponent(paymentData));
+    let payHtml = '';
+    
+    if(payment.method === 'Cash') {
+      payHtml = `
+        <div><strong>Payment Method:</strong> Cash</div>
+        <div><strong>Cash:</strong> ₱${payment.cash}</div>
+        <div><strong>Change:</strong> ₱${payment.change}</div>
+      `;
+    } else if(payment.method === 'GCash') {
+      payHtml = `
+        <div><strong>Payment Method:</strong> GCash</div>
+        <div><strong>Send to:</strong> ${payment.gcashName}</div>
+        <div><strong>GCash No:</strong> ${payment.gcashNumber}</div>
+      `;
+    }
+    document.getElementById('paymentInfo').innerHTML = payHtml;
+  }
 }
 
 function getPrice(name) {
