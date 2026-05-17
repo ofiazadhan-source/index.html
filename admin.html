@@ -2,100 +2,128 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#ff6b35">
-<link rel="manifest" href="manifest.json">
-<title>DHAN SIOMAI - Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - DHAN SIOMAI</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 * {margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif;}
-body {background:#f5f5f5; padding:20px;}
+body {background:#f5f5f5; padding:15px;}
 .header {
   background:linear-gradient(135deg, #ff6b35, #ff4500);
   color:white; padding:20px; border-radius:15px; margin-bottom:20px;
-  text-align:center;
+  text-align:center; position:relative;
 }
-.card {
-  background:white; border-radius:15px; padding:20px; margin-bottom:15px;
-  box-shadow:0 3px 10px rgba(0,0,0,0.1);
-}
-h2 {color:#ff6b35; margin-bottom:15px; font-size:18px;}
-input, select, button {
-  width:100%; padding:14px; margin-bottom:12px;
-  border:2px solid #ddd; border-radius:10px; font-size:16px;
-}
-button {
-  background:#ff6b35; color:white; border:none; font-weight:700;
+.logout-btn {
+  position:absolute; right:15px; top:15px; background:white; color:#ff6b35;
+  border:none; padding:8px 15px; border-radius:8px; font-weight:700;
   cursor:pointer;
 }
-.btn-green {background:#28a745;}
-.btn-red {background:#dc3545;}
-.btn-blue {background:#17a2b8;}
-.stats {
-  display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;
+.stats-grid {
+  display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:20px;
 }
-.stat-box {padding:15px; border-radius:12px; color:white; text-align:center;}
-.stat-sales {background:#28a745;}
-.stat-expenses {background:#dc3545;}
-.stat-profit {background:#17a2b8;}
-table {width:100%; border-collapse:collapse; font-size:14px;}
+.stat-card {
+  padding:15px; border-radius:12px; text-align:center; color:white;
+}
+.stat-card.green {background:#4caf50;}
+.stat-card.red {background:#f44336;}
+.stat-card.blue {background:#2196f3;}
+.stat-card h3 {font-size:24px; margin-top:5px;}
+.section {
+  background:white; border-radius:12px; padding:15px; margin-bottom:15px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+.section h3 {color:#ff6b35; margin-bottom:15px;}
+button {
+  background:#ff6b35; color:white; border:none; padding:12px 20px;
+  border-radius:8px; font-weight:700; cursor:pointer; margin:5px;
+}
+button:hover {background:#ff4500;}
+input, select {
+  width:100%; padding:10px; margin:8px 0; border:1px solid #ddd;
+  border-radius:8px; font-size:14px;
+}
+table {width:100%; border-collapse:collapse;}
 th, td {padding:10px; text-align:left; border-bottom:1px solid #eee;}
 th {background:#ff6b35; color:white;}
-.expense-item {
-  display:flex; justify-content:space-between; padding:12px;
-  border-bottom:1px solid #eee;
-}
-.expense-item:last-child {border-bottom:none;}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>🔥 DHAN SIOMAI</h1>
-  <p>Admin Dashboard</p>
+  <h2>⚙️ Admin Dashboard</h2>
+  <p>Manage Stock, Price, Sales & Expenses</p>
+  <button class="logout-btn" onclick="window.location.href='index.html'">Logout</button>
 </div>
 
-<div class="stats">
-  <div class="stat-box stat-sales">
+<div class="stats-grid">
+  <div class="stat-card green">
     <div>Total Sales</div>
-    <h3 id="totalSales">₱0</h3>
+    <h3>₱<span id="totalSales">0</span></h3>
   </div>
-  <div class="stat-box stat-expenses">
+  <div class="stat-card red">
     <div>Expenses</div>
-    <h3 id="totalExpenses">₱0</h3>
+    <h3>₱<span id="totalExpenses">0</span></h3>
   </div>
-  <div class="stat-box stat-profit">
+  <div class="stat-card blue">
     <div>Net Profit</div>
-    <h3 id="netProfit">₱0</h3>
+    <h3>₱<span id="netProfit">0</span></h3>
   </div>
 </div>
 
-<div class="card">
-  <h2>➕ Add Stock</h2>
+<div class="section">
+  <h3>📦 Add Stock</h3>
   <select id="stockItem"></select>
-  <input type="number" id="stockQty" placeholder="Quantity to add">
-  <button class="btn-green" onclick="addStock()">Add Stock</button>
+  <input type="number" id="stockQty" placeholder="Enter quantity" min="1">
+  <button onclick="addStock()">Add Stock</button>
 </div>
 
-<div class="card">
-  <h2>💰 PRICE MANAGEMENT</h2>
-  <select id="priceItem" onchange="loadPrice()">
-    <option value="">Select Item</option>
-  </select>
-  <input type="number" id="priceValue" placeholder="Enter new price">
-  <button class="btn-blue" onclick="updatePrice()">Update Price</button>
+<div class="section">
+  <h3>💰 Price Management</h3>
+  <select id="priceItem"></select>
+  <input type="number" id="priceValue" placeholder="Enter new price" min="0">
+  <button onclick="updatePrice()">Update Price</button>
 </div>
 
-<div class="card">
-  <h2>📦 Products & Stock</h2>
-  <div id="productsList"></div>
+<div class="section">
+  <h3>🧾 Add Expense</h3>
+  <button onclick="addExpense()">Add Expense</button>
 </div>
 
-<div class="card">
-  <h2>💸 Expenses</h2>
-  <button class="btn-red" onclick="addExpense()">➕ ADD EXPENSE</button>
-  <div id="expenseList"></div>
-  <button class="btn-red" onclick="clearExpenses()">Clear History</button>
+<div class="section">
+  <h3>📊 Products & Stock</h3>
+  <div style="overflow-x:auto;">
+    <table id="stockTable">
+      <thead>
+        <tr><th>Item</th><th>Stock</th><th>Price</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <h3>📈 Recent Sales</h3>
+  <div style="overflow-x:auto;">
+    <table id="salesTable">
+      <thead>
+        <tr><th>Date</th><th>Items</th><th>Total</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <h3>🧾 Expense History</h3>
+  <div style="overflow-x:auto;">
+    <table id="expenseTable">
+      <thead>
+        <tr><th>Date</th><th>Item</th><th>Amount</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <button style="background:#f44336; margin-top:10px;" onclick="clearHistory()">Clear History</button>
 </div>
 
 <script>
@@ -108,130 +136,167 @@ const products = [
   "Chili Garlic Sauce", "Siopao Sauce"
 ];
 
-const commonExpenses = [
-  "Gasul", "Plastic", "Kuryente", "Tubig", "Internet",
-  "Sahod", "Rent", "Transport", "Other"
-];
+const expenseTypes = ["Gasul", "Plastic", "Kuryente", "Tubig", "Internet", "Sahod", "Rent", "Transport", "Other"];
 
 window.onload = function() {
+  loadProducts();
+  loadData();
+}
+
+function loadProducts() {
   let stockSelect = document.getElementById('stockItem');
   let priceSelect = document.getElementById('priceItem');
+
   products.forEach(p => {
     stockSelect.innerHTML += `<option value="${p}">${p}</option>`;
     priceSelect.innerHTML += `<option value="${p}">${p}</option>`;
   });
-  updateDashboard();
+}
 
-  // Register service worker for PWA
-  if('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-  }
+function loadData() {
+  let salesHistory = JSON.parse(localStorage.getItem('salesHistory')) || [];
+  let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+  let stock = JSON.parse(localStorage.getItem('stock')) || {};
+  let prices = JSON.parse(localStorage.getItem('prices')) || {};
+
+  let totalSales = salesHistory.reduce((sum, s) => sum + s.total, 0);
+  let totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
+  let netProfit = totalSales - totalExpenses;
+
+  document.getElementById('totalSales').textContent = totalSales;
+  document.getElementById('totalExpenses').textContent = totalExpenses;
+  document.getElementById('netProfit').textContent = netProfit;
+
+  // Load stock table
+  let stockBody = document.querySelector('#stockTable tbody');
+  stockBody.innerHTML = '';
+  products.forEach(p => {
+    stockBody.innerHTML += `
+      <tr>
+        <td>${p}</td>
+        <td>${stock[p] || 0}</td>
+        <td>₱${prices[p] || 0}</td>
+      </tr>
+    `;
+  });
+
+  // Load sales table
+  let salesBody = document.querySelector('#salesTable tbody');
+  salesBody.innerHTML = '';
+  salesHistory.slice(-10).reverse().forEach(sale => {
+    let items = sale.items.map(i => `${i.name} x${i.qty}`).join(', ');
+    salesBody.innerHTML += `
+      <tr>
+        <td>${sale.time}</td>
+        <td>${items}</td>
+        <td>₱${sale.total}</td>
+      </tr>
+    `;
+  });
+
+  // Load expense table
+  let expenseBody = document.querySelector('#expenseTable tbody');
+  expenseBody.innerHTML = '';
+  expenses.slice(-10).reverse().forEach(exp => {
+    expenseBody.innerHTML += `
+      <tr>
+        <td>${exp.time}</td>
+        <td>${exp.item}</td>
+        <td>₱${exp.amount}</td>
+      </tr>
+    `;
+  });
 }
 
 function addStock() {
   let item = document.getElementById('stockItem').value;
   let qty = parseInt(document.getElementById('stockQty').value);
-  if(!qty || qty <= 0) return alert("Invalid quantity!");
+
+  if (!qty || qty <= 0) {
+    alert("Enter valid quantity!");
+    return;
+  }
 
   let stock = JSON.parse(localStorage.getItem('stock')) || {};
   stock[item] = (stock[item] || 0) + qty;
   localStorage.setItem('stock', JSON.stringify(stock));
 
+  alert(`${qty} pcs added to ${item}`);
   document.getElementById('stockQty').value = '';
-  updateDashboard();
-  alert("Stock added!");
-}
-
-function loadPrice() {
-  let item = document.getElementById('priceItem').value;
-  let prices = JSON.parse(localStorage.getItem('prices')) || {};
-  document.getElementById('priceValue').value = prices[item] || '';
+  loadData();
 }
 
 function updatePrice() {
   let item = document.getElementById('priceItem').value;
   let price = parseFloat(document.getElementById('priceValue').value);
-  if(!item || isNaN(price)) return alert("Select item and enter price!");
+
+  if (isNaN(price) || price < 0) {
+    alert("Enter valid price!");
+    return;
+  }
 
   let prices = JSON.parse(localStorage.getItem('prices')) || {};
   prices[item] = price;
   localStorage.setItem('prices', JSON.stringify(prices));
-  alert("Price updated!");
+
+  alert(`Price updated for ${item}`);
+  document.getElementById('priceValue').value = '';
+  loadData();
 }
 
 function addExpense() {
-  let desc = prompt("Piliin ang expense:\n1. Gasul\n2. Plastic\n3. Kuryente\n4. Tubig\n5. Internet\n6. Sahod\n7. Rent\n8. Transport\n9. Other");
+  let choice = prompt(`Piliin ang expense:
+1. Gasul
+2. Plastic
+3. Kuryente
+4. Tubig
+5. Internet
+6. Sahod
+7. Rent
+8. Transport
+9. Other`);
 
-  let expenseName = "";
-  if(desc === "1") expenseName = "Gasul";
-  else if(desc === "2") expenseName = "Plastic";
-  else if(desc === "3") expenseName = "Kuryente";
-  else if(desc === "4") expenseName = "Tubig";
-  else if(desc === "5") expenseName = "Internet";
-  else if(desc === "6") expenseName = "Sahod";
-  else if(desc === "7") expenseName = "Rent";
-  else if(desc === "8") expenseName = "Transport";
-  else if(desc === "9") expenseName = prompt("Ilagay ang expense name:");
-  else return;
+  if (!choice) return;
 
-  let amount = prompt("Magkano:");
-  if(!amount || isNaN(amount)) return alert("Invalid amount!");
+  let index = parseInt(choice) - 1;
+  let expenseName;
+
+  if (index >= 0 && index < 8) {
+    expenseName = expenseTypes[index];
+  } else if (index === 8) {
+    expenseName = prompt("Ano ang binili mo?");
+    if (!expenseName) return;
+  } else {
+    alert("Invalid choice!");
+    return;
+  }
+
+  let amount = parseFloat(prompt(`Enter amount for ${expenseName}:`));
+
+  if (isNaN(amount) || amount <= 0) {
+    alert("Invalid amount!");
+    return;
+  }
 
   let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+
   expenses.push({
-    name: expenseName,
-    amount: parseFloat(amount),
+    item: expenseName,
+    amount: amount,
     time: new Date().toLocaleString()
   });
+
   localStorage.setItem('expenses', JSON.stringify(expenses));
-  updateDashboard();
+  alert(`${expenseName} - ₱${amount} added to expenses!`);
+  loadData();
 }
 
-function clearExpenses() {
-  if(confirm("Clear all expenses?")) {
+function clearHistory() {
+  if (confirm("Are you sure you want to clear all history?")) {
+    localStorage.removeItem('salesHistory');
     localStorage.removeItem('expenses');
-    updateDashboard();
-  }
-}
-
-function updateDashboard() {
-  let salesHistory = JSON.parse(localStorage.getItem('salesHistory')) || [];
-  let stock = JSON.parse(localStorage.getItem('stock')) || {};
-  let prices = JSON.parse(localStorage.getItem('prices')) || {};
-  let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-
-  let totalSales = salesHistory.reduce((sum, s) => sum + s.total, 0);
-  let totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
-
-  document.getElementById('totalSales').textContent = '₱' + totalSales.toLocaleString();
-  document.getElementById('totalExpenses').textContent = '₱' + totalExpenses.toLocaleString();
-  document.getElementById('netProfit').textContent = '₱' + (totalSales - totalExpenses).toLocaleString();
-
-  // Products list
-  let prodList = document.getElementById('productsList');
-  prodList.innerHTML = '';
-  products.forEach(name => {
-    prodList.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee;">
-      <strong>${name}</strong><br>
-      Stock: ${stock[name] || 0} | Price: ₱${prices[name] || 0}
-    </div>`;
-  });
-
-  // Expenses list
-  let expenseList = document.getElementById('expenseList');
-  expenseList.innerHTML = '';
-  if(expenses.length === 0) {
-    expenseList.innerHTML = '<div style="text-align:center; color:#999; padding:20px;">No expenses yet</div>';
-  } else {
-    expenses.slice(-10).reverse().forEach(e => {
-      expenseList.innerHTML += `<div class="expense-item">
-        <div>
-          <strong>${e.name}</strong><br>
-          <small>${e.time}</small>
-        </div>
-        <div style="color:red; font-weight:700;">-₱${e.amount}</div>
-      </div>`;
-    });
+    alert("History cleared!");
+    loadData();
   }
 }
 </script>
