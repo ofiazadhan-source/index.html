@@ -177,7 +177,6 @@ function loadData() {
 
   let {start, end} = getDateRange();
 
-  // Filter data
   let filteredSales = salesHistory.filter(s => {
     let saleDate = new Date(s.time);
     if(start && saleDate < start) return false;
@@ -192,7 +191,6 @@ function loadData() {
     return true;
   });
 
-  // Calculate totals
   let totalSales = filteredSales.reduce((sum, s) => sum + s.total, 0);
   let totalExpenses = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
   let netProfit = totalSales - totalExpenses;
@@ -203,7 +201,6 @@ function loadData() {
 
   loadProductsStock(stock, prices);
 
-  // Load sales table
   let salesBody = document.querySelector('#salesTable tbody');
   salesBody.innerHTML = '';
   filteredSales.slice(-50).reverse().forEach(sale => {
@@ -219,7 +216,6 @@ function loadData() {
     });
   });
 
-  // Load expenses table
   let expensesBody = document.querySelector('#expensesTable tbody');
   expensesBody.innerHTML = '';
   filteredExpenses.slice(-50).reverse().forEach(exp => {
