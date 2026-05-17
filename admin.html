@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#ff6b35">
 <link rel="manifest" href="manifest.json">
 <title>DHAN SIOMAI - Admin</title>
@@ -38,10 +38,14 @@ button {
 .stat-sales {background:#28a745;}
 .stat-expenses {background:#dc3545;}
 .stat-profit {background:#17a2b8;}
+table {width:100%; border-collapse:collapse; font-size:14px;}
+th, td {padding:10px; text-align:left; border-bottom:1px solid #eee;}
+th {background:#ff6b35; color:white;}
 .expense-item {
   display:flex; justify-content:space-between; padding:12px;
   border-bottom:1px solid #eee;
 }
+.expense-item:last-child {border-bottom:none;}
 </style>
 </head>
 <body>
@@ -104,6 +108,11 @@ const products = [
   "Chili Garlic Sauce", "Siopao Sauce"
 ];
 
+const commonExpenses = [
+  "Gasul", "Plastic", "Kuryente", "Tubig", "Internet",
+  "Sahod", "Rent", "Transport", "Other"
+];
+
 window.onload = function() {
   let stockSelect = document.getElementById('stockItem');
   let priceSelect = document.getElementById('priceItem');
@@ -112,15 +121,22 @@ window.onload = function() {
     priceSelect.innerHTML += `<option value="${p}">${p}</option>`;
   });
   updateDashboard();
+
+  // Register service worker for PWA
+  if('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
 }
 
 function addStock() {
   let item = document.getElementById('stockItem').value;
   let qty = parseInt(document.getElementById('stockQty').value);
   if(!qty || qty <= 0) return alert("Invalid quantity!");
+
   let stock = JSON.parse(localStorage.getItem('stock')) || {};
   stock[item] = (stock[item] || 0) + qty;
   localStorage.setItem('stock', JSON.stringify(stock));
+
   document.getElementById('stockQty').value = '';
   updateDashboard();
   alert("Stock added!");
@@ -136,6 +152,7 @@ function updatePrice() {
   let item = document.getElementById('priceItem').value;
   let price = parseFloat(document.getElementById('priceValue').value);
   if(!item || isNaN(price)) return alert("Select item and enter price!");
+
   let prices = JSON.parse(localStorage.getItem('prices')) || {};
   prices[item] = price;
   localStorage.setItem('prices', JSON.stringify(prices));
@@ -144,6 +161,7 @@ function updatePrice() {
 
 function addExpense() {
   let desc = prompt("Piliin ang expense:\n1. Gasul\n2. Plastic\n3. Kuryente\n4. Tubig\n5. Internet\n6. Sahod\n7. Rent\n8. Transport\n9. Other");
+
   let expenseName = "";
   if(desc === "1") expenseName = "Gasul";
   else if(desc === "2") expenseName = "Plastic";
@@ -155,12 +173,16 @@ function addExpense() {
   else if(desc === "8") expenseName = "Transport";
   else if(desc === "9") expenseName = prompt("Ilagay ang expense name:");
   else return;
-  
+
   let amount = prompt("Magkano:");
   if(!amount || isNaN(amount)) return alert("Invalid amount!");
-  
+
   let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-  expenses.push({name: expenseName, amount: parseFloat(amount), time: new Date().toLocaleString()});
+  expenses.push({
+    name: expenseName,
+    amount: parseFloat(amount),
+    time: new Date().toLocaleString()
+  });
   localStorage.setItem('expenses', JSON.stringify(expenses));
   updateDashboard();
 }
@@ -185,6 +207,7 @@ function updateDashboard() {
   document.getElementById('totalExpenses').textContent = '₱' + totalExpenses.toLocaleString();
   document.getElementById('netProfit').textContent = '₱' + (totalSales - totalExpenses).toLocaleString();
 
+  // Products list
   let prodList = document.getElementById('productsList');
   prodList.innerHTML = '';
   products.forEach(name => {
@@ -194,6 +217,7 @@ function updateDashboard() {
     </div>`;
   });
 
+  // Expenses list
   let expenseList = document.getElementById('expenseList');
   expenseList.innerHTML = '';
   if(expenses.length === 0) {
@@ -201,7 +225,10 @@ function updateDashboard() {
   } else {
     expenses.slice(-10).reverse().forEach(e => {
       expenseList.innerHTML += `<div class="expense-item">
-        <div><strong>${e.name}</strong><br><small>${e.time}</small></div>
+        <div>
+          <strong>${e.name}</strong><br>
+          <small>${e.time}</small>
+        </div>
         <div style="color:red; font-weight:700;">-₱${e.amount}</div>
       </div>`;
     });
