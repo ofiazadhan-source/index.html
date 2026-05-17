@@ -2,309 +2,238 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#ff6b35">
-<link rel="manifest" href="manifest.json">
-<title>DHAN SIOMAI - Viewer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Viewer Mode - DHAN SIOMAI</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 * {margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif;}
-body {background:#f5f5f5; color:#333; padding:20px;}
-.login-overlay {
-  position:fixed; top:0; left:0; width:100%; height:100%;
-  background:linear-gradient(135deg, #ff6b35, #ff4500);
-  display:flex; align-items:center; justify-content:center; z-index:9999;
-}
-.login-box {
-  background:white; padding:30px 25px; border-radius:20px;
-  width:90%; max-width:350px; text-align:center;
-  box-shadow:0 10px 30px rgba(0,0,0,0.3);
-}
-.login-box h2 {color:#ff6b35; margin-bottom:20px;}
-.login-box input {
-  width:100%; padding:14px; margin-bottom:12px;
-  border:2px solid #ddd; border-radius:10px; font-size:16px;
-}
-.login-box button {
-  width:100%; padding:14px; background:#ff6b35; color:white;
-  border:none; border-radius:10px; font-size:16px; font-weight:700; cursor:pointer;
-}
-.main-content {display:none;}
+body {background:#f5f5f5; padding:15px;}
 .header {
   background:linear-gradient(135deg, #ff6b35, #ff4500);
   color:white; padding:20px; border-radius:15px; margin-bottom:20px;
   text-align:center; position:relative;
 }
-.card {
-  background:white; border-radius:15px; padding:20px; margin-bottom:15px;
-  box-shadow:0 3px 10px rgba(0,0,0,0.1);
+.logout-btn {
+  position:absolute; right:15px; top:15px; background:white; color:#ff6b35;
+  border:none; padding:8px 15px; border-radius:8px; font-weight:700;
+  cursor:pointer;
 }
-h2 {color:#ff6b35; margin-bottom:15px; font-size:18px;}
-.stats {
+.stats-grid {
   display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:20px;
 }
-.stat-box {padding:15px; border-radius:12px; color:white; text-align:center;}
-.stat-sales {background:#28a745;}
-.stat-expenses {background:#dc3545;}
-.stat-profit {background:#17a2b8;}
-
-/* Category Folder */
+.stat-card {
+  padding:15px; border-radius:12px; text-align:center; color:white;
+}
+.stat-card.green {background:#4caf50;}
+.stat-card.red {background:#f44336;}
+.stat-card.blue {background:#2196f3;}
+.stat-card h3 {font-size:24px; margin-top:5px;}
+.section {
+  background:white; border-radius:12px; padding:15px; margin-bottom:15px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+.section h3 {color:#ff6b35; margin-bottom:15px;}
+table {width:100%; border-collapse:collapse;}
+th, td {padding:10px; text-align:left; border-bottom:1px solid #eee;}
+th {background:#ff6b35; color:white;}
+.badge {
+  display:inline-block; padding:5px 10px; border-radius:6px; 
+  color:white; font-weight:600; font-size:13px;
+}
 .category-folder {
-  margin-bottom:12px;
-  border:1px solid #e0e0e0;
-  border-radius:10px;
-  overflow:hidden;
+  margin-bottom:10px; border:1px solid #ddd; border-radius:8px;
 }
 .category-header {
-  background:#fff3f0;
-  padding:12px 15px;
-  font-weight:700;
-  color:#ff6b35;
-  cursor:pointer;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  user-select:none;
+  padding:12px; background:#fff3f0; cursor:pointer; font-weight:700;
+  display:flex; justify-content:space-between;
 }
-.category-header:hover {background:#ffe8e3;}
-.category-header.arrow {
-  transition:transform 0.3s;
-}
-.category-folder.active.arrow {
-  transform:rotate(90deg);
-}
-.category-content {
-  display:none;
-  padding:0;
-}
-.category-folder.active.category-content {
-  display:block;
-}
-
-table {width:100%; border-collapse:collapse; font-size:14px;}
-th, td {padding:10px 15px; text-align:left; border-bottom:1px solid #eee;}
-th {background:#ff6b35; color:white; font-weight:600;}
-tr:last-child td {border-bottom:none;}
-
-.item-tag {
-  padding:4px 8px;
-  border-radius:6px;
-  font-weight:600;
-  display:inline-block;
-}
-.item-pork {background:#ff4d4d; color:white;}
-.item-chicken {background:#ffeb3b; color:#333;}
-.item-beef {background:#4caf50; color:white;}
-.item-shrimp {background:#ffffff; color:#333; border:1px solid #ddd;}
-.item-japanese {background:#000; color:white;}
-.item-qty {
-  color:#666;
-  font-size:12px;
-  background:#f0f0f0;
-  padding:2px 6px;
-  border-radius:8px;
-  margin-left:5px;
-}
-.logout-btn {
-  position:absolute; top:15px; right:15px;
-  background:rgba(255,255,255,0.2); border:1px solid white;
-  color:white; padding:8px 15px; border-radius:8px; cursor:pointer;
-}
-.no-data {text-align:center; color:#999; padding:20px;}
+.category-content {display:none; padding:10px;}
+.category-folder.active .category-content {display:block;}
+.category-folder.active .arrow {transform:rotate(90deg);}
+.arrow {transition:0.3s;}
 </style>
 </head>
 <body>
 
-<div class="login-overlay" id="loginOverlay">
-  <div class="login-box">
-    <h2>👁️ Viewer Login</h2>
-    <input type="password" id="viewerPass" placeholder="Enter Password">
-    <button onclick="checkPassword()">Login</button>
-    <p style="margin-top:10px; font-size:12px; color:#999;">Default: viewer123</p>
+<div class="header">
+  <h2>👁️ Viewer Mode</h2>
+  <p>Read Only - Sales, Expenses, Stock, Price</p>
+  <button class="logout-btn" onclick="window.location.href='index.html'">Logout</button>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card green">
+    <div>Total Sales</div>
+    <h3>₱<span id="totalSales">0</span></h3>
+  </div>
+  <div class="stat-card red">
+    <div>Expenses</div>
+    <h3>₱<span id="totalExpenses">0</span></h3>
+  </div>
+  <div class="stat-card blue">
+    <div>Net Profit</div>
+    <h3>₱<span id="netProfit">0</span></h3>
   </div>
 </div>
 
-<div class="main-content" id="mainContent">
-  <div class="header">
-    <button class="logout-btn" onclick="logout()">Logout</button>
-    <h1>👁️ Viewer Mode</h1>
-    <p>Read Only - Sales, Expenses, Stock, Price</p>
-  </div>
+<div class="section">
+  <h3>📦 Products & Stock</h3>
+  <div id="productsStock"></div>
+</div>
 
-  <div class="stats">
-    <div class="stat-box stat-sales">
-      <div>Total Sales</div>
-      <h3 id="totalSales">₱0</h3>
-    </div>
-    <div class="stat-box stat-expenses">
-      <div>Expenses</div>
-      <h3 id="totalExpenses">₱0</h3>
-    </div>
-    <div class="stat-box stat-profit">
-      <div>Net Profit</div>
-      <h3 id="netProfit">₱0</h3>
-    </div>
-  </div>
-
-  <div class="card">
-    <h2>📦 Products & Stock</h2>
-    <div id="productsContainer"></div>
-  </div>
-
-  <div class="card">
-    <h2>💰 Recent Sales</h2>
+<div class="section">
+  <h3>💰 Recent Sales</h3>
+  <div style="overflow-x:auto;">
     <table id="salesTable">
-      <thead><tr><th>Date</th><th>Item</th><th>Qty</th><th>Subtotal</th></tr></thead>
+      <thead>
+        <tr><th>Date</th><th>Item</th><th>Qty</th><th>Subtotal</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <h3>🧾 Recent Expenses</h3>
+  <div style="overflow-x:auto;">
+    <table id="expensesTable">
+      <thead>
+        <tr><th>Date</th><th>Item/Description</th><th>Amount</th></tr>
+      </thead>
       <tbody></tbody>
     </table>
   </div>
 </div>
 
 <script>
-const VIEWER_PASSWORD = "viewer123";
-
-if(sessionStorage.getItem('viewerLoggedIn') === 'true') {
-  showMainContent();
+window.onload = function() {
+  loadData();
+  setInterval(loadData, 5000); // auto refresh every 5 sec
 }
 
-function checkPassword() {
-  if(document.getElementById('viewerPass').value === VIEWER_PASSWORD) {
-    sessionStorage.setItem('viewerLoggedIn', 'true');
-    showMainContent();
-  } else {
-    alert('Wrong password!');
-  }
+function loadData() {
+  let salesHistory = JSON.parse(localStorage.getItem('salesHistory')) || [];
+  let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+  let stock = JSON.parse(localStorage.getItem('stock')) || {};
+  let prices = JSON.parse(localStorage.getItem('prices')) || {};
+
+  // Calculate totals
+  let totalSales = salesHistory.reduce((sum, s) => sum + s.total, 0);
+  let totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
+  let netProfit = totalSales - totalExpenses;
+
+  document.getElementById('totalSales').textContent = totalSales;
+  document.getElementById('totalExpenses').textContent = totalExpenses;
+  document.getElementById('netProfit').textContent = netProfit;
+
+  // Load products & stock
+  loadProductsStock(stock, prices);
+  
+  // Load sales table
+  let salesBody = document.querySelector('#salesTable tbody');
+  salesBody.innerHTML = '';
+  salesHistory.slice(-20).reverse().forEach(sale => {
+    sale.items.forEach(item => {
+      salesBody.innerHTML += `
+        <tr>
+          <td>${sale.time}</td>
+          <td><span class="badge" style="background:${getColor(item.name)}">${item.name}</span></td>
+          <td>${item.qty}</td>
+          <td>₱${item.subtotal}</td>
+        </tr>
+      `;
+    });
+  });
+
+  // Load expenses table
+  let expensesBody = document.querySelector('#expensesTable tbody');
+  expensesBody.innerHTML = '';
+  expenses.slice(-20).reverse().forEach(exp => {
+    expensesBody.innerHTML += `
+      <tr>
+        <td>${exp.time}</td>
+        <td>${exp.item}</td>
+        <td>₱${exp.amount}</td>
+      </tr>
+    `;
+  });
 }
 
-function showMainContent() {
-  document.getElementById('loginOverlay').style.display = 'none';
-  document.getElementById('mainContent').style.display = 'block';
-  updateDashboard();
-  setInterval(updateDashboard, 5000);
+function loadProductsStock(stock, prices) {
+  const products = [
+    {name:"Pork Siomai 65", cat:"Siomai 65"},
+    {name:"Chicken Siomai 65", cat:"Siomai 65"},
+    {name:"Beef Siomai 65", cat:"Siomai 65"},
+    {name:"Shrimp Siomai 65", cat:"Siomai 65"},
+    {name:"Pork Siomai 30", cat:"Siomai 30"},
+    {name:"Chicken Siomai 30", cat:"Siomai 30"},
+    {name:"Beef Siomai 30", cat:"Siomai 30"},
+    {name:"Shrimp Siomai 30", cat:"Siomai 30"},
+    {name:"Japanese Siomai 30", cat:"Siomai 30"},
+    {name:"Big Pork Siomai", cat:"Big Siomai"},
+    {name:"Big Chicken Siomai", cat:"Big Siomai"},
+    {name:"Big Beef Siomai", cat:"Big Siomai"},
+    {name:"Big Japanese Siomai", cat:"Big Siomai"},
+    {name:"Gyoza Dumplings", cat:"Dumplings"},
+    {name:"Sharksfin Dumplings", cat:"Dumplings"},
+    {name:"Hakaw Dumplings", cat:"Dumplings"},
+    {name:"Jumbo Asado Siopao", cat:"Siopao"},
+    {name:"Jumbo Bola-Bola Siopao", cat:"Siopao"},
+    {name:"Mini Asado Siopao", cat:"Siopao"},
+    {name:"Mini Bola-Bola Siopao", cat:"Siopao"},
+    {name:"Chili Garlic Sauce", cat:"Sauce"},
+    {name:"Siopao Sauce", cat:"Sauce"}
+  ];
 
-  if('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-  }
+  let grouped = {};
+  products.forEach(p => {
+    if(!grouped[p.cat]) grouped[p.cat] = [];
+    grouped[p.cat].push(p);
+  });
+
+  let container = document.getElementById('productsStock');
+  container.innerHTML = '';
+  let idx = 0;
+
+  Object.keys(grouped).forEach(cat => {
+    let folderId = 'cat' + idx;
+    let html = `
+      <div class="category-folder" id="${folderId}">
+        <div class="category-header" onclick="toggleCat('${folderId}')">
+          <span>📁 ${cat}</span>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="category-content">
+          <table style="width:100%">
+            <tr><th>Item</th><th>Stock</th><th>Price</th></tr>
+    `;
+
+    grouped[cat].forEach(p => {
+      html += `
+        <tr>
+          <td>${p.name}</td>
+          <td>${stock[p.name] || 0}</td>
+          <td>₱${prices[p.name] || '-'}</td>
+        </tr>
+      `;
+    });
+
+    html += `</table></div></div>`;
+    container.innerHTML += html;
+    idx++;
+  });
 }
 
-function logout() {
-  sessionStorage.removeItem('viewerLoggedIn');
-  location.reload();
-}
-
-function getItemClass(itemName) {
-  if(itemName.includes('Pork')) return 'item-pork';
-  if(itemName.includes('Chicken')) return 'item-chicken';
-  if(itemName.includes('Beef')) return 'item-beef';
-  if(itemName.includes('Shrimp')) return 'item-shrimp';
-  if(itemName.includes('Japanese')) return 'item-japanese';
-  return '';
-}
-
-function getCategory(name) {
-  if(name.includes('Siomai 65')) return 'Siomai 65';
-  if(name.includes('Siomai 30')) return 'Siomai 30';
-  if(name.includes('Big') && name.includes('Siomai')) return 'Big Siomai';
-  if(name.includes('Dumplings')) return 'Dumplings';
-  if(name.includes('Siopao')) return 'Siopao';
-  if(name.includes('Sauce')) return 'Sauce';
-  return 'Others';
-}
-
-function toggleCategory(id) {
+function toggleCat(id) {
   document.getElementById(id).classList.toggle('active');
 }
 
-function updateDashboard() {
-  // Check 3 possible keys para sure na makuha yung sales
-  let salesHistory = JSON.parse(localStorage.getItem('salesHistory')) ||
-                     JSON.parse(localStorage.getItem('orders')) ||
-                     JSON.parse(localStorage.getItem('sales')) || [];
-
-  let stock = JSON.parse(localStorage.getItem('stock')) || {};
-  let prices = JSON.parse(localStorage.getItem('prices')) || {};
-  let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-
-  // Totals
-  let totalSales = salesHistory.reduce((sum, s) => sum + s.total, 0);
-  let totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
-
-  document.getElementById('totalSales').textContent = '₱' + totalSales.toLocaleString();
-  document.getElementById('totalExpenses').textContent = '₱' + totalExpenses.toLocaleString();
-  document.getElementById('netProfit').textContent = '₱' + (totalSales - totalExpenses).toLocaleString();
-
-  // Group products by category automatically
-  let grouped = {};
-  Object.keys(stock).forEach(name => {
-    let cat = getCategory(name);
-    if(!grouped[cat]) grouped[cat] = [];
-    grouped[cat].push(name);
-  });
-
-  // Products table
-  let prodContainer = document.getElementById('productsContainer');
-  prodContainer.innerHTML = '';
-
-  if(Object.keys(grouped).length === 0) {
-    prodContainer.innerHTML = '<div class="no-data">No products yet</div>';
-  } else {
-    let idx = 0;
-    Object.keys(grouped).sort().forEach(catName => {
-      let folderId = 'cat-' + idx;
-      let items = grouped[catName];
-
-      let folderHTML = `
-        <div class="category-folder" id="${folderId}">
-          <div class="category-header" onclick="toggleCategory('${folderId}')">
-            <span>📁 ${catName}</span>
-            <span class="arrow">▶</span>
-          </div>
-          <div class="category-content">
-            <table>
-              <thead><tr><th>Product</th><th>Stock</th><th>Price</th></tr></thead>
-              <tbody>
-      `;
-
-      items.forEach(name => {
-        folderHTML += `<tr>
-          <td>${name}</td>
-          <td>${stock[name] || 0}</td>
-          <td>₱${prices[name] || 0}</td>
-        </tr>`;
-      });
-
-      folderHTML += `</tbody></table></div></div>`;
-      prodContainer.innerHTML += folderHTML;
-      idx++;
-    });
-  }
-
-  // Sales table
-  let salesBody = document.querySelector('#salesTable tbody');
-  salesBody.innerHTML = '';
-  if(salesHistory.length === 0) {
-    salesBody.innerHTML = '<tr><td colspan="4" class="no-data">No sales yet</td></tr>';
-  } else {
-    salesHistory.slice(-20).reverse().forEach(s => {
-      let items = s.items || [{name: s.item || 'Item', qty: s.qty || 0, subtotal: s.total || 0}];
-
-      items.forEach((item, index) => {
-        let isFirstRow = index === 0;
-        let itemClass = getItemClass(item.name);
-        salesBody.innerHTML += `<tr>
-          <td>${isFirstRow? s.time : ''}</td>
-          <td><span class="item-tag ${itemClass}">${item.name}</span> <span class="item-qty">x${item.qty}</span></td>
-          <td>${isFirstRow? item.qty : ''}</td>
-          <td>${isFirstRow? '₱' + s.total : '₱' + item.subtotal}</td>
-        </tr>`;
-      });
-    });
-  }
+function getColor(name) {
+  const colors = ['#f44336', '#ff9800', '#9c27b0', '#3f51b5', '#009688', '#ff5722'];
+  let hash = 0;
+  for(let i=0; i<name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  return colors[Math.abs(hash) % colors.length];
 }
-
-document.getElementById('viewerPass').addEventListener('keypress', function(e) {
-  if(e.key === 'Enter') checkPassword();
-});
 </script>
 </body>
 </html>
