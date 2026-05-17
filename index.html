@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,12 +24,15 @@ body {background:#f5f5f5; padding-bottom:100px;}
 }
 .category-content {display:none; padding:10px;}
 .category-folder.active.category-content {display:block;}
+.category-folder.active.arrow {transform:rotate(90deg);}
+.arrow {transition:transform 0.3s;}
 .product-card {
   display:flex; align-items:center; padding:12px; border-bottom:1px solid #eee;
 }
+.product-card:last-child {border-bottom:none;}
 .product-card img {width:50px; height:50px; border-radius:10px; margin-right:12px;}
 .product-info {flex:1;}
-.product-info h4 {font-size:15px;}
+.product-info h4 {font-size:15px; margin-bottom:3px;}
 .product-info p {color:#ff6b35; font-weight:700;}
 .qty-control {display:flex; align-items:center; gap:8px;}
 .qty-control button {
@@ -58,7 +60,7 @@ body {background:#f5f5f5; padding-bottom:100px;}
 <body>
 
 <div class="header">
-  <h2>🔥 DHAN SIOMAI</h2>
+  <h2>🔥 DHAN SIOMAI POS</h2>
 </div>
 
 <div id="productsContainer"></div>
@@ -73,28 +75,28 @@ body {background:#f5f5f5; padding-bottom:100px;}
 
 <script>
 const products = [
-  {name:"Pork Siomai 65", price:150, img:"🐷", cat:"Siomai 65"},
-  {name:"Chicken Siomai 65", price:150, img:"🍗", cat:"Siomai 65"},
-  {name:"Beef Siomai 65", price:160, img:"🐮", cat:"Siomai 65"},
-  {name:"Shrimp Siomai 65", price:170, img:"🦐", cat:"Siomai 65"},
-  {name:"Pork Siomai 30", price:80, img:"🐷", cat:"Siomai 30"},
-  {name:"Chicken Siomai 30", price:80, img:"🍗", cat:"Siomai 30"},
-  {name:"Beef Siomai 30", price:85, img:"🐮", cat:"Siomai 30"},
-  {name:"Shrimp Siomai 30", price:90, img:"🦐", cat:"Siomai 30"},
-  {name:"Japanese Siomai 30", price:95, img:"🍣", cat:"Siomai 30"},
-  {name:"Big Pork Siomai", price:200, img:"🐷", cat:"Big Siomai"},
-  {name:"Big Chicken Siomai", price:200, img:"🍗", cat:"Big Siomai"},
-  {name:"Big Beef Siomai", price:210, img:"🐮", cat:"Big Siomai"},
-  {name:"Big Japanese Siomai", price:220, img:"🍣", cat:"Big Siomai"},
-  {name:"Gyoza Dumplings", price:120, img:"🥟", cat:"Dumplings"},
-  {name:"Sharksfin Dumplings", price:130, img:"🥟", cat:"Dumplings"},
-  {name:"Hakaw Dumplings", price:140, img:"🥟", cat:"Dumplings"},
-  {name:"Jumbo Asado Siopao", price:60, img:"🥮", cat:"Siopao"},
-  {name:"Jumbo Bola-Bola Siopao", price:60, img:"🥮", cat:"Siopao"},
-  {name:"Mini Asado Siopao", price:35, img:"🥮", cat:"Siopao"},
-  {name:"Mini Bola-Bola Siopao", price:35, img:"🥮", cat:"Siopao"},
-  {name:"Chili Garlic Sauce", price:50, img:"🌶️", cat:"Sauce"},
-  {name:"Siopao Sauce", price:30, img:"🥫", cat:"Sauce"}
+  {name:"Pork Siomai 65", price:150, emoji:"🐷", cat:"Siomai 65"},
+  {name:"Chicken Siomai 65", price:150, emoji:"🍗", cat:"Siomai 65"},
+  {name:"Beef Siomai 65", price:160, emoji:"🐮", cat:"Siomai 65"},
+  {name:"Shrimp Siomai 65", price:170, emoji:"🦐", cat:"Siomai 65"},
+  {name:"Pork Siomai 30", price:80, emoji:"🐷", cat:"Siomai 30"},
+  {name:"Chicken Siomai 30", price:80, emoji:"🍗", cat:"Siomai 30"},
+  {name:"Beef Siomai 30", price:85, emoji:"🐮", cat:"Siomai 30"},
+  {name:"Shrimp Siomai 30", price:90, emoji:"🦐", cat:"Siomai 30"},
+  {name:"Japanese Siomai 30", price:95, emoji:"🍣", cat:"Siomai 30"},
+  {name:"Big Pork Siomai", price:200, emoji:"🐷", cat:"Big Siomai"},
+  {name:"Big Chicken Siomai", price:200, emoji:"🍗", cat:"Big Siomai"},
+  {name:"Big Beef Siomai", price:210, emoji:"🐮", cat:"Big Siomai"},
+  {name:"Big Japanese Siomai", price:220, emoji:"🍣", cat:"Big Siomai"},
+  {name:"Gyoza Dumplings", price:120, emoji:"🥟", cat:"Dumplings"},
+  {name:"Sharksfin Dumplings", price:130, emoji:"🥟", cat:"Dumplings"},
+  {name:"Hakaw Dumplings", price:140, emoji:"🥟", cat:"Dumplings"},
+  {name:"Jumbo Asado Siopao", price:60, emoji:"🥮", cat:"Siopao"},
+  {name:"Jumbo Bola-Bola Siopao", price:60, emoji:"🥮", cat:"Siopao"},
+  {name:"Mini Asado Siopao", price:35, emoji:"🥮", cat:"Siopao"},
+  {name:"Mini Bola-Bola Siopao", price:35, emoji:"🥮", cat:"Siopao"},
+  {name:"Chili Garlic Sauce", price:50, emoji:"🌶️", cat:"Sauce"},
+  {name:"Siopao Sauce", price:30, emoji:"🥫", cat:"Sauce"}
 ];
 
 let cart = [];
@@ -121,19 +123,22 @@ function renderProducts() {
       <div class="category-folder" id="${folderId}">
         <div class="category-header" onclick="toggleCat('${folderId}')">
           <span>📁 ${cat}</span>
-          <span>▶</span>
+          <span class="arrow">▶</span>
         </div>
         <div class="category-content">
     `;
-    
+
     grouped[cat].forEach(p => {
       let stock = JSON.parse(localStorage.getItem('stock')) || {};
+      let prices = JSON.parse(localStorage.getItem('prices')) || {};
+      let currentPrice = prices[p.name] || p.price;
+
       html += `
         <div class="product-card">
-          <div style="font-size:40px;">${p.img}</div>
+          <div style="font-size:40px;">${p.emoji}</div>
           <div class="product-info">
             <h4>${p.name}</h4>
-            <p>₱${p.price}</p>
+            <p>₱${currentPrice}</p>
             <span class="stock-badge">Stock: ${stock[p.name] || 0}</span>
           </div>
           <div class="qty-control">
@@ -144,7 +149,7 @@ function renderProducts() {
         </div>
       `;
     });
-    
+
     html += `</div></div>`;
     container.innerHTML += html;
     idx++;
@@ -160,18 +165,21 @@ function updateQty(name, change) {
   let qty = parseInt(input.value) + change;
   if(qty < 0) qty = 0;
   input.value = qty;
-  
+
   let stock = JSON.parse(localStorage.getItem('stock')) || {};
+  let prices = JSON.parse(localStorage.getItem('prices')) || {};
+  let prod = products.find(p => p.name === name);
+  let currentPrice = prices[name] || prod.price;
+
   if(qty > (stock[name] || 0)) {
     alert("Not enough stock!");
     input.value = stock[name] || 0;
     qty = stock[name] || 0;
   }
-  
+
   cart = cart.filter(i => i.name!== name);
   if(qty > 0) {
-    let prod = products.find(p => p.name === name);
-    cart.push({name, qty, price: prod.price, subtotal: qty * prod.price});
+    cart.push({name, qty, price: currentPrice, subtotal: qty * currentPrice});
   }
   updateCart();
 }
@@ -185,19 +193,19 @@ function updateCart() {
 
 function checkout() {
   if(cart.length === 0) return alert("Cart is empty!");
-  
+
   let total = cart.reduce((sum, i) => sum + i.subtotal, 0);
   let payment = prompt(`=== ORDER ===\n${cart.map(i=>`${i.name} x${i.qty} = ₱${i.subtotal}`).join('\n')}\n\nTOTAL: ₱${total}\n\nPiliin payment:\n1. COD - Cash on Delivery\n2. GCash\nType 1 or 2:`);
-  
+
   if(!payment) return;
   let paymentMethod = payment === "1"? "COD" : payment === "2"? "GCash" : null;
   if(!paymentMethod) return alert("Invalid choice!");
-  
+
   let name = prompt("Customer Name:");
   if(!name) return;
   let address = prompt("Address:");
   if(!address) return;
-  
+
   let cash = 0;
   if(paymentMethod === "COD") {
     cash = parseFloat(prompt(`Cash received:\nTotal: ₱${total}`));
@@ -205,12 +213,11 @@ function checkout() {
   } else {
     cash = total;
   }
-  
+
   let change = cash - total;
-  
-  // Confirm
+
   let confirmMsg = `=== CONFIRM ORDER ===\n${cart.map(i=>`${i.name} x${i.qty} = ₱${i.subtotal}`).join('\n')}\n----------------\nPayment: ${paymentMethod}\nName: ${name}\nAddress: ${address}\nTotal: ₱${total}\nCash: ₱${cash}\nChange: ₱${change}\n\nPrint receipt?`;
-  
+
   if(confirm(confirmMsg)) {
     saveSale(name, address, paymentMethod, cash, change);
     printReceipt(name, address, paymentMethod, cash, change);
@@ -220,21 +227,21 @@ function checkout() {
 function saveSale(name, address, payment, cash, change) {
   let salesHistory = JSON.parse(localStorage.getItem('salesHistory')) || [];
   let stock = JSON.parse(localStorage.getItem('stock')) || {};
-  
+
   cart.forEach(item => {
     stock[item.name] = (stock[item.name] || 0) - item.qty;
   });
-  
+
   salesHistory.push({
     items: cart,
     total: cart.reduce((sum, i) => sum + i.subtotal, 0),
     payment, name, address, cash, change,
     time: new Date().toLocaleString()
   });
-  
+
   localStorage.setItem('salesHistory', JSON.stringify(salesHistory));
   localStorage.setItem('stock', JSON.stringify(stock));
-  
+
   cart = [];
   location.reload();
 }
@@ -248,17 +255,17 @@ Payment: ${payment}
 Name: ${name}
 Address: ${address}
 ${cart.map(i=>`${i.qty}x ${i.name} ₱${i.subtotal}`).join('\n')}
---------------------------
+
 TOTAL ₱${total}
 Cash ₱${cash}
 Change ₱${change}
---------------------------
+
 THANK YOU!
 COME AGAIN
   `;
-  
+
   let win = window.open('', '_blank');
-  win.document.write(`<pre>${receipt}</pre>`);
+  win.document.write(`<pre style="font-family:monospace;">${receipt}</pre>`);
   win.print();
 }
 </script>
