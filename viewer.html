@@ -54,10 +54,12 @@ th {background:#ff6b35; color:white;}
 }
 .category-folder {
   margin-bottom:10px; border:1px solid #ddd; border-radius:8px;
+  overflow:hidden;
 }
 .category-header {
   padding:12px; background:#fff3f0; cursor:pointer; font-weight:700;
   display:flex; justify-content:space-between;
+  align-items:center;
 }
 .category-content {display:none; padding:10px;}
 .category-folder.active.category-content {display:block;}
@@ -217,11 +219,11 @@ function loadData() {
     });
   });
 
-  // Load expenses table - FIXED: handles both item and description
+  // Load expenses table
   let expensesBody = document.querySelector('#expensesTable tbody');
   expensesBody.innerHTML = '';
   filteredExpenses.slice(-50).reverse().forEach(exp => {
-    let desc = exp.item || exp.description || 'No description';
+    let desc = exp.item || exp.description || exp.name || 'No description';
     expensesBody.innerHTML += `
       <tr>
         <td>${exp.time}</td>
@@ -334,7 +336,7 @@ function exportCSV() {
     if(end && expDate >= end) return false;
     return true;
   }).forEach(exp => {
-    let desc = exp.item || exp.description || 'No description';
+    let desc = exp.item || exp.description || exp.name || 'No description';
     csv += `${exp.time},Expense,${desc},1,${exp.amount}\n`;
   });
 
