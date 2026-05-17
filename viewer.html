@@ -61,10 +61,13 @@ th {background:#ff6b35; color:white;}
   display:flex; justify-content:space-between;
   align-items:center;
 }
-.category-content {display:none; padding:10px;}
-.category-folder.active.category-content {display:block;}
-.category-folder.active.arrow {transform:rotate(90deg);}
-.arrow {transition:0.3s;}
+.category-content {
+  display:none;
+  padding:10px;
+}
+.arrow {
+  transition:0.3s;
+}
 </style>
 </head>
 <body>
@@ -272,9 +275,9 @@ function loadProductsStock(stock, prices) {
       <div class="category-folder" id="${folderId}">
         <div class="category-header" onclick="toggleCat('${folderId}')">
           <span>📁 ${cat}</span>
-          <span class="arrow">▶</span>
+          <span class="arrow" id="arrow-${folderId}">▶</span>
         </div>
-        <div class="category-content">
+        <div class="category-content" id="content-${folderId}">
           <table style="width:100%">
             <tr><th>Item</th><th>Stock</th><th>Price</th></tr>
     `;
@@ -296,7 +299,16 @@ function loadProductsStock(stock, prices) {
 }
 
 function toggleCat(id) {
-  document.getElementById(id).classList.toggle('active');
+  let content = document.getElementById('content-' + id);
+  let arrow = document.getElementById('arrow-' + id);
+
+  if(content.style.display === 'block') {
+    content.style.display = 'none';
+    arrow.style.transform = 'rotate(0deg)';
+  } else {
+    content.style.display = 'block';
+    arrow.style.transform = 'rotate(90deg)';
+  }
 }
 
 function getColor(name) {
