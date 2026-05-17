@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout - DHAN SIOMAI POS</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+* {margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif;}
+body {background:#f5f5f5; padding:20px;}
+.container {max-width:600px; margin:0 auto; background:white; border-radius:12px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+h2 {color:#ff6b35; margin-bottom:15px;}
+.cart-item {display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #eee;}
+.total {font-size:20px; font-weight:700; text-align:right; margin-top:15px; color:#333;}
+.btn-back {background:#666; color:white; border:none; padding:12px 20px; border-radius:8px; font-weight:700; margin-top:20px; cursor:pointer; width:100%;}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>🧾 Order Summary</h2>
+  <div id="cartList"></div>
+  <div class="total" id="totalPrice"></div>
+  <button class="btn-back" onclick="history.back()">← Back to Order</button>
+</div>
+
+<script>
+window.onload = function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const cartData = urlParams.get('cart');
+  
+  if(!cartData) {
+    document.getElementById('cartList').innerHTML = '<p>Walang items sa cart</p>';
+    return;
+  }
+
+  const cart = JSON.parse(decodeURIComponent(cartData));
+  let html = '';
+  let total = 0;
+
+  Object.keys(cart).forEach(name => {
+    let qty = cart[name];
+    let price = getPrice(name);
+    let subtotal = price * qty;
+    total += subtotal;
+    html += `
+      <div class="cart-item">
+        <span>${name} x${qty}</span>
+        <span>₱${subtotal}</span>
+      </div>
+    `;
+  });
+
+  document.getElementById('cartList').innerHTML = html;
+  document.getElementById('totalPrice').innerHTML = 'Total: ₱' + total;
+}
+
+function getPrice(name) {
+  const prices = {
+    "Pork Siomai 65":150, "Chicken Siomai 65":150, "Beef Siomai 65":150, "Shrimp Siomai 65":150,
+    "Pork Siomai 30":80, "Chicken Siomai 30":80, "Beef Siomai 30":80, "Shrimp Siomai 30":80,
+    "Big Pork Siomai":200, "Big Chicken Siomai":200, "Big Beef Siomai":200,
+    "Gyoza Dumplings":180, "Sharksfin Dumplings":180, "Hakaw Dumplings":180,
+    "Jumbo Asado Siopao":120, "Jumbo Bola-Bola Siopao":120,
+    "Mini Asado Siopao":60, "Mini Bola-Bola Siopao":60,
+    "Chili Garlic Sauce":50, "Siopao Sauce":40
+  };
+  return prices[name] || 0;
+}
+</script>
+</body>
+</html>
