@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#ff6b35">
+<link rel="manifest" href="manifest.json">
 <title>DHAN SIOMAI - Viewer</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -179,6 +181,10 @@ function showMainContent() {
   document.getElementById('mainContent').style.display = 'block';
   updateDashboard();
   setInterval(updateDashboard, 5000);
+
+  if('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
 }
 
 function logout() {
@@ -210,7 +216,11 @@ function toggleCategory(id) {
 }
 
 function updateDashboard() {
-  let salesHistory = JSON.parse(localStorage.getItem('salesHistory')) || [];
+  // Check 3 possible keys para sure na makuha yung sales
+  let salesHistory = JSON.parse(localStorage.getItem('salesHistory')) ||
+                     JSON.parse(localStorage.getItem('orders')) ||
+                     JSON.parse(localStorage.getItem('sales')) || [];
+
   let stock = JSON.parse(localStorage.getItem('stock')) || {};
   let prices = JSON.parse(localStorage.getItem('prices')) || {};
   let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
@@ -231,7 +241,7 @@ function updateDashboard() {
     grouped[cat].push(name);
   });
 
-  // Products table - grouped by category
+  // Products table
   let prodContainer = document.getElementById('productsContainer');
   prodContainer.innerHTML = '';
 
@@ -242,7 +252,7 @@ function updateDashboard() {
     Object.keys(grouped).sort().forEach(catName => {
       let folderId = 'cat-' + idx;
       let items = grouped[catName];
-      
+
       let folderHTML = `
         <div class="category-folder" id="${folderId}">
           <div class="category-header" onclick="toggleCategory('${folderId}')">
@@ -276,7 +286,9 @@ function updateDashboard() {
     salesBody.innerHTML = '<tr><td colspan="4" class="no-data">No sales yet</td></tr>';
   } else {
     salesHistory.slice(-20).reverse().forEach(s => {
-      s.items.forEach((item, index) => {
+      let items = s.items || [{name: s.item || 'Item', qty: s.qty || 0, subtotal: s.total || 0}];
+
+      items.forEach((item, index) => {
         let isFirstRow = index === 0;
         let itemClass = getItemClass(item.name);
         salesBody.innerHTML += `<tr>
