@@ -3,342 +3,287 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Panel - DHAN SIOMAI</title>
+<title>DHAN SIOMAI Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 * {margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif;}
 body {background:#f5f5f5; padding:15px;}
-.header {
-  background:linear-gradient(135deg, #ff6b35, #ff4500);
-  color:white; padding:20px; border-radius:15px; margin-bottom:20px;
-  text-align:center; position:relative;
-}
-.logout-btn {
-  position:absolute; right:15px; top:15px; background:white; color:#ff6b35;
-  border:none; padding:8px 15px; border-radius:8px; font-weight:700;
-  cursor:pointer;
-}
-.section {
-  background:white; border-radius:12px; padding:15px; margin-bottom:15px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.1);
-}
-.section h3 {color:#ff6b35; margin-bottom:15px;}
+.header {background:linear-gradient(135deg, #ff6b35, #ff4500); color:white; padding:15px; border-radius:12px; margin-bottom:20px; text-align:center;}
+.header h2 {font-size:20px;}
+.card {background:white; padding:15px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08); margin-bottom:15px;}
+.card h3 {color:#ff6b35; margin-bottom:15px; font-size:18px;}
+input, button {font-family:'Poppins', sans-serif;}
 table {width:100%; border-collapse:collapse;}
-th, td {padding:10px; text-align:left; border-bottom:1px solid #eee;}
-th {background:#ff6b35; color:white;}
-input[type="number"], input[type="text"] {
-  width:100%; padding:8px; border:1px solid #ddd; border-radius:6px;
-}
-.btn-save {
-  background:#4caf50; color:white; border:none; padding:8px 15px;
-  border-radius:6px; cursor:pointer; font-weight:700;
-}
-.btn-delete {
-  background:#f44336; color:white; border:none; padding:6px 12px;
-  border-radius:6px; cursor:pointer;
-}
-.add-form {
-  display:grid; grid-template-columns:2fr 1fr 1fr auto; gap:10px; margin-bottom:15px;
-}
+th {background:#ff6b35; color:white; padding:10px; text-align:left; font-size:14px;}
+td {padding:10px; border-bottom:1px solid #eee; font-size:14px;}
+.admin-tools {border:2px solid #ff6b35;}
+.btn-reset {width:100%; padding:12px; margin-bottom:10px; border:none; border-radius:8px; color:white; font-weight:700; font-size:15px; cursor:pointer;}
+.btn-red {background:#f44336;}
+.btn-orange {background:#ff9800;}
+.btn-purple {background:#9c27b0;}
+.note {font-size:12px; color:#666; margin-top:10px;}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h2>🔧 Admin Panel</h2>
-  <p>Manage Stock, Price, Sales, Expenses</p>
-  <button class="logout-btn" onclick="window.location.href='index.html'">Logout</button>
+  <h2>⚙️ DHAN SIOMAI ADMIN</h2>
 </div>
 
-<div class="section">
+<div class="card">
   <h3>📦 Manage Stock & Price</h3>
-  <div class="add-form">
-    <input type="text" id="itemName" placeholder="Item Name">
-    <input type="number" id="itemStock" placeholder="Stock">
-    <input type="number" id="itemPrice" placeholder="Price">
-    <button class="btn-save" onclick="addItem()">Add</button>
-  </div>
-  <div style="overflow-x:auto;">
-    <table id="stockTable">
-      <thead>
-        <tr><th>Item</th><th>Stock</th><th>Price</th><th>Action</th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+  <div id="stockTable"></div>
+</div>
+
+<div class="card">
+  <h3>📊 Recent Sales</h3>
+  <div id="salesTable"></div>
+</div>
+
+<div class="card">
+  <h3>💸 Add Expense</h3>
+  <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
+    <input type="text" id="expenseDesc" placeholder="Description" style="flex:2; min-width:150px; padding:10px; border:1px solid #ddd; border-radius:8px;">
+    <input type="number" id="expenseAmount" placeholder="Amount" style="flex:1; min-width:100px; padding:10px; border:1px solid #ddd; border-radius:8px;">
+    <button onclick="addExpense()" style="background:#ff6b35; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:700;">Add</button>
   </div>
 </div>
 
-<div class="section">
-  <h3>💰 Recent Sales</h3>
-  <div style="overflow-x:auto;">
-    <table id="salesTable">
-      <thead>
-        <tr><th>Date</th><th>Item</th><th>Qty</th><th>Subtotal</th><th>Action</th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-</div>
-
-<div class="section">
+<div class="card">
   <h3>🧾 Recent Expenses</h3>
-  <div style="overflow-x:auto;">
-    <table id="expensesTable">
-      <thead>
-        <tr><th>Date</th><th>Description</th><th>Amount</th><th>Action</th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+  <div id="expensesTable"></div>
 </div>
 
-<!-- ADMIN TOOLS -->
-<div style="margin-top:25px; padding:20px; background:#fff3f0; border-radius:12px; border:2px solid #ff6b35;">
-  <h3 style="color:#ff6b35; margin-bottom:15px;">⚠️ Admin Tools - Ingat dito!</h3>
+<div class="card admin-tools">
+  <h3>⚠️ Admin Tools - Ingat dito!</h3>
 
-  <div style="display:grid; gap:10px;">
-    <button onclick="resetStock()" style="background:#f44336; color:white; padding:12px; border:none; border-radius:8px; font-weight:700; cursor:pointer; text-align:left;">
-      🔄 Reset Stock - Ibalik sa default stock values
-    </button>
+  <button class="btn-reset btn-red" onclick="resetStock()">🔄 Reset Stock - Ibalik sa default stock values</button>
 
-    <button onclick="resetPrice()" style="background:#ff9800; color:white; padding:12px; border:none; border-radius:8px; font-weight:700; cursor:pointer; text-align:left;">
-      💰 Reset Price - Ibalik sa default prices
-    </button>
+  <button class="btn-reset btn-orange" onclick="resetPrice()">💰 Reset Price - Ibalik sa default prices</button>
 
-    <button onclick="resetSales()" style="background:#9c27b0; color:white; padding:12px; border:none; border-radius:8px; font-weight:700; cursor:pointer; text-align:left;">
-      🗑️ Reset Sales & Expenses - Burahin lahat ng benta at gastos
-    </button>
-  </div>
+  <button class="btn-reset btn-purple" onclick="resetSalesExpenses()">🗑️ Reset Sales & Expenses - Burahin lahat ng benta at gastos</button>
 
-  <p style="font-size:12px; color:#666; margin-top:12px;">
-    <strong>Note:</strong> Kailangan ng password bago mag-reset. Gawin lang pag may mali sa data.
-  </p>
+  <div class="note">Note: Kailangan ng password bago mag-reset. Gawin lang pag may mali sa data.</div>
 </div>
 
 <script>
-// PALITAN MO TO SA GUSTO MONG PASSWORD
-const ADMIN_PASSWORD = "dhan123";
+const defaultStock = {
+  "Pork Siomai 65": 50, "Chicken Siomai 65": 50, "Beef Siomai 65": 50, "Shrimp Siomai 65": 50,
+  "Pork Siomai 30": 50, "Chicken Siomai 30": 50, "Beef Siomai 30": 50, "Shrimp Siomai 30": 50,
+  "Big Pork Siomai": 30, "Big Chicken Siomai": 30, "Big Beef Siomai": 30,
+  "Gyoza Dumplings": 40, "Sharksfin Dumplings": 40, "Hakaw Dumplings": 40,
+  "Jumbo Asado Siopao": 20, "Jumbo Bola-Bola Siopao": 20,
+  "Mini Asado Siopao": 20, "Mini Bola-Bola Siopao": 20,
+  "Chili Garlic Sauce": 20, "Siopao Sauce": 20
+};
+
+const defaultPrice = {
+  "Pork Siomai 65": 150, "Chicken Siomai 65": 150, "Beef Siomai 65": 150, "Shrimp Siomai 65": 150,
+  "Pork Siomai 30": 80, "Chicken Siomai 30": 80, "Beef Siomai 30": 80, "Shrimp Siomai 30": 80,
+  "Big Pork Siomai": 200, "Big Chicken Siomai": 200, "Big Beef Siomai": 200,
+  "Gyoza Dumplings": 180, "Sharksfin Dumplings": 180, "Hakaw Dumplings": 180,
+  "Jumbo Asado Siopao": 120, "Jumbo Bola-Bola Siopao": 120,
+  "Mini Asado Siopao": 60, "Mini Bola-Bola Siopao": 60,
+  "Chili Garlic Sauce": 50, "Siopao Sauce": 40
+};
+
+const ADMIN_PASSWORD = "dhan123"; // Palitan mo to
 
 window.onload = function() {
-  loadData();
+  loadStockTable();
+  loadSales();
+  loadExpenses();
 }
 
-function loadData() {
-  let stock = JSON.parse(localStorage.getItem('stock')) || {};
-  let prices = JSON.parse(localStorage.getItem('prices')) || {};
-  let salesHistory = JSON.parse(localStorage.getItem('salesHistory')) || [];
-  let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+function loadStockTable() {
+  let stock = JSON.parse(localStorage.getItem('stock')) || defaultStock;
+  let price = JSON.parse(localStorage.getItem('price')) || defaultPrice;
 
-  // Load Stock Table
-  let stockBody = document.querySelector('#stockTable tbody');
-  stockBody.innerHTML = '';
+  let html = `
+    <table>
+      <tr>
+        <th>Item</th>
+        <th>Stock</th>
+        <th>Price</th>
+        <th>Action</th>
+      </tr>
+  `;
+
   Object.keys(stock).forEach(item => {
-    stockBody.innerHTML += `
+    html += `
       <tr>
         <td>${item}</td>
-        <td><input type="number" value="${stock[item]}" onchange="updateStock('${item}', this.value)"></td>
-        <td><input type="number" value="${prices[item] || 0}" onchange="updatePrice('${item}', this.value)"></td>
-        <td><button class="btn-delete" onclick="deleteItem('${item}')">Delete</button></td>
+        <td><input type="number" value="${stock[item]}" id="stock-${item}" style="width:80px; padding:5px; border:1px solid #ddd; border-radius:5px;"></td>
+        <td><input type="number" value="${price[item]}" id="price-${item}" style="width:80px; padding:5px; border:1px solid #ddd; border-radius:5px;"></td>
+        <td><button onclick="saveItem('${item}')" style="background:#4CAF50; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Save</button></td>
       </tr>
     `;
   });
 
-  // Load Sales Table
-  let salesBody = document.querySelector('#salesTable tbody');
-  salesBody.innerHTML = '';
-  salesHistory.slice(-50).reverse().forEach((sale, idx) => {
-    sale.items.forEach(item => {
-      salesBody.innerHTML += `
+  html += `</table>`;
+  document.getElementById('stockTable').innerHTML = html;
+}
+
+function saveItem(item) {
+  let stock = JSON.parse(localStorage.getItem('stock')) || defaultStock;
+  let price = JSON.parse(localStorage.getItem('price')) || defaultPrice;
+
+  stock[item] = parseInt(document.getElementById(`stock-${item}`).value) || 0;
+  price[item] = parseFloat(document.getElementById(`price-${item}`).value) || 0;
+
+  localStorage.setItem('stock', JSON.stringify(stock));
+  localStorage.setItem('price', JSON.stringify(price));
+
+  alert(item + " updated!");
+}
+
+function loadSales() {
+  let sales = JSON.parse(localStorage.getItem('sales')) || [];
+  let html = `
+    <table>
+      <tr>
+        <th>Date</th>
+        <th>Item</th>
+        <th>Qty</th>
+        <th>Subtotal</th>
+        <th>Action</th>
+      </tr>
+  `;
+
+  if(sales.length === 0) {
+    html += `<tr><td colspan="5" style="text-align:center; padding:20px;">No sales yet</td></tr>`;
+  } else {
+    sales.slice(0, 10).forEach((sale, idx) => {
+      html += `
         <tr>
-          <td>${sale.time}</td>
-          <td>${item.name}</td>
-          <td>${item.qty}</td>
-          <td>₱${item.subtotal}</td>
-          <td><button class="btn-delete" onclick="deleteSale(${salesHistory.length - 1 - idx})">Delete</button></td>
+          <td>${sale.date}</td>
+          <td>${sale.item}</td>
+          <td>${sale.qty}</td>
+          <td>₱${sale.subtotal}</td>
+          <td><button onclick="deleteSale(${idx})" style="background:#f44336; color:white; border:none; padding:5px 10px; border-radius:5px;">Delete</button></td>
         </tr>
       `;
     });
-  });
+  }
 
-  // Load Expenses Table
-  let expensesBody = document.querySelector('#expensesTable tbody');
-  expensesBody.innerHTML = '';
-  expenses.slice(-50).reverse().forEach((exp, idx) => {
-    let desc = exp.item || exp.description || exp.name || 'No description';
-    expensesBody.innerHTML += `
-      <tr>
-        <td>${exp.time}</td>
-        <td>${desc}</td>
-        <td>₱${exp.amount}</td>
-        <td><button class="btn-delete" onclick="deleteExpense(${expenses.length - 1 - idx})">Delete</button></td>
-      </tr>
-    `;
-  });
+  html += `</table>`;
+  document.getElementById('salesTable').innerHTML = html;
 }
 
-function addItem() {
-  let name = document.getElementById('itemName').value;
-  let stock = document.getElementById('itemStock').value;
-  let price = document.getElementById('itemPrice').value;
+function deleteSale(idx) {
+  if(confirm("Delete this sale?")) {
+    let sales = JSON.parse(localStorage.getItem('sales')) || [];
+    sales.splice(idx, 1);
+    localStorage.setItem('sales', JSON.stringify(sales));
+    loadSales();
+  }
+}
 
-  if(!name ||!stock ||!price) {
-    alert("Punan mo lahat ng fields!");
+function addExpense() {
+  let desc = document.getElementById('expenseDesc').value;
+  let amount = parseFloat(document.getElementById('expenseAmount').value);
+
+  if(!desc ||!amount || amount <= 0) {
+    alert("Lagyan mo ng description at valid amount!");
     return;
   }
 
-  let stockData = JSON.parse(localStorage.getItem('stock')) || {};
-  let priceData = JSON.parse(localStorage.getItem('prices')) || {};
+  let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+  expenses.unshift({
+    date: new Date().toLocaleString(),
+    desc: desc,
+    amount: amount
+  });
 
-  stockData[name] = parseInt(stock);
-  priceData[name] = parseInt(price);
+  localStorage.setItem('expenses', JSON.stringify(expenses));
 
-  localStorage.setItem('stock', JSON.stringify(stockData));
-  localStorage.setItem('prices', JSON.stringify(priceData));
+  document.getElementById('expenseDesc').value = '';
+  document.getElementById('expenseAmount').value = '';
 
-  document.getElementById('itemName').value = '';
-  document.getElementById('itemStock').value = '';
-  document.getElementById('itemPrice').value = '';
-
-  loadData();
+  loadExpenses();
+  alert("Expense added!");
 }
 
-function updateStock(item, value) {
-  let stockData = JSON.parse(localStorage.getItem('stock')) || {};
-  stockData[item] = parseInt(value);
-  localStorage.setItem('stock', JSON.stringify(stockData));
-}
+function loadExpenses() {
+  let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+  let html = `
+    <table>
+      <tr>
+        <th>Date</th>
+        <th>Description</th>
+        <th>Amount</th>
+        <th>Action</th>
+      </tr>
+  `;
 
-function updatePrice(item, value) {
-  let priceData = JSON.parse(localStorage.getItem('prices')) || {};
-  priceData[item] = parseInt(value);
-  localStorage.setItem('prices', JSON.stringify(priceData));
-}
-
-function deleteItem(item) {
-  if(confirm(`Delete ${item}?`)) {
-    let stockData = JSON.parse(localStorage.getItem('stock')) || {};
-    let priceData = JSON.parse(localStorage.getItem('prices')) || {};
-    delete stockData[item];
-    delete priceData[item];
-    localStorage.setItem('stock', JSON.stringify(stockData));
-    localStorage.setItem('prices', JSON.stringify(priceData));
-    loadData();
+  if(expenses.length === 0) {
+    html += `<tr><td colspan="4" style="text-align:center; padding:20px;">No expenses yet</td></tr>`;
+  } else {
+    expenses.forEach((exp, idx) => {
+      html += `
+        <tr>
+          <td>${exp.date}</td>
+          <td>${exp.desc}</td>
+          <td style="text-align:right;">₱${exp.amount}</td>
+          <td style="text-align:center;">
+            <button onclick="deleteExpense(${idx})" style="background:#f44336; color:white; border:none; padding:5px 10px; border-radius:5px;">Delete</button>
+          </td>
+        </tr>
+      `;
+    });
   }
+
+  html += `</table>`;
+  document.getElementById('expensesTable').innerHTML = html;
 }
 
-function deleteSale(index) {
-  if(confirm("Delete this sale?")) {
-    let sales = JSON.parse(localStorage.getItem('salesHistory')) || [];
-    sales.splice(index, 1);
-    localStorage.setItem('salesHistory', JSON.stringify(sales));
-    loadData();
-  }
-}
-
-function deleteExpense(index) {
+function deleteExpense(idx) {
   if(confirm("Delete this expense?")) {
     let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-    expenses.splice(index, 1);
+    expenses.splice(idx, 1);
     localStorage.setItem('expenses', JSON.stringify(expenses));
-    loadData();
+    loadExpenses();
   }
 }
 
-// ADMIN RESET FUNCTIONS
 function resetStock() {
-  let password = prompt("Ilagay ang Admin Password para i-reset ang Stock:");
-
-  if(password === ADMIN_PASSWORD) {
-    if(confirm("Sigurado ka ba? Mawawala ang current stock values.")) {
-
-      let newStock = {
-        "Pork Siomai 65": 50,
-        "Chicken Siomai 65": 50,
-        "Beef Siomai 65": 30,
-        "Shrimp Siomai 65": 30,
-        "Pork Siomai 30": 40,
-        "Chicken Siomai 30": 40,
-        "Beef Siomai 30": 20,
-        "Shrimp Siomai 30": 20,
-        "Japanese Siomai 30": 20,
-        "Big Pork Siomai": 15,
-        "Big Chicken Siomai": 15,
-        "Big Beef Siomai": 15,
-        "Big Japanese Siomai": 15,
-        "Gyoza Dumplings": 30,
-        "Sharksfin Dumplings": 30,
-        "Hakaw Dumplings": 30,
-        "Jumbo Asado Siopao": 15,
-        "Jumbo Bola-Bola Siopao": 15,
-        "Mini Asado Siopao": 20,
-        "Mini Bola-Bola Siopao": 20,
-        "Chili Garlic Sauce": 20,
-        "Siopao Sauce": 20
-      };
-
-      localStorage.setItem('stock', JSON.stringify(newStock));
-      alert("✅ Stock na-reset na!");
-      location.reload();
-    }
-  } else if(password!== null) {
-    alert("❌ Mali ang password!");
+  let pass = prompt("Enter admin password:");
+  if(pass!== ADMIN_PASSWORD) {
+    alert("Wrong password!");
+    return;
+  }
+  if(confirm("Reset all stock to default values?")) {
+    localStorage.setItem('stock', JSON.stringify(defaultStock));
+    loadStockTable();
+    alert("Stock reset done!");
   }
 }
 
 function resetPrice() {
-  let password = prompt("Ilagay ang Admin Password para i-reset ang Price:");
-
-  if(password === ADMIN_PASSWORD) {
-    if(confirm("Sigurado ka ba? Mawawala ang current price values.")) {
-
-      let newPrices = {
-        "Pork Siomai 65": 65,
-        "Chicken Siomai 65": 65,
-        "Beef Siomai 65": 65,
-        "Shrimp Siomai 65": 65,
-        "Pork Siomai 30": 30,
-        "Chicken Siomai 30": 30,
-        "Beef Siomai 30": 30,
-        "Shrimp Siomai 30": 30,
-        "Japanese Siomai 30": 30,
-        "Big Pork Siomai": 85,
-        "Big Chicken Siomai": 85,
-        "Big Beef Siomai": 85,
-        "Big Japanese Siomai": 85,
-        "Gyoza Dumplings": 70,
-        "Sharksfin Dumplings": 70,
-        "Hakaw Dumplings": 70,
-        "Jumbo Asado Siopao": 45,
-        "Jumbo Bola-Bola Siopao": 45,
-        "Mini Asado Siopao": 25,
-        "Mini Bola-Bola Siopao": 25,
-        "Chili Garlic Sauce": 25,
-        "Siopao Sauce": 20
-      };
-
-      localStorage.setItem('prices', JSON.stringify(newPrices));
-      alert("✅ Price na-reset na!");
-      location.reload();
-    }
-  } else if(password!== null) {
-    alert("❌ Mali ang password!");
+  let pass = prompt("Enter admin password:");
+  if(pass!== ADMIN_PASSWORD) {
+    alert("Wrong password!");
+    return;
+  }
+  if(confirm("Reset all prices to default values?")) {
+    localStorage.setItem('price', JSON.stringify(defaultPrice));
+    loadStockTable();
+    alert("Price reset done!");
   }
 }
 
-function resetSales() {
-  let password = prompt("Ilagay ang Admin Password para i-reset ang Sales & Expenses:");
-
-  if(password === ADMIN_PASSWORD) {
-    if(confirm("WARNING! Buburahin nito LAHAT ng sales at expenses. Hindi na mababawi. Sigurado ka?")) {
-
-      localStorage.removeItem('salesHistory');
-      localStorage.removeItem('expenses');
-
-      alert("✅ Sales at Expenses na-reset na!");
-      location.reload();
-    }
-  } else if(password!== null) {
-    alert("❌ Mali ang password!");
+function resetSalesExpenses() {
+  let pass = prompt("Enter admin password:");
+  if(pass!== ADMIN_PASSWORD) {
+    alert("Wrong password!");
+    return;
+  }
+  if(confirm("DELETE ALL sales and expenses? This cannot be undone!")) {
+    localStorage.removeItem('sales');
+    localStorage.removeItem('expenses');
+    loadSales();
+    loadExpenses();
+    alert("All sales and expenses deleted!");
   }
 }
 </script>
