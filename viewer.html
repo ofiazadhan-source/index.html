@@ -3,357 +3,222 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Viewer Mode - DHAN SIOMAI</title>
+<title>DHAN SIOMAI Viewer</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 * {margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif;}
 body {background:#f5f5f5; padding:15px;}
-.header {
-  background:linear-gradient(135deg, #ff6b35, #ff4500);
-  color:white; padding:20px; border-radius:15px; margin-bottom:20px;
-  text-align:center; position:relative;
-}
-.logout-btn {
-  position:absolute; right:15px; top:15px; background:white; color:#ff6b35;
-  border:none; padding:8px 15px; border-radius:8px; font-weight:700;
-  cursor:pointer;
-}
-.filter-bar {
-  background:white; padding:15px; border-radius:12px; margin-bottom:15px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.1);
-  display:flex; gap:10px; flex-wrap:wrap; align-items:center;
-}
-.filter-bar select,.filter-bar input {
-  padding:8px 12px; border:1px solid #ddd; border-radius:8px; font-size:14px;
-}
-.filter-bar button {
-  padding:8px 15px; background:#ff6b35; color:white; border:none;
-  border-radius:8px; font-weight:700; cursor:pointer;
-}
-.stats-grid {
-  display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:20px;
-}
-.stat-card {
-  padding:15px; border-radius:12px; text-align:center; color:white;
-}
-.stat-card.green {background:#4caf50;}
-.stat-card.red {background:#f44336;}
-.stat-card.blue {background:#2196f3;}
-.stat-card h3 {font-size:24px; margin-top:5px;}
-.section {
-  background:white; border-radius:12px; padding:15px; margin-bottom:15px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.1);
-}
-.section h3 {color:#ff6b35; margin-bottom:15px;}
+.header {background:linear-gradient(135deg, #ff6b35, #ff4500); color:white; padding:15px; border-radius:12px; margin-bottom:20px; text-align:center;}
+.header h2 {font-size:20px;}
+.summary {display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:20px;}
+.summary-card {padding:15px; border-radius:12px; color:white; text-align:center;}
+.summary-card.green {background:#4CAF50;}
+.summary-card.red {background:#f44336;}
+.summary-card.blue {background:#2196F3;}
+.summary-card h4 {font-size:13px; margin-bottom:5px; font-weight:400;}
+.summary-card h2 {font-size:22px;}
+.card {background:white; padding:15px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08); margin-bottom:15px;}
+.card h3 {color:#ff6b35; margin-bottom:15px; font-size:18px;}
 table {width:100%; border-collapse:collapse;}
-th, td {padding:10px; text-align:left; border-bottom:1px solid #eee;}
-th {background:#ff6b35; color:white;}
-.badge {
-  display:inline-block; padding:5px 10px; border-radius:6px;
-  color:white; font-weight:600; font-size:13px;
-}
-.category-folder {
-  margin-bottom:10px; border:1px solid #ddd; border-radius:8px;
-  overflow:hidden;
-}
-.category-header {
-  padding:12px; background:#fff3f0; cursor:pointer; font-weight:700;
-  display:flex; justify-content:space-between;
-  align-items:center;
-}
-.category-content {
-  display:none;
-  padding:10px;
-}
-.arrow {
-  transition:0.3s;
-}
+th {background:#ff6b35; color:white; padding:10px; text-align:left; font-size:14px;}
+td {padding:10px; border-bottom:1px solid #eee; font-size:14px;}
+.category {background:#fff3f0; padding:10px; margin-bottom:8px; border-radius:8px; cursor:pointer; display:flex; justify-content:space-between; font-weight:700; color:#ff6b35;}
+.category-content {display:none; padding-left:10px;}
+.category-content.active {display:block;}
+.product-item {padding:8px 0; border-bottom:1px solid #eee; display:flex; justify-content:space-between;}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h2>👁️ Viewer Mode</h2>
-  <p>Read Only - Sales, Expenses, Stock, Price</p>
-  <button class="logout-btn" onclick="window.location.href='index.html'">Logout</button>
+  <h2>📊 DHAN SIOMAI VIEWER</h2>
 </div>
 
-<div class="filter-bar">
-  <label>Filter by Date:</label>
-  <select id="dateFilter" onchange="loadData()">
-    <option value="all">All Time</option>
-    <option value="today">Today</option>
-    <option value="week">This Week</option>
-    <option value="month">This Month</option>
-    <option value="custom">Custom Date</option>
-  </select>
-  <input type="date" id="startDate" style="display:none;" onchange="loadData()">
-  <input type="date" id="endDate" style="display:none;" onchange="loadData()">
-  <button onclick="exportCSV()">📊 Export CSV</button>
-</div>
-
-<div class="stats-grid">
-  <div class="stat-card green">
-    <div>Total Sales</div>
-    <h3>₱<span id="totalSales">0</span></h3>
+<div class="summary">
+  <div class="summary-card green">
+    <h4>Total Sales</h4>
+    <h2 id="totalSales">₱0</h2>
   </div>
-  <div class="stat-card red">
-    <div>Expenses</div>
-    <h3>₱<span id="totalExpenses">0</span></h3>
+  <div class="summary-card red">
+    <h4>Expenses</h4>
+    <h2 id="totalExpenses">₱0</h2>
   </div>
-  <div class="stat-card blue">
-    <div>Net Profit</div>
-    <h3>₱<span id="netProfit">0</span></h3>
+  <div class="summary-card blue">
+    <h4>Net Profit</h4>
+    <h2 id="netProfit">₱0</h2>
   </div>
 </div>
 
-<div class="section">
+<div class="card">
   <h3>📦 Products & Stock</h3>
-  <div id="productsStock"></div>
+  <div id="productList"></div>
 </div>
 
-<div class="section">
+<div class="card">
   <h3>💰 Recent Sales</h3>
-  <div style="overflow-x:auto;">
-    <table id="salesTable">
-      <thead>
-        <tr><th>Date</th><th>Item</th><th>Qty</th><th>Subtotal</th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+  <div id="salesTable"></div>
 </div>
 
-<div class="section">
+<div class="card">
   <h3>🧾 Recent Expenses</h3>
-  <div style="overflow-x:auto;">
-    <table id="expensesTable">
-      <thead>
-        <tr><th>Date</th><th>Item/Description</th><th>Amount</th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+  <div id="expensesTable"></div>
 </div>
 
 <script>
+let products = {
+  "Siomai 65": [
+    {name:"Pork Siomai 65", price:150},
+    {name:"Chicken Siomai 65", price:150},
+    {name:"Beef Siomai 65", price:150},
+    {name:"Shrimp Siomai 65", price:150}
+  ],
+  "Siomai 30": [
+    {name:"Pork Siomai 30", price:80},
+    {name:"Chicken Siomai 30", price:80},
+    {name:"Beef Siomai 30", price:80},
+    {name:"Shrimp Siomai 30", price:80}
+  ],
+  "Big Siomai": [
+    {name:"Big Pork Siomai", price:200},
+    {name:"Big Chicken Siomai", price:200},
+    {name:"Big Beef Siomai", price:200}
+  ],
+  "Dumplings": [
+    {name:"Gyoza Dumplings", price:180},
+    {name:"Sharksfin Dumplings", price:180},
+    {name:"Hakaw Dumplings", price:180}
+  ],
+  "Siopao": [
+    {name:"Jumbo Asado Siopao", price:120},
+    {name:"Jumbo Bola-Bola Siopao", price:120},
+    {name:"Mini Asado Siopao", price:60},
+    {name:"Mini Bola-Bola Siopao", price:60}
+  ],
+  "Sauce": [
+    {name:"Chili Garlic Sauce", price:50},
+    {name:"Siopao Sauce", price:40}
+  ]
+};
+
 window.onload = function() {
-  loadData();
-  setInterval(loadData, 5000);
-
-  document.getElementById('dateFilter').addEventListener('change', function() {
-    let custom = this.value === 'custom';
-    document.getElementById('startDate').style.display = custom? 'block' : 'none';
-    document.getElementById('endDate').style.display = custom? 'block' : 'none';
-  });
+  loadSummary();
+  loadProducts();
+  loadSales();
+  loadExpenses();
 }
 
-function getDateRange() {
-  let filter = document.getElementById('dateFilter').value;
-  let now = new Date();
-  let start, end;
-
-  if(filter === 'today') {
-    start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-  } else if(filter === 'week') {
-    let day = now.getDay();
-    start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - day);
-    end = new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000);
-  } else if(filter === 'month') {
-    start = new Date(now.getFullYear(), now.getMonth(), 1);
-    end = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-  } else if(filter === 'custom') {
-    start = document.getElementById('startDate').value? new Date(document.getElementById('startDate').value) : null;
-    end = document.getElementById('endDate').value? new Date(document.getElementById('endDate').value) : null;
-    if(end) end.setDate(end.getDate() + 1);
-  }
-
-  return {start, end};
-}
-
-function loadData() {
-  let salesHistory = JSON.parse(localStorage.getItem('salesHistory')) || [];
+function loadSummary() {
+  let sales = JSON.parse(localStorage.getItem('sales')) || [];
   let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-  let stock = JSON.parse(localStorage.getItem('stock')) || {};
-  let prices = JSON.parse(localStorage.getItem('prices')) || {};
 
-  let {start, end} = getDateRange();
-
-  let filteredSales = salesHistory.filter(s => {
-    let saleDate = new Date(s.time);
-    if(start && saleDate < start) return false;
-    if(end && saleDate >= end) return false;
-    return true;
-  });
-
-  let filteredExpenses = expenses.filter(e => {
-    let expDate = new Date(e.time);
-    if(start && expDate < start) return false;
-    if(end && expDate >= end) return false;
-    return true;
-  });
-
-  let totalSales = filteredSales.reduce((sum, s) => sum + s.total, 0);
-  let totalExpenses = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
+  let totalSales = sales.reduce((sum, s) => sum + s.subtotal, 0);
+  let totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
   let netProfit = totalSales - totalExpenses;
 
-  document.getElementById('totalSales').textContent = totalSales;
-  document.getElementById('totalExpenses').textContent = totalExpenses;
-  document.getElementById('netProfit').textContent = netProfit;
-
-  loadProductsStock(stock, prices);
-
-  let salesBody = document.querySelector('#salesTable tbody');
-  salesBody.innerHTML = '';
-  filteredSales.slice(-50).reverse().forEach(sale => {
-    sale.items.forEach(item => {
-      salesBody.innerHTML += `
-        <tr>
-          <td>${sale.time}</td>
-          <td><span class="badge" style="background:${getColor(item.name)}">${item.name}</span></td>
-          <td>${item.qty}</td>
-          <td>₱${item.subtotal}</td>
-        </tr>
-      `;
-    });
-  });
-
-  let expensesBody = document.querySelector('#expensesTable tbody');
-  expensesBody.innerHTML = '';
-  filteredExpenses.slice(-50).reverse().forEach(exp => {
-    let desc = exp.item || exp.description || exp.name || 'No description';
-    expensesBody.innerHTML += `
-      <tr>
-        <td>${exp.time}</td>
-        <td>${desc}</td>
-        <td>₱${exp.amount}</td>
-      </tr>
-    `;
-  });
+  document.getElementById('totalSales').textContent = '₱' + totalSales;
+  document.getElementById('totalExpenses').textContent = '₱' + totalExpenses;
+  document.getElementById('netProfit').textContent = '₱' + netProfit;
 }
 
-function loadProductsStock(stock, prices) {
-  const products = [
-    {name:"Pork Siomai 65", cat:"Siomai 65"},
-    {name:"Chicken Siomai 65", cat:"Siomai 65"},
-    {name:"Beef Siomai 65", cat:"Siomai 65"},
-    {name:"Shrimp Siomai 65", cat:"Siomai 65"},
-    {name:"Pork Siomai 30", cat:"Siomai 30"},
-    {name:"Chicken Siomai 30", cat:"Siomai 30"},
-    {name:"Beef Siomai 30", cat:"Siomai 30"},
-    {name:"Shrimp Siomai 30", cat:"Siomai 30"},
-    {name:"Japanese Siomai 30", cat:"Siomai 30"},
-    {name:"Big Pork Siomai", cat:"Big Siomai"},
-    {name:"Big Chicken Siomai", cat:"Big Siomai"},
-    {name:"Big Beef Siomai", cat:"Big Siomai"},
-    {name:"Big Japanese Siomai", cat:"Big Siomai"},
-    {name:"Gyoza Dumplings", cat:"Dumplings"},
-    {name:"Sharksfin Dumplings", cat:"Dumplings"},
-    {name:"Hakaw Dumplings", cat:"Dumplings"},
-    {name:"Jumbo Asado Siopao", cat:"Siopao"},
-    {name:"Jumbo Bola-Bola Siopao", cat:"Siopao"},
-    {name:"Mini Asado Siopao", cat:"Siopao"},
-    {name:"Mini Bola-Bola Siopao", cat:"Siopao"},
-    {name:"Chili Garlic Sauce", cat:"Sauce"},
-    {name:"Siopao Sauce", cat:"Sauce"}
-  ];
+function loadProducts() {
+  let stock = JSON.parse(localStorage.getItem('stock')) || {};
+  let price = JSON.parse(localStorage.getItem('price')) || {};
+  let html = '';
 
-  let grouped = {};
-  products.forEach(p => {
-    if(!grouped[p.cat]) grouped[p.cat] = [];
-    grouped[p.cat].push(p);
-  });
-
-  let container = document.getElementById('productsStock');
-  container.innerHTML = '';
-  let idx = 0;
-
-  Object.keys(grouped).forEach(cat => {
-    let folderId = 'cat' + idx;
-    let html = `
-      <div class="category-folder" id="${folderId}">
-        <div class="category-header" onclick="toggleCat('${folderId}')">
-          <span>📁 ${cat}</span>
-          <span class="arrow" id="arrow-${folderId}">▶</span>
-        </div>
-        <div class="category-content" id="content-${folderId}">
-          <table style="width:100%">
-            <tr><th>Item</th><th>Stock</th><th>Price</th></tr>
+  Object.keys(products).forEach((cat, idx) => {
+    html += `
+      <div class="category" onclick="toggleCat(${idx})">
+        <span>📁 ${cat}</span>
+        <span id="arrow${idx}">▶</span>
+      </div>
+      <div class="category-content" id="cat${idx}">
     `;
 
-    grouped[cat].forEach(p => {
+    products[cat].forEach(prod => {
+      let stockQty = stock[prod.name] || 0;
+      let prodPrice = price[prod.name] || prod.price;
+      html += `
+        <div class="product-item">
+          <span>${prod.name}</span>
+          <span>Stock: ${stockQty} | ₱${prodPrice}</span>
+        </div>
+      `;
+    });
+
+    html += `</div>`;
+  });
+
+  document.getElementById('productList').innerHTML = html;
+}
+
+function toggleCat(idx) {
+  let content = document.getElementById(`cat${idx}`);
+  let arrow = document.getElementById(`arrow${idx}`);
+  content.classList.toggle('active');
+  arrow.textContent = content.classList.contains('active')? '▼' : '▶';
+}
+
+function loadSales() {
+  let sales = JSON.parse(localStorage.getItem('sales')) || [];
+  let html = `
+    <table>
+      <tr>
+        <th>Date</th>
+        <th>Item</th>
+        <th>Qty</th>
+        <th>Subtotal</th>
+      </tr>
+  `;
+
+  if(sales.length === 0) {
+    html += `<tr><td colspan="4" style="text-align:center; padding:20px;">No sales yet</td></tr>`;
+  } else {
+    sales.slice(0, 20).forEach((sale) => {
       html += `
         <tr>
-          <td>${p.name}</td>
-          <td>${stock[p.name] || 0}</td>
-          <td>₱${prices[p.name] || '-'}</td>
+          <td>${sale.date}</td>
+          <td>${sale.item}</td>
+          <td>${sale.qty}</td>
+          <td>₱${sale.subtotal}</td>
         </tr>
       `;
     });
-
-    html += `</table></div></div>`;
-    container.innerHTML += html;
-    idx++;
-  });
-}
-
-function toggleCat(id) {
-  let content = document.getElementById('content-' + id);
-  let arrow = document.getElementById('arrow-' + id);
-
-  if(content.style.display === 'block') {
-    content.style.display = 'none';
-    arrow.style.transform = 'rotate(0deg)';
-  } else {
-    content.style.display = 'block';
-    arrow.style.transform = 'rotate(90deg)';
   }
+
+  html += `</table>`;
+  document.getElementById('salesTable').innerHTML = html;
 }
 
-function getColor(name) {
-  const colors = ['#f44336', '#ff9800', '#9c27b0', '#3f51b5', '#009688', '#ff5722'];
-  let hash = 0;
-  for(let i=0; i<name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  return colors[Math.abs(hash) % colors.length];
-}
-
-function exportCSV() {
-  let salesHistory = JSON.parse(localStorage.getItem('salesHistory')) || [];
+function loadExpenses() {
   let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-  let {start, end} = getDateRange();
+  let html = `
+    <table>
+      <tr>
+        <th>Date</th>
+        <th>Item/Description</th>
+        <th>Amount</th>
+      </tr>
+  `;
 
-  let filteredSales = salesHistory.filter(s => {
-    let saleDate = new Date(s.time);
-    if(start && saleDate < start) return false;
-    if(end && saleDate >= end) return false;
-    return true;
-  });
+  if(expenses.length === 0) {
+    html += `<tr><td colspan="3" style="text-align:center; padding:20px;">No expenses yet</td></tr>`;
+  } else {
+    expenses.forEach((exp) => {
+      let desc = exp.desc || exp.description || "No description";
+      let date = exp.date || "No date";
 
-  let csv = 'Date,Type,Item,Qty,Amount\n';
-
-  filteredSales.forEach(sale => {
-    sale.items.forEach(item => {
-      csv += `${sale.time},Sale,${item.name},${item.qty},${item.subtotal}\n`;
+      html += `
+        <tr>
+          <td>${date}</td>
+          <td>${desc}</td>
+          <td style="text-align:right;">₱${exp.amount}</td>
+        </tr>
+      `;
     });
-  });
+  }
 
-  expenses.filter(e => {
-    let expDate = new Date(e.time);
-    if(start && expDate < start) return false;
-    if(end && expDate >= end) return false;
-    return true;
-  }).forEach(exp => {
-    let desc = exp.item || exp.description || exp.name || 'No description';
-    csv += `${exp.time},Expense,${desc},1,${exp.amount}\n`;
-  });
-
-  let blob = new Blob([csv], {type: 'text/csv'});
-  let url = window.URL.createObjectURL(blob);
-  let a = document.createElement('a');
-  a.href = url;
-  a.download = 'dhan-siomai-report.csv';
-  a.click();
+  html += `</table>`;
+  document.getElementById('expensesTable').innerHTML = html;
 }
 </script>
 </body>
