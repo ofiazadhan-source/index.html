@@ -165,6 +165,20 @@ const emojis = {
 window.onload = function() {
   renderProducts();
   renderCart();
+
+  // Force: Siomai 65 lang ang bukas, iba sarado
+  let allContents = document.querySelectorAll('.category-content');
+  let allArrows = document.querySelectorAll('[id^="arrow"]');
+
+  allContents.forEach((content, i) => {
+    if(i === 0) {
+      content.classList.add('active');
+      allArrows[i].textContent = '▼';
+    } else {
+      content.classList.remove('active');
+      allArrows[i].textContent = '▶';
+    }
+  });
 }
 
 function renderProducts() {
@@ -176,9 +190,9 @@ function renderProducts() {
       <div class="category">
         <div class="category-header" onclick="toggleCat(${idx})">
           <span>📁 ${cat}</span>
-          <span id="arrow${idx}">${idx==0?'▼':'▶'}</span>
+          <span id="arrow${idx}">▶</span>
         </div>
-        <div class="category-content ${idx==0?'active':''}" id="cat${idx}">
+        <div class="category-content" id="cat${idx}">
     `;
 
     products[cat].forEach(prod => {
