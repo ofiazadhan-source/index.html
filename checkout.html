@@ -9,7 +9,6 @@
 * {margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif;}
 body {background:#f5f5f5; padding:20px;}
 .container {max-width:600px; margin:0 auto; background:white; border-radius:12px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.1);}
-h2 {color:#ff6b35; margin-bottom:10px; text-align:center;}
 .receipt-header {text-align:center; margin-bottom:15px; border-bottom:2px dashed #ddd; padding-bottom:15px;}
 .receipt-header h3 {font-size:18px; margin-bottom:5px;}
 .receipt-header p {font-size:12px; color:#666;}
@@ -24,8 +23,8 @@ h2 {color:#ff6b35; margin-bottom:10px; text-align:center;}
 .btn-back {background:#666; color:white;}
 @media print {
   body {background:white; padding:0;}
-.container {box-shadow:none; padding:0;}
-.btn-group {display:none;}
+ .container {box-shadow:none; padding:0;}
+ .btn-group {display:none;}
 }
 </style>
 </head>
@@ -100,7 +99,6 @@ window.onload = function() {
   document.getElementById('totalItems').textContent = totalItems;
   document.getElementById('totalPrice').textContent = '₱' + total;
 
-  // Payment info
   if(paymentData) {
     const payment = JSON.parse(decodeURIComponent(paymentData));
     let payHtml = '';
